@@ -8576,7 +8576,7 @@ index ef2fcbf..fd10616 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 3389c64..2a4488a 100644
+index 355f246..b51cec0 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
 @@ -168,6 +168,7 @@ ChatCommand * ChatHandler::getCommandTable()
@@ -8596,7 +8596,7 @@ index 3389c64..2a4488a 100644
          { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", NULL },
          { "cooldown",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleCooldownCommand,            "", NULL },
          { "unlearn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnLearnCommand,             "", NULL },
-@@ -527,6 +530,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -526,6 +529,7 @@ ChatCommand * ChatHandler::getCommandTable()
          { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
          { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCombatStopCommand,          "", NULL },
          { "sendmessage",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
@@ -8605,7 +8605,7 @@ index 3389c64..2a4488a 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 8c6f19d..94d2f77 100644
+index 6ab125f..5d1f772 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
 @@ -319,6 +319,8 @@ class ChatHandler
@@ -8617,7 +8617,7 @@ index 8c6f19d..94d2f77 100644
  
          bool HandleCooldownCommand(const char* args);
          bool HandleUnLearnCommand(const char* args);
-@@ -404,6 +406,7 @@ class ChatHandler
+@@ -403,6 +405,7 @@ class ChatHandler
          bool HandleComeToMeCommand(const char *args);
          bool HandleCombatStopCommand(const char *args);
          bool HandleSendMessageCommand(const char * args);
@@ -8625,7 +8625,7 @@ index 8c6f19d..94d2f77 100644
  
          //! Development Commands
          bool HandleSetValue(const char* args);
-@@ -416,6 +419,7 @@ class ChatHandler
+@@ -415,6 +418,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
          bool HandleGetLootRecipient(const char * args);
@@ -10364,7 +10364,7 @@ index 5672f14..b07146d 100644
      }
  }
 diff --git a/src/game/Language.h b/src/game/Language.h
-index cd48754..261fc3b 100644
+index acdd14b..c46512a 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
 @@ -21,6 +21,8 @@
@@ -10566,7 +10566,7 @@ index 243e393..fb15fab 100644
          SendSysMessage(LANG_BAD_VALUE);
          SetSentErrorMessage(true);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index de6a100..7525ae5 100644
+index 4e84316..983d359 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -10577,7 +10577,7 @@ index de6a100..7525ae5 100644
  #include "InstanceSaveMgr.h"
  #include "InstanceData.h"
  #include "AccountMgr.h"
-@@ -4800,6 +4801,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
+@@ -4834,6 +4835,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
      return true;
  }
  
@@ -10670,7 +10670,7 @@ index de6a100..7525ae5 100644
  bool ChatHandler::HandleBanAccountCommand(const char* args)
  {
      return HandleBanHelper(BAN_ACCOUNT,args);
-@@ -5294,24 +5381,30 @@ bool ChatHandler::HandleFlyModeCommand(const char* args)
+@@ -5328,24 +5415,30 @@ bool ChatHandler::HandleFlyModeCommand(const char* args)
      if(!args)
          return false;
  
@@ -10707,7 +10707,7 @@ index de6a100..7525ae5 100644
      return true;
  }
  
-@@ -6096,3 +6189,9 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
+@@ -6130,3 +6223,9 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
      PSendSysMessage(LANG_SENDMESSAGE,name.c_str(),msg_str);
      return true;
  }
@@ -17002,7 +17002,7 @@ index 81ca688..9822209 100644
          }
      }
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index 1d48a28..5aceeee 100644
+index ab3e98e..ae43f1e 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -52,7 +52,10 @@
@@ -17942,7 +17942,7 @@ index 1d48a28..5aceeee 100644
  bool Player::HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item const* ignoreItem)
  {
      if(spellInfo->EquippedItemClass < 0)
-@@ -18159,9 +18396,34 @@ bool Player::isAllowUseBattleGroundObject()
+@@ -18160,9 +18397,34 @@ bool Player::isAllowUseBattleGroundObject()
  {
      return ( //InBattleGround() &&                            // in battleground - not need, check in other cases
               !IsMounted() &&                                  // not mounted

@@ -185,9 +185,9 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
 +            {
 +                if (Phase1)
-+                    DoStartAttackNoMovement(who);
++                    DoStartNoMovement(who);
 +                else
-+                    DoStartAttackAndMovement(who);
++                    DoStartMovement(who);
 +                
 +                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
 +
@@ -209,9 +209,9 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +        {
 +            //Begin attack
 +            if (Phase1)
-+                DoStartAttackNoMovement(who);
++                DoStartNoMovement(who);
 +            else
-+                DoStartAttackAndMovement(who);
++                DoStartMovement(who);
 +
 +            if (!InCombat)
 +            {

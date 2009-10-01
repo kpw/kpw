@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 715)
+--- Makefile.am	(revision 720)
 +++ Makefile.am	(working copy)
 @@ -51,10 +51,20 @@
  scripts/custom/custom_example.cpp \
@@ -54,7 +54,7 @@ Index: Makefile.am
  scripts/zone/zulaman/zulaman.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 715)
+--- ScriptMgr.cpp	(revision 720)
 +++ ScriptMgr.cpp	(working copy)
 @@ -77,12 +77,22 @@
  extern void AddSC_custom_example();
@@ -1682,7 +1682,7 @@ Index: scripts/guard/g_marcus_jonathan.cpp
 +}
 Index: scripts/guard/guard_ai.cpp
 ===================================================================
---- scripts/guard/guard_ai.cpp	(revision 715)
+--- scripts/guard/guard_ai.cpp	(revision 720)
 +++ scripts/guard/guard_ai.cpp	(working copy)
 @@ -1,26 +1,12 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -1708,7 +1708,7 @@ Index: scripts/guard/guard_ai.cpp
 -/* ScriptData
 -SDName: Guard_AI
 -SD%Complete: 90
--SDComment: 
+-SDComment:
 -SDCategory: Guards
 -EndScriptData */
 +by Myav
@@ -2227,7 +2227,7 @@ Index: scripts/guard/guard_ai.cpp
      else
 Index: scripts/guard/guard_ai.h
 ===================================================================
---- scripts/guard/guard_ai.h	(revision 715)
+--- scripts/guard/guard_ai.h	(revision 720)
 +++ scripts/guard/guard_ai.h	(working copy)
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -3831,7 +3831,7 @@ Index: scripts/guard/thrall.cpp
 +}
 Index: scripts/item/item_scripts.cpp
 ===================================================================
---- scripts/item/item_scripts.cpp	(revision 715)
+--- scripts/item/item_scripts.cpp	(revision 720)
 +++ scripts/item/item_scripts.cpp	(working copy)
 @@ -393,6 +393,25 @@
  }
@@ -3873,7 +3873,7 @@ Index: scripts/item/item_scripts.cpp
      m_scripts[nrscripts++] = newscript;
 Index: scripts/zone/black_temple/boss_supremus.cpp
 ===================================================================
---- scripts/zone/black_temple/boss_supremus.cpp	(revision 715)
+--- scripts/zone/black_temple/boss_supremus.cpp	(revision 720)
 +++ scripts/zone/black_temple/boss_supremus.cpp	(working copy)
 @@ -115,7 +115,7 @@
          CheckTimer = 1000;
@@ -3903,7 +3903,7 @@ Index: scripts/zone/black_temple/boss_supremus.cpp
                  }
 Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
 ===================================================================
---- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 715)
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 720)
 +++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
 @@ -66,7 +66,7 @@
  #define TAINTED_ELEMENTAL           22009
@@ -3985,7 +3985,7 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
      newscript = new Script;
 Index: scripts/zone/deadmines/deadmines.cpp
 ===================================================================
---- scripts/zone/deadmines/deadmines.cpp	(revision 715)
+--- scripts/zone/deadmines/deadmines.cpp	(revision 720)
 +++ scripts/zone/deadmines/deadmines.cpp	(working copy)
 @@ -22,3 +22,223 @@
  EndScriptData */
@@ -4232,7 +4232,7 @@ Index: scripts/zone/deadmines/def_deadmines.h
 +#endif
 Index: scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
 ===================================================================
---- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 715)
+--- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 720)
 +++ scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(working copy)
 @@ -179,6 +179,8 @@
                  m_creature->setFaction(14);
@@ -4364,7 +4364,7 @@ Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_blade
 +}
 Index: scripts/zone/karazhan/boss_nightbane.cpp
 ===================================================================
---- scripts/zone/karazhan/boss_nightbane.cpp	(revision 715)
+--- scripts/zone/karazhan/boss_nightbane.cpp	(revision 720)
 +++ scripts/zone/karazhan/boss_nightbane.cpp	(working copy)
 @@ -22,12 +22,370 @@
  EndScriptData */
@@ -4747,7 +4747,7 @@ Index: scripts/zone/karazhan/boss_nightbane.cpp
 +}
 Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 715)
+--- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 720)
 +++ scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(working copy)
 @@ -121,7 +121,7 @@
                  target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
@@ -6647,7 +6647,7 @@ Index: scripts/zone/zulaman/boss_hexlord.cpp
 +}
 Index: scripts/zone/zulaman/boss_janalai.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_janalai.cpp	(revision 715)
+--- scripts/zone/zulaman/boss_janalai.cpp	(revision 720)
 +++ scripts/zone/zulaman/boss_janalai.cpp	(working copy)
 @@ -29,14 +29,14 @@
  #define SPELL_FLAME_BREATH          43140
@@ -7772,7 +7772,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  }
 Index: scripts/zone/zulaman/boss_nalorakk.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 715)
+--- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 720)
 +++ scripts/zone/zulaman/boss_nalorakk.cpp	(working copy)
 @@ -22,6 +22,7 @@
  EndScriptData */
@@ -8805,7 +8805,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +}
 Index: scripts/zone/zulaman/def_zulaman.h
 ===================================================================
---- scripts/zone/zulaman/def_zulaman.h	(revision 715)
+--- scripts/zone/zulaman/def_zulaman.h	(revision 720)
 +++ scripts/zone/zulaman/def_zulaman.h	(working copy)
 @@ -5,13 +5,14 @@
  #ifndef DEF_ZULAMAN_H
@@ -8832,7 +8832,7 @@ Index: scripts/zone/zulaman/def_zulaman.h
  #endif
 Index: scripts/zone/zulaman/instance_zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/instance_zulaman.cpp	(revision 715)
+--- scripts/zone/zulaman/instance_zulaman.cpp	(revision 720)
 +++ scripts/zone/zulaman/instance_zulaman.cpp	(working copy)
 @@ -24,26 +24,58 @@
  #include "precompiled.h"
@@ -9139,7 +9139,7 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
  InstanceData* GetInstanceData_instance_zulaman(Map* map)
 Index: scripts/zone/zulaman/zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/zulaman.cpp	(revision 715)
+--- scripts/zone/zulaman/zulaman.cpp	(revision 720)
 +++ scripts/zone/zulaman/zulaman.cpp	(working copy)
 @@ -97,6 +97,74 @@
      return new npc_forest_frogAI (_Creature);
@@ -9230,7 +9230,7 @@ Index: scripts/zone/zulaman/zulaman.cpp
  }
 Index: VC71/71ScriptDev2.vcproj
 ===================================================================
---- VC71/71ScriptDev2.vcproj	(revision 715)
+--- VC71/71ScriptDev2.vcproj	(revision 720)
 +++ VC71/71ScriptDev2.vcproj	(working copy)
 @@ -263,6 +263,10 @@
  					<File
@@ -9245,7 +9245,7 @@ Index: VC71/71ScriptDev2.vcproj
  					Name="Deadwind Pass">
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 715)
+--- VC80/80ScriptDev2.vcproj	(revision 720)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="Windows-1252"?>
@@ -9372,7 +9372,7 @@ Index: VC80/80ScriptDev2.vcproj
  					</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 715)
+--- VC90/90ScriptDev2.vcproj	(revision 720)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -407,7 +407,23 @@
  			<Filter
