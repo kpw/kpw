@@ -500,4 +500,4 @@ index 65ba1a8..7434577 100644
 +Anticheat.Movement.Enable = 1
 +Anticheat.Movement.Kick = 1
 +Anticheat.Movement.AlarmCount = 5
-+Anticheat.Movement.AlarmTime = 5000   
++Anticheat.Movement.AlarmTime = 5000

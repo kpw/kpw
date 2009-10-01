@@ -1,0 +1,62 @@
+diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
+index 7faf701..adaed27 100644
+--- a/src/game/Spell.cpp
++++ b/src/game/Spell.cpp
+@@ -1268,6 +1268,12 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+         }
+         case TARGET_CHAIN_DAMAGE:
+         {
++            // Charge casted on self
++            if (m_spellInfo->Effect[i] == SPELL_EFFECT_CHARGE)
++            {
++                TagUnitMap.push_back(m_caster);
++                break;
++            }
+             if (EffectChainTarget <= 1)
+             {
+                 Unit* pUnitTarget = SelectMagnetTarget();
+diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
+index ef129fa..6c57086 100644
+--- a/src/game/SpellEffects.cpp
++++ b/src/game/SpellEffects.cpp
+@@ -5539,10 +5539,14 @@ void Spell::EffectCharge(uint32 /*i*/)
+     if(!unitTarget || !m_caster)
+         return;
+ 
++    Unit *chargeTarget = m_targets.getUnitTarget();
++    if (!chargeTarget)
++        return;
++
+     float x, y, z;
+-    unitTarget->GetContactPoint(m_caster, x, y, z);
+-    if(unitTarget->GetTypeId() != TYPEID_PLAYER)
+-        ((Creature *)unitTarget)->StopMoving();
++    chargeTarget->GetContactPoint(m_caster, x, y, z);
++    if(chargeTarget->GetTypeId() != TYPEID_PLAYER)
++        ((Creature *)chargeTarget)->StopMoving();
+ 
+     // Only send MOVEMENTFLAG_WALK_MODE, client has strange issues with other move flags
+     m_caster->SendMonsterMove(x, y, z, 0, MOVEMENTFLAG_WALK_MODE, 1);
+@@ -5552,7 +5556,7 @@ void Spell::EffectCharge(uint32 /*i*/)
+ 
+     // not all charge effects used in negative spells
+     if ( !IsPositiveSpell(m_spellInfo->Id))
+-        m_caster->Attack(unitTarget,true);
++        m_caster->Attack(chargeTarget,true);
+ }
+ 
+ void Spell::EffectSummonCritter(uint32 i)
+diff --git a/src/game/SpellMgr.cpp b/src/game/SpellMgr.cpp
+index 044b327..b2180d1 100644
+--- a/src/game/SpellMgr.cpp
++++ b/src/game/SpellMgr.cpp
+@@ -310,6 +310,9 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
+         case SPELL_EFFECT_ENERGIZE_PCT:
+             return true;
+ 
++        // Charge casted on self to run - so must be positive
++        case SPELL_EFFECT_CHARGE:
++            return true;
+             // non-positive aura use
+         case SPELL_EFFECT_APPLY_AURA:
+         case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:

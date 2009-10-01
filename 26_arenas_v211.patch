@@ -1,5 +1,5 @@
 diff --git a/src/game/ArenaTeam.cpp b/src/game/ArenaTeam.cpp
-index b8796f6..cac160c 100644
+index 06336fe..52e67b8 100644
 --- a/src/game/ArenaTeam.cpp
 +++ b/src/game/ArenaTeam.cpp
 @@ -51,7 +51,7 @@ bool ArenaTeam::create(uint64 captainGuid, uint32 type, std::string ArenaTeamNam
@@ -11,7 +11,7 @@ index b8796f6..cac160c 100644
  
      CaptainGuid = captainGuid;
      Name = ArenaTeamName;
-@@ -143,10 +143,8 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
+@@ -137,10 +137,8 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
      {
          pl->SetInArenaTeam(Id, GetSlot());
          pl->SetArenaTeamIdInvited(0);
@@ -24,7 +24,7 @@ index b8796f6..cac160c 100644
      }
  
      // hide promote/remove buttons
-@@ -154,18 +152,39 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
+@@ -148,18 +146,39 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
      {
          if(pl)
              pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 6), 1);
@@ -70,7 +70,7 @@ index b8796f6..cac160c 100644
      QueryResult *result = CharacterDatabase.PQuery("SELECT arenateamid,name,captainguid,type,BackgroundColor,EmblemStyle,EmblemColor,BorderStyle,BorderColor FROM arena_team WHERE arenateamid = '%u'", ArenaTeamId);
  
      if(!result)
-@@ -185,6 +204,22 @@ bool ArenaTeam::LoadArenaTeamFromDB(uint32 ArenaTeamId)
+@@ -179,6 +198,22 @@ bool ArenaTeam::LoadArenaTeamFromDB(uint32 ArenaTeamId)
  
      delete result;
  
@@ -93,7 +93,7 @@ index b8796f6..cac160c 100644
      return true;
  }
  
-@@ -212,7 +247,7 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
+@@ -206,7 +241,7 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
  {
      Field *fields;
  
@@ -102,7 +102,7 @@ index b8796f6..cac160c 100644
      if(!result)
          return;
  
-@@ -221,6 +256,14 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
+@@ -215,6 +250,14 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
          fields = result->Fetch();
          ArenaTeamMember newmember;
          newmember.guid          = MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER);
@@ -117,7 +117,7 @@ index b8796f6..cac160c 100644
          LoadPlayerStats(&newmember);
          newmember.played_week   = fields[1].GetUInt32();
          newmember.wons_week     = fields[2].GetUInt32();
-@@ -281,17 +324,36 @@ void ArenaTeam::DelMember(uint64 guid)
+@@ -275,17 +318,36 @@ void ArenaTeam::DelMember(uint64 guid)
      }
  
      Player *player = objmgr.GetPlayer(guid);
@@ -157,7 +157,7 @@ index b8796f6..cac160c 100644
  }
  
  void ArenaTeam::Disband(WorldSession *session)
-@@ -318,6 +380,7 @@ void ArenaTeam::Disband(WorldSession *session)
+@@ -312,6 +374,7 @@ void ArenaTeam::Disband(WorldSession *session)
  
      CharacterDatabase.BeginTransaction();
      CharacterDatabase.PExecute("DELETE FROM arena_team WHERE arenateamid = '%u'", Id);
@@ -165,7 +165,7 @@ index b8796f6..cac160c 100644
      CharacterDatabase.PExecute("DELETE FROM arena_team_stats WHERE arenateamid = '%u'", Id);
      CharacterDatabase.CommitTransaction();
      objmgr.RemoveArenaTeam(this);
-@@ -347,7 +410,7 @@ void ArenaTeam::Roster(WorldSession *session)
+@@ -341,7 +404,7 @@ void ArenaTeam::Roster(WorldSession *session)
              data << uint32(itr->wons_week);                 // wins this week
              data << uint32(itr->played_season);             // played this season
              data << uint32(itr->wons_season);               // wins this season
@@ -174,7 +174,7 @@ index b8796f6..cac160c 100644
          }
          else
          {
-@@ -361,7 +424,7 @@ void ArenaTeam::Roster(WorldSession *session)
+@@ -355,7 +418,7 @@ void ArenaTeam::Roster(WorldSession *session)
              data << uint32(itr->wons_week);                 // wins this week
              data << uint32(itr->played_season);             // played this season
              data << uint32(itr->wons_season);               // wins this season
@@ -183,7 +183,7 @@ index b8796f6..cac160c 100644
          }
      }
      session->SendPacket(&data);
-@@ -396,6 +459,18 @@ void ArenaTeam::Stats(WorldSession *session)
+@@ -390,6 +453,18 @@ void ArenaTeam::Stats(WorldSession *session)
      session->SendPacket(&data);
  }
  
@@ -202,7 +202,7 @@ index b8796f6..cac160c 100644
  void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
  {
      WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8+1+4*6);
-@@ -403,10 +478,20 @@ void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
+@@ -397,10 +472,20 @@ void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
      data << uint8(GetSlot());                               // slot (0...2)
      data << uint32(GetId());                                // arena team id
      data << uint32(stats.rating);                           // rating
@@ -227,7 +227,7 @@ index b8796f6..cac160c 100644
      session->SendPacket(&data);
  }
  
-@@ -499,24 +584,211 @@ bool ArenaTeam::HaveMember( uint64 guid ) const
+@@ -493,24 +578,211 @@ bool ArenaTeam::HaveMember( uint64 guid ) const
      return false;
  }
  
@@ -495,7 +495,7 @@ index c6b9059..d302703 100644
          // already in arena team that size
          return;
 diff --git a/src/game/BattleGround.cpp b/src/game/BattleGround.cpp
-index 7cb417c..8eb0d85 100644
+index 2781ef6..7328b0a 100644
 --- a/src/game/BattleGround.cpp
 +++ b/src/game/BattleGround.cpp
 @@ -24,6 +24,7 @@
@@ -996,7 +996,7 @@ index 7cb417c..8eb0d85 100644
  
      m_Events = 0;
  
-@@ -668,11 +886,12 @@ void BattleGround::Reset()
+@@ -668,6 +886,7 @@ void BattleGround::Reset()
  
      m_InvitedAlliance = 0;
      m_InvitedHorde = 0;
@@ -1004,12 +1004,6 @@ index 7cb417c..8eb0d85 100644
  
      m_Players.clear();
      m_PlayerScores.clear();
- 
--    // reset BGSubclass
-+    // reset BGSubclass (this cleans up creatures and gos as well)
-     this->ResetBGSubclass();
- }
- 
 @@ -704,10 +923,11 @@ void BattleGround::AddPlayer(Player *plr)
      sBattleGroundMgr.BuildPlayerJoinedBattleGroundPacket(&data, plr);
      SendPacketToTeam(team, &data, plr, false);
@@ -1351,10 +1345,18 @@ index 7cb417c..8eb0d85 100644
 +    return count;
 +}
 diff --git a/src/game/BattleGround.h b/src/game/BattleGround.h
-index 9e41e66..2cea3f3 100644
+index 9e41e66..80a20c1 100644
 --- a/src/game/BattleGround.h
 +++ b/src/game/BattleGround.h
-@@ -143,6 +143,18 @@ enum BattleGroundTypeId
+@@ -18,6 +18,7 @@
+ 
+ #ifndef __BATTLEGROUND_H
+ #define __BATTLEGROUND_H
++#define ARENA_PATCH
+ 
+ #include "Common.h"
+ #include "WorldPacket.h"
+@@ -143,6 +144,18 @@ enum BattleGroundTypeId
      BATTLEGROUND_RL     = 8
  };
  
@@ -1373,7 +1375,7 @@ index 9e41e66..2cea3f3 100644
  enum ScoreType
  {
      SCORE_KILLING_BLOWS         = 1,
-@@ -195,6 +207,20 @@ enum BattleGroundTeamId
+@@ -195,6 +208,20 @@ enum BattleGroundTeamId
      BG_TEAM_HORDE           = 1
  };
  
@@ -1394,7 +1396,7 @@ index 9e41e66..2cea3f3 100644
  class BattleGroundScore
  {
      public:
-@@ -224,6 +250,7 @@ class BattleGround
+@@ -224,6 +251,7 @@ class BattleGround
      public:
          /* Construction */
          BattleGround();
@@ -1402,7 +1404,7 @@ index 9e41e66..2cea3f3 100644
          virtual ~BattleGround();
          virtual void Update(time_t diff);                   // must be implemented in BG subclass of BG specific update code, but must in begginning call parent version
          virtual bool SetupBattleGround()                    // must be implemented in BG subclass
-@@ -296,6 +323,7 @@ class BattleGround
+@@ -296,6 +324,7 @@ class BattleGround
          }
          bool HasFreeSlotsForTeam(uint32 Team) const;
          bool HasFreeSlots() const;
@@ -1410,7 +1412,7 @@ index 9e41e66..2cea3f3 100644
  
          bool isArena() const        { return m_IsArena; }
          bool isBattleGround() const { return !m_IsArena; }
-@@ -366,6 +394,7 @@ class BattleGround
+@@ -366,6 +395,7 @@ class BattleGround
  
          uint8 GetTeamIndexByTeamId(uint32 Team) const { return Team == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE; }
          uint32 GetPlayersCountByTeam(uint32 Team) const { return m_PlayersCount[GetTeamIndexByTeamId(Team)]; }
@@ -1418,7 +1420,7 @@ index 9e41e66..2cea3f3 100644
          void UpdatePlayersCountByTeam(uint32 Team, bool remove)
          {
              if(remove)
-@@ -374,6 +403,12 @@ class BattleGround
+@@ -374,6 +404,12 @@ class BattleGround
                  ++m_PlayersCount[GetTeamIndexByTeamId(Team)];
          }
  
@@ -1431,7 +1433,7 @@ index 9e41e66..2cea3f3 100644
          /* Triggers handle */
          // must be implemented in BG subclass
          virtual void HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/) {}
-@@ -390,6 +425,7 @@ class BattleGround
+@@ -390,6 +426,7 @@ class BattleGround
          virtual WorldSafeLocsEntry const* GetClosestGraveYard(float /*x*/, float /*y*/, float /*z*/, uint32 /*team*/)  { return NULL; }
  
          virtual void AddPlayer(Player *plr);                // must be implemented in BG subclass
@@ -1439,7 +1441,7 @@ index 9e41e66..2cea3f3 100644
          virtual void RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPacket);
                                                              // can be extended in in BG subclass
  
-@@ -402,7 +438,8 @@ class BattleGround
+@@ -402,7 +439,8 @@ class BattleGround
          BGCreatures m_BgCreatures;
          void SpawnBGObject(uint32 type, uint32 respawntime);
          bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0);
@@ -1449,7 +1451,7 @@ index 9e41e66..2cea3f3 100644
          bool DelCreature(uint32 type);
          bool DelObject(uint32 type);
          bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, uint32 team);
-@@ -411,6 +448,13 @@ class BattleGround
+@@ -411,6 +449,13 @@ class BattleGround
          void DoorClose(uint32 type);
          const char *GetMangosString(int32 entry);
  
@@ -1463,7 +1465,7 @@ index 9e41e66..2cea3f3 100644
      protected:
          //this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends BattleGround
          void EndNow();
-@@ -443,6 +487,8 @@ class BattleGround
+@@ -443,6 +488,8 @@ class BattleGround
          uint32 m_LastResurrectTime;
          uint32 m_Queue_type;
          uint8  m_ArenaType;                                 // 2=2v2, 3=3v3, 5=5v5
@@ -1472,7 +1474,7 @@ index 9e41e66..2cea3f3 100644
          // this variable is not used .... it can be found in many other ways... but to store it in BG object instance is useless
          //uint8  m_BattleGroundType;                        // 3=BG, 4=arena
          //instead of uint8 (in previous line) is bool used
-@@ -450,6 +496,8 @@ class BattleGround
+@@ -450,6 +497,8 @@ class BattleGround
          uint8  m_Winner;                                    // 0=alliance, 1=horde, 2=none
          int32  m_StartDelayTime;
          bool   m_IsRated;                                   // is this battle rated?
@@ -1481,7 +1483,7 @@ index 9e41e66..2cea3f3 100644
          char const *m_Name;
  
          /* Player lists */
-@@ -468,6 +516,11 @@ class BattleGround
+@@ -468,6 +517,11 @@ class BattleGround
          /* Players count by team */
          uint32 m_PlayersCount[2];
  
@@ -1647,7 +1649,7 @@ index f74f0a6..df46efb 100644
  };
  #endif
 diff --git a/src/game/BattleGroundEY.cpp b/src/game/BattleGroundEY.cpp
-index 5eb6d62..1c81f03 100644
+index 18d0859..cec2379 100644
 --- a/src/game/BattleGroundEY.cpp
 +++ b/src/game/BattleGroundEY.cpp
 @@ -54,9 +54,18 @@ void BattleGroundEY::Update(time_t diff)
@@ -2566,7 +2568,7 @@ index 3b744f0..f699d3e 100644
  }
  
 diff --git a/src/game/BattleGroundMgr.cpp b/src/game/BattleGroundMgr.cpp
-index 046f18b..6a1eb6f 100644
+index 5cee001..420404d 100644
 --- a/src/game/BattleGroundMgr.cpp
 +++ b/src/game/BattleGroundMgr.cpp
 @@ -30,10 +30,13 @@
@@ -2796,7 +2798,7 @@ index 046f18b..6a1eb6f 100644
 -    else
 -        ++m_QueuedPlayers[queue_id].Horde;
 -
--    this->Update(bgTypeId, queue_id);
+-    Update(bgTypeId, queue_id);
 +    info.GroupInfo                  = ginfo;
  
 +    // add the pinfo to ginfo's list
@@ -3118,8 +3120,8 @@ index 046f18b..6a1eb6f 100644
      }
  
      //if no players in queue ... do nothing
--    if (this->m_QueuedPlayers[queue_id].Alliance == 0 && this->m_QueuedPlayers[queue_id].Horde == 0)
-+    if (this->m_QueuedGroups[queue_id].size() == 0)
+-    if (m_QueuedPlayers[queue_id].Alliance == 0 && m_QueuedPlayers[queue_id].Horde == 0)
++    if (m_QueuedGroups[queue_id].size() == 0)
          return;
  
 +    uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(bgTypeId, arenatype);
@@ -3855,7 +3857,7 @@ index 046f18b..6a1eb6f 100644
 +void BattleGroundMgr::InvitePlayer(Player* plr, uint32 bgInstanceGUID, uint32 team)
  {
      // set invited player counters:
-     BattleGround* bg = this->GetBattleGround(bgInstanceGUID);
+     BattleGround* bg = GetBattleGround(bgInstanceGUID);
      if(!bg)
          return;
 +    bg->IncreaseInvitedCount(team);
@@ -4797,7 +4799,7 @@ index 0e9a38b..dd000ce 100644
  };
  #endif
 diff --git a/src/game/BattleGroundWS.cpp b/src/game/BattleGroundWS.cpp
-index dfaf0d0..95bf61e 100644
+index 23c90a7..53c67c1 100644
 --- a/src/game/BattleGroundWS.cpp
 +++ b/src/game/BattleGroundWS.cpp
 @@ -49,6 +49,16 @@ void BattleGroundWS::Update(time_t diff)
@@ -4864,7 +4866,7 @@ index 700f4f8..6e7bbaa 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 1f2bcdd..53b15a0 100644
+index 1f2bcdd..ba7db55 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
 @@ -169,6 +169,7 @@ ChatCommand * ChatHandler::getCommandTable()
@@ -4875,26 +4877,26 @@ index 1f2bcdd..53b15a0 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
  
-@@ -533,6 +534,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -530,6 +531,7 @@ ChatCommand * ChatHandler::getCommandTable()
+         { "damage",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDamageCommand,              "", NULL },
+         { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
+         { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCombatStopCommand,          "", NULL },
++        { "flusharenapoints",    SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,         "",   NULL },
          { "sendmessage",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
          { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
          { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
-+        { "flusharenapoints",    SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,         "",   NULL },
- 
-         { NULL,             0,                  false, NULL,                                           "", NULL }
-     };
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 28d1b3c..6d37ce6 100644
+index 28d1b3c..233acfc 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
-@@ -413,6 +413,7 @@ class ChatHandler
+@@ -411,6 +411,7 @@ class ChatHandler
+         bool HandleComeToMeCommand(const char *args);
+         bool HandleCombatStopCommand(const char *args);
          bool HandleSendMessageCommand(const char * args);
++        bool HandleFlushArenaPointsCommand(const char *args);
          bool HandleRepairitemsCommand(const char* args);
          bool HandleWaterwalkCommand(const char* args);
-+        bool HandleFlushArenaPointsCommand(const char *args);
  
-         //! Development Commands
-         bool HandleSetValue(const char* args);
 @@ -425,6 +426,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
@@ -4904,7 +4906,7 @@ index 28d1b3c..6d37ce6 100644
          Player*   getSelectedPlayer();
          Creature* getSelectedCreature();
 diff --git a/src/game/Group.cpp b/src/game/Group.cpp
-index 36bccee..9ba36c4 100644
+index cb03eda..ebf4916 100644
 --- a/src/game/Group.cpp
 +++ b/src/game/Group.cpp
 @@ -1298,6 +1298,54 @@ void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
@@ -5060,7 +5062,7 @@ index 37b8b14..b590fa6 100644
              // we have to go to instance, and can go to player only if:
              //   1) we are in his group (either as leader or as member)
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 2a12a53..5957b96 100644
+index 2a12a53..962a90c 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -5071,16 +5073,19 @@ index 2a12a53..5957b96 100644
  #include "InstanceSaveMgr.h"
  #include "InstanceData.h"
  #include "AccountMgr.h"
-@@ -6218,3 +6219,9 @@ bool ChatHandler::HandleModifyGenderCommand(const char *args)
-         ChatHandler(player).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full,GetName());
+@@ -6159,6 +6160,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
      return true;
  }
-+
+ 
 +bool ChatHandler::HandleFlushArenaPointsCommand(const char * /*args*/)
 +{
 +    sBattleGroundMgr.DistributeArenaPoints();
 +    return true;
 +}
++
+ bool ChatHandler::HandleModifyGenderCommand(const char *args)
+ {
+     if(!*args)
 diff --git a/src/game/MapInstanced.cpp b/src/game/MapInstanced.cpp
 index 79a8b88..ce4be94 100644
 --- a/src/game/MapInstanced.cpp
@@ -5211,7 +5216,7 @@ index 8ebae23..b4d8402 100644
  }
  
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index 6e0b178..c625b4b 100644
+index a849df1..184dd42 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
 @@ -313,6 +313,8 @@ class ObjectMgr
@@ -5224,7 +5229,7 @@ index 6e0b178..c625b4b 100644
          static CreatureInfo const *GetCreatureTemplate( uint32 id );
          CreatureModelInfo const *GetCreatureModelInfo( uint32 modelid );
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index a89b113..3781cc9 100644
+index bdda338..9b0e912 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -346,8 +346,8 @@ Player::Player (WorldSession *session): Unit()
@@ -5366,7 +5371,7 @@ index a89b113..3781cc9 100644
          return false;
  
 diff --git a/src/game/Player.h b/src/game/Player.h
-index 2d8275e..dbcd46d 100644
+index a5222d3..45e23f8 100644
 --- a/src/game/Player.h
 +++ b/src/game/Player.h
 @@ -1807,24 +1807,32 @@ class MANGOS_DLL_SPEC Player : public Unit
@@ -5494,7 +5499,7 @@ index 6732fc5..050283b 100644
                  return;
              }
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index 61a5e32..9997766 100644
+index ef129fa..c446c87 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -2598,7 +2598,7 @@ void Spell::DoCreateItem(uint32 i, uint32 itemtype)
@@ -5507,7 +5512,7 @@ index 61a5e32..9997766 100644
      }
  }
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 57b0c91..54d257a 100644
+index b64f538..60146a9 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -600,25 +600,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa

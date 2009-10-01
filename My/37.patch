@@ -12,7 +12,7 @@ index 637410c..9be41e5 100644
      }
  }
 diff --git a/src/game/ArenaTeam.cpp b/src/game/ArenaTeam.cpp
-index b8796f6..cac160c 100644
+index 06336fe..52e67b8 100644
 --- a/src/game/ArenaTeam.cpp
 +++ b/src/game/ArenaTeam.cpp
 @@ -51,7 +51,7 @@ bool ArenaTeam::create(uint64 captainGuid, uint32 type, std::string ArenaTeamNam
@@ -24,7 +24,7 @@ index b8796f6..cac160c 100644
  
      CaptainGuid = captainGuid;
      Name = ArenaTeamName;
-@@ -143,10 +143,8 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
+@@ -137,10 +137,8 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
      {
          pl->SetInArenaTeam(Id, GetSlot());
          pl->SetArenaTeamIdInvited(0);
@@ -37,7 +37,7 @@ index b8796f6..cac160c 100644
      }
  
      // hide promote/remove buttons
-@@ -154,18 +152,39 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
+@@ -148,18 +146,39 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
      {
          if(pl)
              pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 6), 1);
@@ -83,7 +83,7 @@ index b8796f6..cac160c 100644
      QueryResult *result = CharacterDatabase.PQuery("SELECT arenateamid,name,captainguid,type,BackgroundColor,EmblemStyle,EmblemColor,BorderStyle,BorderColor FROM arena_team WHERE arenateamid = '%u'", ArenaTeamId);
  
      if(!result)
-@@ -185,6 +204,22 @@ bool ArenaTeam::LoadArenaTeamFromDB(uint32 ArenaTeamId)
+@@ -179,6 +198,22 @@ bool ArenaTeam::LoadArenaTeamFromDB(uint32 ArenaTeamId)
  
      delete result;
  
@@ -106,7 +106,7 @@ index b8796f6..cac160c 100644
      return true;
  }
  
-@@ -212,7 +247,7 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
+@@ -206,7 +241,7 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
  {
      Field *fields;
  
@@ -115,7 +115,7 @@ index b8796f6..cac160c 100644
      if(!result)
          return;
  
-@@ -221,6 +256,14 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
+@@ -215,6 +250,14 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
          fields = result->Fetch();
          ArenaTeamMember newmember;
          newmember.guid          = MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER);
@@ -130,7 +130,7 @@ index b8796f6..cac160c 100644
          LoadPlayerStats(&newmember);
          newmember.played_week   = fields[1].GetUInt32();
          newmember.wons_week     = fields[2].GetUInt32();
-@@ -281,17 +324,36 @@ void ArenaTeam::DelMember(uint64 guid)
+@@ -275,17 +318,36 @@ void ArenaTeam::DelMember(uint64 guid)
      }
  
      Player *player = objmgr.GetPlayer(guid);
@@ -170,7 +170,7 @@ index b8796f6..cac160c 100644
  }
  
  void ArenaTeam::Disband(WorldSession *session)
-@@ -318,6 +380,7 @@ void ArenaTeam::Disband(WorldSession *session)
+@@ -312,6 +374,7 @@ void ArenaTeam::Disband(WorldSession *session)
  
      CharacterDatabase.BeginTransaction();
      CharacterDatabase.PExecute("DELETE FROM arena_team WHERE arenateamid = '%u'", Id);
@@ -178,7 +178,7 @@ index b8796f6..cac160c 100644
      CharacterDatabase.PExecute("DELETE FROM arena_team_stats WHERE arenateamid = '%u'", Id);
      CharacterDatabase.CommitTransaction();
      objmgr.RemoveArenaTeam(this);
-@@ -347,7 +410,7 @@ void ArenaTeam::Roster(WorldSession *session)
+@@ -341,7 +404,7 @@ void ArenaTeam::Roster(WorldSession *session)
              data << uint32(itr->wons_week);                 // wins this week
              data << uint32(itr->played_season);             // played this season
              data << uint32(itr->wons_season);               // wins this season
@@ -187,7 +187,7 @@ index b8796f6..cac160c 100644
          }
          else
          {
-@@ -361,7 +424,7 @@ void ArenaTeam::Roster(WorldSession *session)
+@@ -355,7 +418,7 @@ void ArenaTeam::Roster(WorldSession *session)
              data << uint32(itr->wons_week);                 // wins this week
              data << uint32(itr->played_season);             // played this season
              data << uint32(itr->wons_season);               // wins this season
@@ -196,7 +196,7 @@ index b8796f6..cac160c 100644
          }
      }
      session->SendPacket(&data);
-@@ -396,6 +459,18 @@ void ArenaTeam::Stats(WorldSession *session)
+@@ -390,6 +453,18 @@ void ArenaTeam::Stats(WorldSession *session)
      session->SendPacket(&data);
  }
  
@@ -215,7 +215,7 @@ index b8796f6..cac160c 100644
  void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
  {
      WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8+1+4*6);
-@@ -403,10 +478,20 @@ void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
+@@ -397,10 +472,20 @@ void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
      data << uint8(GetSlot());                               // slot (0...2)
      data << uint32(GetId());                                // arena team id
      data << uint32(stats.rating);                           // rating
@@ -240,7 +240,7 @@ index b8796f6..cac160c 100644
      session->SendPacket(&data);
  }
  
-@@ -499,24 +584,211 @@ bool ArenaTeam::HaveMember( uint64 guid ) const
+@@ -493,24 +578,211 @@ bool ArenaTeam::HaveMember( uint64 guid ) const
      return false;
  }
  
@@ -1227,7 +1227,7 @@ index 0000000..04815b7
 +
 +#endif
 diff --git a/src/game/BattleGround.cpp b/src/game/BattleGround.cpp
-index 7cb417c..011f5a8 100644
+index 2781ef6..ce5bb18 100644
 --- a/src/game/BattleGround.cpp
 +++ b/src/game/BattleGround.cpp
 @@ -24,6 +24,7 @@
@@ -1459,7 +1459,7 @@ index 7cb417c..011f5a8 100644
      {
 -        winmsg = GetMangosString(LANG_BG_A_WINS);
 +        if(isBattleGround())
-+            winmsg = GetMangosString(LANG_BG_A_WINS);
++            winmsg = GetMangosString(LANG_BG_A_WINS); //TODO herald yells this.. (at least in bg_av)
 +        else
 +            winmsg = GetMangosString(LANG_ARENA_GOLD_WINS);
  
@@ -1686,7 +1686,8 @@ index 7cb417c..011f5a8 100644
 +                    }
 +                }
 +            }
-+
+ 
+-        Group * group = plr->GetGroup();
 +            WorldPacket data;
 +            if(SendPacket)
 +            {
@@ -1694,14 +1695,13 @@ index 7cb417c..011f5a8 100644
 +                plr->GetSession()->SendPacket(&data);
 +            }
  
--        Group * group = plr->GetGroup();
-+            // this call is important, because player, when joins to battleground, this method is not called, so it must be called when leaving bg
-+            plr->RemoveBattleGroundQueueId(bgQueueTypeId);
- 
 -        // remove from raid group if exist
 -        if(group && group == GetBgRaid(plr->GetTeam()))
 -        {
 -            if(!group->RemoveMember(guid, 0))               // group was disbanded
++            // this call is important, because player, when joins to battleground, this method is not called, so it must be called when leaving bg
++            plr->RemoveBattleGroundQueueId(bgQueueTypeId);
++
 +            DecreaseInvitedCount(team);
 +            //we should update battleground queue, but only if bg isn't ending
 +            if (GetQueueType() < MAX_BATTLEGROUND_QUEUES)
@@ -1772,7 +1772,7 @@ index 7cb417c..011f5a8 100644
  
      m_Events = 0;
  
-@@ -668,11 +920,12 @@ void BattleGround::Reset()
+@@ -668,6 +920,7 @@ void BattleGround::Reset()
  
      m_InvitedAlliance = 0;
      m_InvitedHorde = 0;
@@ -1780,12 +1780,6 @@ index 7cb417c..011f5a8 100644
  
      m_Players.clear();
      m_PlayerScores.clear();
- 
--    // reset BGSubclass
-+    // reset BGSubclass (this cleans up creatures and gos as well)
-     this->ResetBGSubclass();
- }
- 
 @@ -704,10 +957,11 @@ void BattleGround::AddPlayer(Player *plr)
      sBattleGroundMgr.BuildPlayerJoinedBattleGroundPacket(&data, plr);
      SendPacketToTeam(team, &data, plr, false);
@@ -1997,10 +1991,19 @@ index 7cb417c..011f5a8 100644
      return true;
  }
  
-@@ -932,8 +1256,27 @@ void BattleGround::DoorOpen(uint32 type)
+@@ -932,8 +1256,36 @@ void BattleGround::DoorOpen(uint32 type)
      }
  }
  
++int32 BattleGround::GetObjectType(uint64 guid)
++{
++    for(uint32 i = 0;i <= m_BgObjects.size(); i++)
++        if(m_BgObjects[i] == guid)
++            return i;
++    sLog.outError("BattleGround: cheating? a player used a gameobject which isnt supposed to be a usable object!");
++    return -1;
++}
++
 +GameObject* BattleGround::GetBGObject(uint32 type)
 +{
 +    GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
@@ -2025,7 +2028,7 @@ index 7cb417c..011f5a8 100644
      if( respawntime == 0 )
      {
          GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
-@@ -942,30 +1285,27 @@ void BattleGround::SpawnBGObject(uint32 type, uint32 respawntime)
+@@ -942,30 +1294,27 @@ void BattleGround::SpawnBGObject(uint32 type, uint32 respawntime)
              //we need to change state from GO_JUST_DEACTIVATED to GO_READY in case battleground is starting again
              if( obj->getLootState() == GO_JUST_DEACTIVATED )
                  obj->SetLootState(GO_READY);
@@ -2063,7 +2066,7 @@ index 7cb417c..011f5a8 100644
  
      Creature* pCreature = new Creature;
      if (!pCreature->Create(objmgr.GenerateLowGuid(HIGHGUID_UNIT), map, entry, teamval))
-@@ -989,9 +1329,39 @@ Creature* BattleGround::AddCreature(uint32 entry, uint32 type, uint32 teamval, f
+@@ -989,9 +1338,39 @@ Creature* BattleGround::AddCreature(uint32 entry, uint32 type, uint32 teamval, f
  
      map->Add(pCreature);
      m_BgCreatures[type] = pCreature->GetGUID();
@@ -2103,7 +2106,7 @@ index 7cb417c..011f5a8 100644
  bool BattleGround::DelCreature(uint32 type)
  {
      Creature *cr = HashMapHolder<Creature>::Find(m_BgCreatures[type]);
-@@ -1072,8 +1442,11 @@ void BattleGround::SendMessageToAll(int32 entry)
+@@ -1072,8 +1451,11 @@ void BattleGround::SendMessageToAll(int32 entry)
  
  void BattleGround::EndNow()
  {
@@ -2115,7 +2118,18 @@ index 7cb417c..011f5a8 100644
  }
  
  // Battleground messages are localized using the dbc lang, they are not client language dependent
-@@ -1151,3 +1524,44 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
+@@ -1123,6 +1505,10 @@ void BattleGround::HandleTriggerBuff(uint64 const& go_guid)
+     SpawnBGObject(index, BUFF_RESPAWN_TIME);
+ }
+ 
++void BattleGround::HandleKillUnit(Creature *creature, Player *killer)
++{
++}
++
+ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
+ {
+     //keep in mind that for arena this will have to be changed a bit
+@@ -1151,3 +1537,29 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
      // to be able to remove insignia
      player->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
  }
@@ -2145,26 +2159,19 @@ index 7cb417c..011f5a8 100644
 +    return count;
 +}
 +
-+int32 BattleGround::GetObjectType(uint64 guid)
-+{
-+    for(uint32 i = 0;i <= m_BgObjects.size(); i++)
-+        if(m_BgObjects[i] == guid)
-+            return i;
-+    sLog.outError("BattleGround: cheating? a player used a gameobject which isnt supposed to be a usable object!");
-+    return -1;
-+}
-+
-+void BattleGround::HandleKillUnit(Creature *creature, Player *killer)
-+{
-+}
-+
-+    
-+
 diff --git a/src/game/BattleGround.h b/src/game/BattleGround.h
-index 9e41e66..ed2dd2b 100644
+index 9e41e66..e488c06 100644
 --- a/src/game/BattleGround.h
 +++ b/src/game/BattleGround.h
-@@ -143,6 +143,18 @@ enum BattleGroundTypeId
+@@ -18,6 +18,7 @@
+ 
+ #ifndef __BATTLEGROUND_H
+ #define __BATTLEGROUND_H
++#define ARENA_PATCH
+ 
+ #include "Common.h"
+ #include "WorldPacket.h"
+@@ -143,6 +144,18 @@ enum BattleGroundTypeId
      BATTLEGROUND_RL     = 8
  };
  
@@ -2183,7 +2190,7 @@ index 9e41e66..ed2dd2b 100644
  enum ScoreType
  {
      SCORE_KILLING_BLOWS         = 1,
-@@ -195,6 +207,20 @@ enum BattleGroundTeamId
+@@ -195,6 +208,20 @@ enum BattleGroundTeamId
      BG_TEAM_HORDE           = 1
  };
  
@@ -2204,7 +2211,7 @@ index 9e41e66..ed2dd2b 100644
  class BattleGroundScore
  {
      public:
-@@ -224,6 +250,7 @@ class BattleGround
+@@ -224,6 +251,7 @@ class BattleGround
      public:
          /* Construction */
          BattleGround();
@@ -2212,7 +2219,7 @@ index 9e41e66..ed2dd2b 100644
          virtual ~BattleGround();
          virtual void Update(time_t diff);                   // must be implemented in BG subclass of BG specific update code, but must in begginning call parent version
          virtual bool SetupBattleGround()                    // must be implemented in BG subclass
-@@ -296,6 +323,7 @@ class BattleGround
+@@ -296,6 +324,7 @@ class BattleGround
          }
          bool HasFreeSlotsForTeam(uint32 Team) const;
          bool HasFreeSlots() const;
@@ -2220,7 +2227,7 @@ index 9e41e66..ed2dd2b 100644
  
          bool isArena() const        { return m_IsArena; }
          bool isBattleGround() const { return !m_IsArena; }
-@@ -317,6 +345,8 @@ class BattleGround
+@@ -317,6 +346,8 @@ class BattleGround
  
          void StartBattleGround();
  
@@ -2229,7 +2236,7 @@ index 9e41e66..ed2dd2b 100644
          /* Location */
          void SetMapId(uint32 MapID) { m_MapId = MapID; }
          uint32 GetMapId() const { return m_MapId; }
-@@ -336,6 +366,7 @@ class BattleGround
+@@ -336,6 +367,7 @@ class BattleGround
          virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
          void SendPacketToTeam(uint32 TeamID, WorldPacket *packet, Player *sender = NULL, bool self = true);
          void SendPacketToAll(WorldPacket *packet);
@@ -2237,7 +2244,7 @@ index 9e41e66..ed2dd2b 100644
          void PlaySoundToTeam(uint32 SoundID, uint32 TeamID);
          void PlaySoundToAll(uint32 SoundID);
          void CastSpellOnTeam(uint32 SpellID, uint32 TeamID);
-@@ -366,6 +397,7 @@ class BattleGround
+@@ -366,6 +398,7 @@ class BattleGround
  
          uint8 GetTeamIndexByTeamId(uint32 Team) const { return Team == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE; }
          uint32 GetPlayersCountByTeam(uint32 Team) const { return m_PlayersCount[GetTeamIndexByTeamId(Team)]; }
@@ -2245,7 +2252,7 @@ index 9e41e66..ed2dd2b 100644
          void UpdatePlayersCountByTeam(uint32 Team, bool remove)
          {
              if(remove)
-@@ -374,11 +406,18 @@ class BattleGround
+@@ -374,11 +407,18 @@ class BattleGround
                  ++m_PlayersCount[GetTeamIndexByTeamId(Team)];
          }
  
@@ -2264,7 +2271,7 @@ index 9e41e66..ed2dd2b 100644
  
          /* Battleground events */
          /* these functions will return true event is possible, but false if player is bugger */
-@@ -390,6 +429,7 @@ class BattleGround
+@@ -390,6 +430,7 @@ class BattleGround
          virtual WorldSafeLocsEntry const* GetClosestGraveYard(float /*x*/, float /*y*/, float /*z*/, uint32 /*team*/)  { return NULL; }
  
          virtual void AddPlayer(Player *plr);                // must be implemented in BG subclass
@@ -2272,7 +2279,7 @@ index 9e41e66..ed2dd2b 100644
          virtual void RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPacket);
                                                              // can be extended in in BG subclass
  
-@@ -402,15 +442,24 @@ class BattleGround
+@@ -402,15 +443,24 @@ class BattleGround
          BGCreatures m_BgCreatures;
          void SpawnBGObject(uint32 type, uint32 respawntime);
          bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0);
@@ -2298,7 +2305,7 @@ index 9e41e66..ed2dd2b 100644
      protected:
          //this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends BattleGround
          void EndNow();
-@@ -443,6 +492,8 @@ class BattleGround
+@@ -443,6 +493,8 @@ class BattleGround
          uint32 m_LastResurrectTime;
          uint32 m_Queue_type;
          uint8  m_ArenaType;                                 // 2=2v2, 3=3v3, 5=5v5
@@ -2307,7 +2314,7 @@ index 9e41e66..ed2dd2b 100644
          // this variable is not used .... it can be found in many other ways... but to store it in BG object instance is useless
          //uint8  m_BattleGroundType;                        // 3=BG, 4=arena
          //instead of uint8 (in previous line) is bool used
-@@ -450,6 +501,8 @@ class BattleGround
+@@ -450,6 +502,8 @@ class BattleGround
          uint8  m_Winner;                                    // 0=alliance, 1=horde, 2=none
          int32  m_StartDelayTime;
          bool   m_IsRated;                                   // is this battle rated?
@@ -2316,7 +2323,7 @@ index 9e41e66..ed2dd2b 100644
          char const *m_Name;
  
          /* Player lists */
-@@ -468,6 +521,11 @@ class BattleGround
+@@ -468,6 +522,11 @@ class BattleGround
          /* Players count by team */
          uint32 m_PlayersCount[2];
  
@@ -2355,10 +2362,10 @@ index dcf23cc..5200a3f 100644
      uint8 capturedNodes = 0;
      for (uint8 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
 diff --git a/src/game/BattleGroundAV.cpp b/src/game/BattleGroundAV.cpp
-index 9421e97..3717fdf 100644
+index 9421e97..e33c381 100644
 --- a/src/game/BattleGroundAV.cpp
 +++ b/src/game/BattleGroundAV.cpp
-@@ -16,27 +16,424 @@
+@@ -16,27 +16,431 @@
   * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   */
  
@@ -2385,7 +2392,7 @@ index 9421e97..3717fdf 100644
  BattleGroundAV::~BattleGroundAV()
  {
 +}
- 
++
 +const uint16 BattleGroundAV::GetBonusHonor(uint8 kills) //TODO: move this function to Battleground.cpp (needs to find a way to get m_MaxLevel)
 +{
 +    if(m_MaxLevel==70)
@@ -2433,6 +2440,10 @@ index 9421e97..3717fdf 100644
 +        //spawn destroyed aura
 +        for(uint8 i=0; i<=9; i++)
 +            SpawnBGObject(BG_AV_OBJECT_BURN_BUILDING_ALLIANCE+i,RESPAWN_IMMEDIATELY);
++        Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
++        if(creature)
++            YellToAll(creature,GetMangosString(LANG_BG_AV_A_CAPTAIN_DEAD),LANG_UNIVERSAL);
++
 +    }
 +    else if ( entry == BG_AV_CreatureInfo[AV_NPC_H_CAPTAIN][0] )
 +    {
@@ -2442,6 +2453,9 @@ index 9421e97..3717fdf 100644
 +        //spawn destroyed aura
 +        for(uint8 i=0; i<=9; i++)
 +            SpawnBGObject(BG_AV_OBJECT_BURN_BUILDING_HORDE+i,RESPAWN_IMMEDIATELY);
++        Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
++        if(creature)
++            YellToAll(creature,GetMangosString(LANG_BG_AV_H_CAPTAIN_DEAD),LANG_UNIVERSAL);
 +    }
 +    else if ( entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_N_4][0] || entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_A_4][0] || entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_H_4][0])
 +        ChangeMineOwner(AV_NORTH_MINE,killer->GetTeam());
@@ -2586,7 +2600,7 @@ index 9421e97..3717fdf 100644
 +    {
 +        type-=(AV_CPLACE_MAX);
 +        cinfoid=int(BG_AV_StaticCreaturePos[type][4]);
-+
+ 
 +        creature = AddCreature(BG_AV_StaticCreatureInfo[cinfoid][0],(type+AV_CPLACE_MAX),BG_AV_StaticCreatureInfo[cinfoid][1],BG_AV_StaticCreaturePos[type][0],BG_AV_StaticCreaturePos[type][1],BG_AV_StaticCreaturePos[type][2],BG_AV_StaticCreaturePos[type][3]);
 +        level = ( BG_AV_StaticCreatureInfo[cinfoid][2] == BG_AV_StaticCreatureInfo[cinfoid][3] ) ? BG_AV_StaticCreatureInfo[cinfoid][2] : urand(BG_AV_StaticCreatureInfo[cinfoid][2],BG_AV_StaticCreatureInfo[cinfoid][3]);
 +        CreatureData &data = objmgr.NewOrExistCreatureData(creature->GetDBTableGUIDLow());
@@ -2620,12 +2634,14 @@ index 9421e97..3717fdf 100644
 +        if (!(m_Events & 0x01))
 +        {
 +            m_Events |= 0x01;
-+            //comment this out if you are running with arenapatch
++
++#ifdef ARENA_PATCH
 +            if(!SetupBattleGround())
 +            {
 +                EndNow();
 +                return;
 +            }
++#endif
 +
 +            uint16 i;
 +            sLog.outDebug("Alterac Valley: entering state STATUS_WAIT_JOIN ...");
@@ -2663,16 +2679,16 @@ index 9421e97..3717fdf 100644
 +			for(BG_AV_Nodes i= BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i )
 +            {
 +                if(m_Nodes[i].Owner)
-+    				PopulateNode(i);
++				PopulateNode(i);
 +            }
 +            //all creatures which don't get despawned through the script are static
 +            sLog.outDebug("BG_AV: start spawning static creatures");
 +            for(i=0; i < AV_STATICCPLACE_MAX; i++ )
 +                AddAVCreature(0,i+AV_CPLACE_MAX);
-+        	//mainspiritguides:
++		//mainspiritguides:
 +            sLog.outDebug("BG_AV: start spawning spiritguides creatures");
 +	        AddSpiritGuide(7, BG_AV_CreaturePos[7][0], BG_AV_CreaturePos[7][1], BG_AV_CreaturePos[7][2], BG_AV_CreaturePos[7][3], ALLIANCE);
-+        	AddSpiritGuide(8, BG_AV_CreaturePos[8][0], BG_AV_CreaturePos[8][1], BG_AV_CreaturePos[8][2], BG_AV_CreaturePos[8][3], HORDE);
++    		AddSpiritGuide(8, BG_AV_CreaturePos[8][0], BG_AV_CreaturePos[8][1], BG_AV_CreaturePos[8][2], BG_AV_CreaturePos[8][3], HORDE);
 +            //spawn the marshals (those who get deleted, if a tower gets destroyed)
 +            sLog.outDebug("BG_AV: start spawning marshal creatures");
 +            for(i=AV_NPC_A_MARSHAL_SOUTH; i<= AV_NPC_H_MARSHAL_WTOWER; i++)
@@ -2739,7 +2755,6 @@ index 9421e97..3717fdf 100644
 +                    Creature* creature = GetBGCreature(AV_CPLACE_MAX + 61);
 +                    if(creature)
 +                        YellToAll(creature,LANG_BG_AV_A_CAPTAIN_BUFF,LANG_COMMON);
-+//                    creature->Yell(LANG_BG_AV_A_CAPTAIN_BUFF,LANG_UNIVERSAL,0); //TODO look if this position here is right or if this is sd2 stuff
 +                }
 +                else
 +                {
@@ -2747,7 +2762,6 @@ index 9421e97..3717fdf 100644
 +                    Creature* creature = GetBGCreature(AV_CPLACE_MAX + 59); //TODO: make the captains a dynamic creature
 +                    if(creature)
 +                        YellToAll(creature,LANG_BG_AV_H_CAPTAIN_BUFF,LANG_ORCISH);
-+                        //creature->Yell(LANG_BG_AV_H_CAPTAIN_BUFF,LANG_UNIVERSAL,0); //TODO look if this position here is right or if this is sd2 stuff
 +                }
 +                m_CaptainBuffTimer[i] = 120000 + urand(0,4)* 60000; //as far as i could see, the buff is randomly so i make 2minutes (thats the duration of the buff itself) + 0-4minutes TODO get the right times
 +            }
@@ -2784,7 +2798,7 @@ index 9421e97..3717fdf 100644
  }
  
  void BattleGroundAV::AddPlayer(Player *plr)
-@@ -44,15 +441,26 @@ void BattleGroundAV::AddPlayer(Player *plr)
+@@ -44,15 +448,26 @@ void BattleGroundAV::AddPlayer(Player *plr)
      BattleGround::AddPlayer(plr);
      //create score and add it to map, default values are set in constructor
      BattleGroundAVScore* sc = new BattleGroundAVScore;
@@ -2814,7 +2828,7 @@ index 9421e97..3717fdf 100644
  void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
  {
      // this is wrong way to implement these things. On official it done by gameobject spell cast.
-@@ -63,18 +471,29 @@ void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
+@@ -63,18 +478,29 @@ void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
      switch(Trigger)
      {
          case 95:
@@ -2847,7 +2861,7 @@ index 9421e97..3717fdf 100644
              break;
      }
  
-@@ -118,3 +537,841 @@ void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
+@@ -118,3 +544,840 @@ void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
              break;
      }
  }
@@ -2882,7 +2896,6 @@ index 9421e97..3717fdf 100644
 +        RewardReputationToTeam((owner == ALLIANCE)?730:729,BG_AV_REP_TOWER,owner);
 +        RewardHonorToTeam(GetBonusHonor(BG_AV_KILL_TOWER),owner);
 +
-+        //despawn big banner+aura on top of tower TODO: look if this works (i think it doesn't)
 +        SpawnBGObject(BG_AV_OBJECT_TAURA_A_DUNBALDAR_SOUTH+GetTeamIndexByTeamId(owner)+(2*tmp),RESPAWN_ONE_DAY);
 +        SpawnBGObject(BG_AV_OBJECT_TFLAG_A_DUNBALDAR_SOUTH+GetTeamIndexByTeamId(owner)+(2*tmp),RESPAWN_ONE_DAY);
 +    }
@@ -2910,7 +2923,7 @@ index 9421e97..3717fdf 100644
 +        sprintf(buf, GetMangosString(LANG_BG_AV_TOWER_TAKEN) , GetNodeName(node),( owner == ALLIANCE ) ? GetMangosString(LANG_BG_AV_ALLY) : GetMangosString(LANG_BG_AV_HORDE)  );
 +    else
 +        sprintf(buf, GetMangosString(LANG_BG_AV_GRAVE_TAKEN) , GetNodeName(node),( owner == ALLIANCE ) ? GetMangosString(LANG_BG_AV_ALLY) :GetMangosString(LANG_BG_AV_HORDE)  );
-+        
++
 +    Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
 +    if(creature)
 +        YellToAll(creature,buf,LANG_UNIVERSAL);
@@ -2989,7 +3002,7 @@ index 9421e97..3717fdf 100644
 +    if(team == ALLIANCE || team == HORDE)
 +    {
 +        m_Mine_Reclaim_Timer[mine]=AV_MINE_RECLAIM_TIMER;
-+    	char buf[256];
++	char buf[256];
 +	    sprintf(buf, GetMangosString(LANG_BG_AV_MINE_TAKEN), GetMangosString(( mine == AV_NORTH_MINE ) ? LANG_BG_AV_MINE_NORTH : LANG_BG_AV_MINE_SOUTH), ( team == ALLIANCE ) ?  GetMangosString(LANG_BG_AV_ALLY) : GetMangosString(LANG_BG_AV_HORDE));
 +        Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
 +        if(creature)
@@ -3027,7 +3040,7 @@ index 9421e97..3717fdf 100644
 +    else
 +    {
 +        uint8 team2 = GetTeamIndexByTeamId(owner);
-+    	if (m_Team_QuestStatus[team2][0] < 500 )
++	if (m_Team_QuestStatus[team2][0] < 500 )
 +            creatureid = ( owner == ALLIANCE )? AV_NPC_A_GRAVEDEFENSE0 : AV_NPC_H_GRAVEDEFENSE0;
 +        else if ( m_Team_QuestStatus[team2][0] < 1000 )
 +            creatureid = ( owner == ALLIANCE )? AV_NPC_A_GRAVEDEFENSE1 : AV_NPC_H_GRAVEDEFENSE1;
@@ -3112,7 +3125,7 @@ index 9421e97..3717fdf 100644
 +        return BG_AV_OBJECT_FLAG_N_SNOWFALL_GRAVE;
 +    sLog.outError("BattleGroundAV: Error! GetPlaceNode couldn't resolve node %i",node);
 +    assert(false);
-+    return 0; //i don't know what i should return, maybe I should crash the server at this point :>
++    return 0;
 +}
 +
 +
@@ -3665,7 +3678,7 @@ index 9421e97..3717fdf 100644
 +    {
 +        for(uint8 j=0; j<9; j++)
 +            m_Team_QuestStatus[i][j]=0;
-+    	m_Team_Scores[i]=BG_AV_SCORE_INITIAL_POINTS;
++	m_Team_Scores[i]=BG_AV_SCORE_INITIAL_POINTS;
 +        m_IsInformedNearVictory[i]=false;
 +        m_CaptainAlive[i] = true;
 +        m_CaptainBuffTimer[i] = 120000 + urand(0,4)* 60; //as far as i could see, the buff is randomly so i make 2minutes (thats the duration of the buff itself) + 0-4minutes TODO get the right times
@@ -3690,14 +3703,14 @@ index 9421e97..3717fdf 100644
 +}
 +
 diff --git a/src/game/BattleGroundAV.h b/src/game/BattleGroundAV.h
-index 11bd08b..e4a0ff8 100644
+index 11bd08b..79951bc 100644
 --- a/src/game/BattleGroundAV.h
 +++ b/src/game/BattleGroundAV.h
 @@ -21,6 +21,1459 @@
  
  class BattleGround;
  
-+#define LANG_BG_AV_A_CAPTAIN_BUFF       "Take heart, Alliance! Throw these villains from Alterac Valley!"
++#define LANG_BG_AV_A_CAPTAIN_BUFF       "Begone. Uncouth scum! The Alliance shall prevail in Alterac Valley!"
 +#define LANG_BG_AV_H_CAPTAIN_BUFF       "Now is the time to attack! For the Horde!"
 +
 +#define LANG_BG_AV_S_MINE_BOSS_CLAIMS   "Snivvle is here! Snivvle claims the Coldtooth Mine!"
@@ -4267,7 +4280,7 @@ index 11bd08b..e4a0ff8 100644
 +    AV_CPLACE_MINE_S_S_MAX      = 299,
 +    //boss
 +    AV_CPLACE_MINE_S_3          = 300,
-+    
++
 +    //herald
 +    AV_CPLACE_HERALD          = 301,
 +
@@ -5359,7 +5372,7 @@ index f74f0a6..df46efb 100644
  };
  #endif
 diff --git a/src/game/BattleGroundEY.cpp b/src/game/BattleGroundEY.cpp
-index 5eb6d62..1c81f03 100644
+index 18d0859..cec2379 100644
 --- a/src/game/BattleGroundEY.cpp
 +++ b/src/game/BattleGroundEY.cpp
 @@ -54,9 +54,18 @@ void BattleGroundEY::Update(time_t diff)
@@ -6278,7 +6291,7 @@ index 3b744f0..f699d3e 100644
  }
  
 diff --git a/src/game/BattleGroundMgr.cpp b/src/game/BattleGroundMgr.cpp
-index 046f18b..6a1eb6f 100644
+index 5cee001..420404d 100644
 --- a/src/game/BattleGroundMgr.cpp
 +++ b/src/game/BattleGroundMgr.cpp
 @@ -30,10 +30,13 @@
@@ -6508,7 +6521,7 @@ index 046f18b..6a1eb6f 100644
 -    else
 -        ++m_QueuedPlayers[queue_id].Horde;
 -
--    this->Update(bgTypeId, queue_id);
+-    Update(bgTypeId, queue_id);
 +    info.GroupInfo                  = ginfo;
  
 +    // add the pinfo to ginfo's list
@@ -6830,8 +6843,8 @@ index 046f18b..6a1eb6f 100644
      }
  
      //if no players in queue ... do nothing
--    if (this->m_QueuedPlayers[queue_id].Alliance == 0 && this->m_QueuedPlayers[queue_id].Horde == 0)
-+    if (this->m_QueuedGroups[queue_id].size() == 0)
+-    if (m_QueuedPlayers[queue_id].Alliance == 0 && m_QueuedPlayers[queue_id].Horde == 0)
++    if (m_QueuedGroups[queue_id].size() == 0)
          return;
  
 +    uint32 bgQueueTypeId = sBattleGroundMgr.BGQueueTypeId(bgTypeId, arenatype);
@@ -7567,7 +7580,7 @@ index 046f18b..6a1eb6f 100644
 +void BattleGroundMgr::InvitePlayer(Player* plr, uint32 bgInstanceGUID, uint32 team)
  {
      // set invited player counters:
-     BattleGround* bg = this->GetBattleGround(bgInstanceGUID);
+     BattleGround* bg = GetBattleGround(bgInstanceGUID);
      if(!bg)
          return;
 +    bg->IncreaseInvitedCount(team);
@@ -8509,7 +8522,7 @@ index 0e9a38b..dd000ce 100644
  };
  #endif
 diff --git a/src/game/BattleGroundWS.cpp b/src/game/BattleGroundWS.cpp
-index dfaf0d0..95bf61e 100644
+index 23c90a7..53c67c1 100644
 --- a/src/game/BattleGroundWS.cpp
 +++ b/src/game/BattleGroundWS.cpp
 @@ -49,6 +49,16 @@ void BattleGroundWS::Update(time_t diff)
@@ -8576,7 +8589,7 @@ index 700f4f8..6e7bbaa 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 1f2bcdd..fb443d5 100644
+index 1f2bcdd..5f38d29 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
 @@ -169,6 +169,7 @@ ChatCommand * ChatHandler::getCommandTable()
@@ -8596,16 +8609,16 @@ index 1f2bcdd..fb443d5 100644
          { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", NULL },
          { "cooldown",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleCooldownCommand,            "", NULL },
          { "unlearn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnLearnCommand,             "", NULL },
-@@ -533,6 +536,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -530,6 +533,7 @@ ChatCommand * ChatHandler::getCommandTable()
+         { "damage",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDamageCommand,              "", NULL },
+         { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
+         { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCombatStopCommand,          "", NULL },
++        { "flusharenapoints",    SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,         "",   NULL },
          { "sendmessage",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
          { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
          { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
-+        { "flusharenapoints",    SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,         "",   NULL },
- 
-         { NULL,             0,                  false, NULL,                                           "", NULL }
-     };
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 28d1b3c..aafb209 100644
+index 28d1b3c..37e0c26 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
 @@ -149,6 +149,8 @@ class ChatHandler
@@ -8617,14 +8630,14 @@ index 28d1b3c..aafb209 100644
  
          bool HandleModifyKnownTitlesCommand(const char* args);
          bool HandleModifyHPCommand(const char* args);
-@@ -413,6 +415,7 @@ class ChatHandler
+@@ -411,6 +413,7 @@ class ChatHandler
+         bool HandleComeToMeCommand(const char *args);
+         bool HandleCombatStopCommand(const char *args);
          bool HandleSendMessageCommand(const char * args);
++        bool HandleFlushArenaPointsCommand(const char *args);
          bool HandleRepairitemsCommand(const char* args);
          bool HandleWaterwalkCommand(const char* args);
-+        bool HandleFlushArenaPointsCommand(const char *args);
  
-         //! Development Commands
-         bool HandleSetValue(const char* args);
 @@ -425,6 +428,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
@@ -10087,7 +10100,7 @@ index 0000000..7460b92
 +#define sChatLog MaNGOS::Singleton<ChatLog>::Instance()
 +#endif
 diff --git a/src/game/Creature.cpp b/src/game/Creature.cpp
-index 899a7ab..f4f6704 100644
+index 899a7ab..f4a1ae7 100644
 --- a/src/game/Creature.cpp
 +++ b/src/game/Creature.cpp
 @@ -42,6 +42,7 @@
@@ -10104,8 +10117,8 @@ index 899a7ab..f4f6704 100644
                          break;                              // no checks
 +                    case GOSSIP_OPTION_OUTDOORPVP:
 +                        if ( !sOutdoorPvPMgr.CanTalkTo(pPlayer,this,(*gso)) )
-+                            cantalking = false;
-+                        break;
++                             cantalking = false;
++                         break;
                      default:
                          sLog.outErrorDb("Creature %u (entry: %u) have unknown gossip option %u",GetDBTableGUIDLow(),GetEntry(),gso->Action);
                          break;
@@ -10113,8 +10126,8 @@ index 899a7ab..f4f6704 100644
              player->PlayerTalkClass->SendTalking(textid);
              break;
          }
-+        case GOSSIP_OPTION_OUTDOORPVP:
-+            sOutdoorPvPMgr.HandleGossipOption(player, GetGUID(), gossip->GossipId);
++		case GOSSIP_OPTION_OUTDOORPVP:
++             sOutdoorPvPMgr.HandleGossipOption(player, GetGUID(), gossip->GossipId);
 +            break;
          case GOSSIP_OPTION_SPIRITHEALER:
              if (player->isDead())
@@ -10154,7 +10167,7 @@ index b76a721..ca2ddfc 100644
          (new MovementGeneratorFactory<RandomMovementGenerator<Creature> >(RANDOM_MOTION_TYPE))->RegisterSelf();
          (new MovementGeneratorFactory<WaypointMovementGenerator<Creature> >(WAYPOINT_MOTION_TYPE))->RegisterSelf();
 diff --git a/src/game/GameObject.cpp b/src/game/GameObject.cpp
-index 9f28d72..1940537 100644
+index 1f17d6f..275345b 100644
 --- a/src/game/GameObject.cpp
 +++ b/src/game/GameObject.cpp
 @@ -35,7 +35,9 @@
@@ -10280,7 +10293,7 @@ index 1fab149..d9bc54c 100644
          void SetGoAnimProgress(uint32 animprogress) { SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, animprogress); }
  
 diff --git a/src/game/Group.cpp b/src/game/Group.cpp
-index 36bccee..9ba36c4 100644
+index cb03eda..ebf4916 100644
 --- a/src/game/Group.cpp
 +++ b/src/game/Group.cpp
 @@ -1298,6 +1298,54 @@ void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
@@ -10364,7 +10377,7 @@ index 5672f14..b07146d 100644
      }
  }
 diff --git a/src/game/Language.h b/src/game/Language.h
-index 7dcee62..2dcff1d 100644
+index 7dcee62..a2e6dcc 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
 @@ -21,6 +21,8 @@
@@ -10440,7 +10453,7 @@ index 7dcee62..2dcff1d 100644
      LANG_WAIT_BEFORE_SPEAKING           = 705,
      LANG_NOT_EQUIPPED_ITEM              = 706,
      LANG_PLAYER_DND                     = 707,
-@@ -641,11 +700,65 @@ enum MangosStrings
+@@ -641,11 +700,68 @@ enum MangosStrings
      LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
      LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
  
@@ -10450,42 +10463,45 @@ index 7dcee62..2dcff1d 100644
      LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
      LANG_YOUR_ARENA_TEAM_FULL           = 716,
 -    // Room for BG/ARENA                  717-799 not used
-+     
-+     LANG_BG_AV_ALLY                     = 717,
-+     LANG_BG_AV_HORDE                    = 718,
-+     LANG_BG_AV_TOWER_TAKEN              = 719,
-+     LANG_BG_AV_TOWER_ASSAULTED          = 720,
-+     LANG_BG_AV_TOWER_DEFENDED           = 721,
-+     LANG_BG_AV_GRAVE_TAKEN              = 722,
-+     LANG_BG_AV_GRAVE_DEFENDED           = 723,
-+     LANG_BG_AV_GRAVE_ASSAULTED          = 724,
-+ 
-+     LANG_BG_AV_MINE_TAKEN               = 725,
-+     LANG_BG_AV_MINE_NORTH               = 726,
-+     LANG_BG_AV_MINE_SOUTH               = 727,
-+ 
-+     LANG_BG_AV_NODE_GRAVE_STORM_AID     = 728,
-+     LANG_BG_AV_NODE_TOWER_DUN_S         = 729,
-+     LANG_BG_AV_NODE_TOWER_DUN_N         = 730,
-+     LANG_BG_AV_NODE_GRAVE_STORMPIKE     = 731,
-+     LANG_BG_AV_NODE_TOWER_ICEWING       = 732,
-+     LANG_BG_AV_NODE_GRAVE_STONE         = 733,
-+     LANG_BG_AV_NODE_TOWER_STONE         = 734,
-+     LANG_BG_AV_NODE_GRAVE_SNOW          = 735,
-+     LANG_BG_AV_NODE_TOWER_ICE           = 736,
-+     LANG_BG_AV_NODE_GRAVE_ICE           = 737,
-+     LANG_BG_AV_NODE_TOWER_POINT         = 738,
-+     LANG_BG_AV_NODE_GRAVE_FROST         = 739,
-+     LANG_BG_AV_NODE_TOWER_FROST_E       = 740,
-+     LANG_BG_AV_NODE_TOWER_FROST_W       = 741,
-+     LANG_BG_AV_NODE_GRAVE_FROST_HUT     = 742,
-+ 
-+     LANG_BG_AV_ONEMINTOSTART            = 743,
-+     LANG_BG_AV_HALFMINTOSTART           = 744,
-+     LANG_BG_AV_STARTED                  = 745,
-+     LANG_BG_AV_A_NEAR_LOSE              = 746,
-+     LANG_BG_AV_H_NEAR_LOSE              = 747,
 +
++    LANG_BG_AV_ALLY                     = 717,
++    LANG_BG_AV_HORDE                    = 718,
++    LANG_BG_AV_TOWER_TAKEN              = 719,
++    LANG_BG_AV_TOWER_ASSAULTED          = 720,
++    LANG_BG_AV_TOWER_DEFENDED           = 721,
++    LANG_BG_AV_GRAVE_TAKEN              = 722,
++    LANG_BG_AV_GRAVE_DEFENDED           = 723,
++    LANG_BG_AV_GRAVE_ASSAULTED          = 724,
++
++    LANG_BG_AV_MINE_TAKEN               = 725,
++    LANG_BG_AV_MINE_NORTH               = 726,
++    LANG_BG_AV_MINE_SOUTH               = 727,
++
++    LANG_BG_AV_NODE_GRAVE_STORM_AID     = 728,
++    LANG_BG_AV_NODE_TOWER_DUN_S         = 729,
++    LANG_BG_AV_NODE_TOWER_DUN_N         = 730,
++    LANG_BG_AV_NODE_GRAVE_STORMPIKE     = 731,
++    LANG_BG_AV_NODE_TOWER_ICEWING       = 732,
++    LANG_BG_AV_NODE_GRAVE_STONE         = 733,
++    LANG_BG_AV_NODE_TOWER_STONE         = 734,
++    LANG_BG_AV_NODE_GRAVE_SNOW          = 735,
++    LANG_BG_AV_NODE_TOWER_ICE           = 736,
++    LANG_BG_AV_NODE_GRAVE_ICE           = 737,
++    LANG_BG_AV_NODE_TOWER_POINT         = 738,
++    LANG_BG_AV_NODE_GRAVE_FROST         = 739,
++    LANG_BG_AV_NODE_TOWER_FROST_E       = 740,
++    LANG_BG_AV_NODE_TOWER_FROST_W       = 741,
++    LANG_BG_AV_NODE_GRAVE_FROST_HUT     = 742,
++
++    LANG_BG_AV_ONEMINTOSTART            = 743,
++    LANG_BG_AV_HALFMINTOSTART           = 744,
++    LANG_BG_AV_STARTED                  = 745,
++    LANG_BG_AV_A_NEAR_LOSE              = 746,
++    LANG_BG_AV_H_NEAR_LOSE              = 747,
++    LANG_BG_AV_H_CAPTAIN_DEAD           = 748,
++    LANG_BG_AV_A_CAPTAIN_DEAD           = 749,
++
++    // Room for BG/ARENA                  750-799 not used
 +    LANG_BG_GROUP_TOO_LARGE             = 7007, // "Your group is too large for this battleground. Please regroup to join."
 +    LANG_ARENA_GROUP_TOO_LARGE          = 7008, // "Your group is too large for this arena. Please regroup to join."
 +    LANG_ARENA_YOUR_TEAM_ONLY           = 7009, // "Your group has members not in your arena team. Please regroup to join."
@@ -10566,7 +10582,7 @@ index 37b8b14..dbbaaec 100644
          SendSysMessage(LANG_BAD_VALUE);
          SetSentErrorMessage(true);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 2a12a53..6681c86 100644
+index 2a12a53..7f4e888 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -10707,16 +10723,19 @@ index 2a12a53..6681c86 100644
      return true;
  }
  
-@@ -6218,3 +6311,9 @@ bool ChatHandler::HandleModifyGenderCommand(const char *args)
-         ChatHandler(player).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full,GetName());
+@@ -6159,6 +6252,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
      return true;
  }
-+
+ 
 +bool ChatHandler::HandleFlushArenaPointsCommand(const char * /*args*/)
 +{
 +    sBattleGroundMgr.DistributeArenaPoints();
 +    return true;
 +}
++
+ bool ChatHandler::HandleModifyGenderCommand(const char *args)
+ {
+     if(!*args)
 diff --git a/src/game/LootHandler.cpp b/src/game/LootHandler.cpp
 index 9731442..38d780d 100644
 --- a/src/game/LootHandler.cpp
@@ -10897,7 +10916,7 @@ index 2d77c73..149beec 100644
      AreaTrigger const* at = objmgr.GetAreaTrigger(Trigger_ID);
      if(!at)
 diff --git a/src/game/MovementHandler.cpp b/src/game/MovementHandler.cpp
-index 8ebae23..d5a1376 100644
+index 8ebae23..422e03b 100644
 --- a/src/game/MovementHandler.cpp
 +++ b/src/game/MovementHandler.cpp
 @@ -130,22 +130,28 @@ void WorldSession::HandleMoveWorldportAckOpcode()
@@ -10977,7 +10996,7 @@ index 8ebae23..d5a1376 100644
      }
  
      // fall damage generation (ignore in flight case that can be triggred also at lags in moment teleportation to another map).
-@@ -349,37 +364,166 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+@@ -349,36 +364,165 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
      }
  
      /*----------------------*/
@@ -11094,7 +11113,7 @@ index 8ebae23..d5a1376 100644
 -    data.append(GetPlayer()->GetPackGUID());
 -    data.append(recv_data.contents(), recv_data.size());
 -    GetPlayer()->SendMessageToSet(&data, false);
-+    if (kicked) 
++    if (kicked)
 +    {
 +        recv_data.put<uint32>(5, getMSTime());                  // offset flags(4) + unk(1)
 +        WorldPacket data(recv_data.GetOpcode(), (GetPlayer()->GetPackGUID().size()+recv_data.size()));
@@ -11126,8 +11145,8 @@ index 8ebae23..d5a1376 100644
 -            GetPlayer()->KillPlayer();
 -            GetPlayer()->BuildPlayerRepop();
 -        }
-+            if(GetPlayer()->InBattleGround() 
-+                && GetPlayer()->GetBattleGround() 
++            if(GetPlayer()->InBattleGround()
++                && GetPlayer()->GetBattleGround()
 +                && GetPlayer()->GetBattleGround()->HandlePlayerUnderMap(_player))
 +                {
 +                    // do nothing, the handle already did if returned true
@@ -11148,7 +11167,6 @@ index 8ebae23..d5a1376 100644
  
 -        // cancel the death timer here if started
 -        GetPlayer()->RepopAtGraveyard();
--    }
 +                // cancel the death timer here if started
 +                GetPlayer()->RepopAtGraveyard();
 +            }
@@ -11164,11 +11182,10 @@ index 8ebae23..d5a1376 100644
 +        GetPlayer()->BuildTeleportAckMsg(&data, GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY(), GetPlayer()->GetPositionZ(), GetPlayer()->GetOrientation());
 +        GetPlayer()->GetSession()->SendPacket(&data);
 +        GetPlayer()->BuildHeartBeatMsg(&data);
-+        GetPlayer()->SendMessageToSet(&data, true); 
-+    } 
++        GetPlayer()->SendMessageToSet(&data, true);
+     }
  }
  
- void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
 @@ -498,7 +642,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
          }
          else                                                // must be lesser - cheating
@@ -11328,7 +11345,7 @@ index 0b6bb20..08de19b 100644
 +    if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 4 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
  }
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
-index 724880f..54c3186 100644
+index 7740f83..1339dd8 100644
 --- a/src/game/ObjectMgr.cpp
 +++ b/src/game/ObjectMgr.cpp
 @@ -20,6 +20,7 @@
@@ -11413,7 +11430,7 @@ index 724880f..54c3186 100644
  {
      mAreaTriggers.clear();                                  // need for reload case
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index 6e0b178..2dc742e 100644
+index a849df1..2dc8665 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
 @@ -313,6 +313,8 @@ class ObjectMgr
@@ -17002,7 +17019,7 @@ index 144b2d7..b16877a 100644
          }
      }
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index a89b113..d392818 100644
+index bdda338..d00eaa4 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -52,7 +52,10 @@
@@ -17302,11 +17319,10 @@ index a89b113..d392818 100644
          else
              q_list = itr->second;
 -    }
--
+ 
 -    QuestItemList *ffa_list = 0;
 -    if (permission != NONE_PERMISSION)
 -    {
-+        
          QuestItemMap const& lootPlayerFFAItems = loot->GetPlayerFFAItems();
 -        QuestItemMap::const_iterator itr = lootPlayerFFAItems.find(GetGUIDLow());
 +        itr = lootPlayerFFAItems.find(GetGUIDLow());
@@ -17315,11 +17331,10 @@ index a89b113..d392818 100644
          else
              ffa_list = itr->second;
 -    }
--
+ 
 -    QuestItemList *conditional_list = 0;
 -    if (permission != NONE_PERMISSION)
 -    {
-+        
          QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = loot->GetPlayerNonQuestNonFFAConditionalItems();
 -        QuestItemMap::const_iterator itr = lootPlayerNonQuestNonFFAConditionalItems.find(GetGUIDLow());
 +        itr = lootPlayerNonQuestNonFFAConditionalItems.find(GetGUIDLow());
@@ -17518,7 +17533,7 @@ index a89b113..d392818 100644
 +            else
 +            {
 +                data << uint32(0x7ae) << uint32(0x1);           // 7 snowfall n
-+                data << uint32(0x532) << uint32(0x1);           // 8 frostwolfhut hc 
++                data << uint32(0x532) << uint32(0x1);           // 8 frostwolfhut hc
 +                data << uint32(0x531) << uint32(0x0);           // 9 frostwolfhut ac
 +                data << uint32(0x52e) << uint32(0x0);           // 10 stormpike firstaid a_a
 +                data << uint32(0x571) << uint32(0x0);           // 11 east frostwolf tower horde assaulted -unused
@@ -17950,7 +17965,7 @@ index a89b113..d392818 100644
 +    return false;
 +}
 diff --git a/src/game/Player.h b/src/game/Player.h
-index 2d8275e..fb9df88 100644
+index a5222d3..bffa8fa 100644
 --- a/src/game/Player.h
 +++ b/src/game/Player.h
 @@ -45,6 +45,7 @@ class PlayerMenu;
@@ -18149,7 +18164,7 @@ index 2d8275e..fb9df88 100644
          time_t m_summon_expire;
          uint32 m_summon_mapid;
 diff --git a/src/game/QuestHandler.cpp b/src/game/QuestHandler.cpp
-index 5b68829..c09bed1 100644
+index 5b68829..e84cc31 100644
 --- a/src/game/QuestHandler.cpp
 +++ b/src/game/QuestHandler.cpp
 @@ -29,6 +29,8 @@
@@ -18165,7 +18180,7 @@ index 5b68829..c09bed1 100644
  
      sLog.outDebug( "WORLD: Received CMSG_QUESTGIVER_COMPLETE_QUEST npc = %u, quest = %u",uint32(GUID_LOPART(guid)),quest );
  
-+    
++
      Quest const *pQuest = objmgr.GetQuestTemplate(quest);
      if( pQuest )
      {
@@ -18219,7 +18234,7 @@ index 817ae81..241bd48 100644
  };
  
 diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
-index 0938a62..d79a5db 100644
+index 7faf701..98f5a9d 100644
 --- a/src/game/Spell.cpp
 +++ b/src/game/Spell.cpp
 @@ -306,6 +306,8 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
@@ -18592,7 +18607,20 @@ index 0938a62..d79a5db 100644
          {
              TagUnitMap.push_back(m_caster);
              break;
-@@ -1664,11 +1930,11 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+@@ -1268,6 +1534,12 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+         }
+         case TARGET_CHAIN_DAMAGE:
+         {
++            // Charge casted on self
++            if (m_spellInfo->Effect[i] == SPELL_EFFECT_CHARGE)
++            {
++                TagUnitMap.push_back(m_caster);
++                break;
++            }
+             if (EffectChainTarget <= 1)
+             {
+                 Unit* pUnitTarget = SelectMagnetTarget();
+@@ -1664,11 +1936,11 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                      // IsHostileTo check duel and controlled by enemy
                      if(Target && Target->GetSubGroup()==subgroup && !m_caster->IsHostileTo(Target))
                      {
@@ -18606,7 +18634,7 @@ index 0938a62..d79a5db 100644
                                  TagUnitMap.push_back(pet);
                      }
                  }
-@@ -1683,7 +1949,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+@@ -1683,7 +1955,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                  TagUnitMap.push_back(pTarget);
  
                  if(Pet* pet = pTarget->GetPet())
@@ -18615,7 +18643,7 @@ index 0938a62..d79a5db 100644
                          TagUnitMap.push_back(pet);
              }
  
-@@ -1809,9 +2075,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+@@ -1809,9 +2081,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                      Player* Target = itr->getSource();
  
                      // IsHostileTo check duel and controlled by enemy
@@ -18626,7 +18654,7 @@ index 0938a62..d79a5db 100644
                      {
                          TagUnitMap.push_back(Target);
                      }
-@@ -1951,6 +2215,9 @@ void Spell::prepare(SpellCastTargets * targets, Aura* triggeredByAura)
+@@ -1951,6 +2221,9 @@ void Spell::prepare(SpellCastTargets * targets, Aura* triggeredByAura)
          return;
      }
  
@@ -18636,7 +18664,7 @@ index 0938a62..d79a5db 100644
      // calculate cast time (calculated after first CanCast check to prevent charge counting for first CanCast fail)
      m_casttime = GetSpellCastTime(m_spellInfo, this);
  
-@@ -2096,15 +2363,6 @@ void Spell::cast(bool skipCheck)
+@@ -2096,15 +2369,6 @@ void Spell::cast(bool skipCheck)
      SendCastResult(castResult);
      SendSpellGo();                                          // we must send smsg_spell_go packet before m_castItem delete in TakeCastItem()...
  
@@ -18652,7 +18680,7 @@ index 0938a62..d79a5db 100644
      // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
      if (m_spellInfo->speed > 0.0f)
      {
-@@ -2490,7 +2748,24 @@ void Spell::finish(bool ok)
+@@ -2490,7 +2754,24 @@ void Spell::finish(bool ok)
      // other code related only to successfully finished spells
      if(!ok)
          return;
@@ -18678,7 +18706,7 @@ index 0938a62..d79a5db 100644
      //handle SPELL_AURA_ADD_TARGET_TRIGGER auras
      Unit::AuraList const& targetTriggers = m_caster->GetAurasByType(SPELL_AURA_ADD_TARGET_TRIGGER);
      for(Unit::AuraList::const_iterator i = targetTriggers.begin(); i != targetTriggers.end(); ++i)
-@@ -2510,12 +2785,20 @@ void Spell::finish(bool ok)
+@@ -2510,12 +2791,20 @@ void Spell::finish(bool ok)
                      int32 chance = m_caster->CalculateSpellDamage(auraSpellInfo, auraSpellIdx, (*i)->GetBasePoints(),unit);
  
                      if(roll_chance_i(chance))
@@ -18700,7 +18728,7 @@ index 0938a62..d79a5db 100644
      if (IsMeleeAttackResetSpell())
      {
          m_caster->resetAttackTimer(BASE_ATTACK);
-@@ -3256,23 +3539,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3256,23 +3545,6 @@ uint8 Spell::CanCast(bool strict)
              }
          }
  
@@ -18724,7 +18752,7 @@ index 0938a62..d79a5db 100644
          if(IsPositiveSpell(m_spellInfo->Id))
          {
              if(target->IsImmunedToSpell(m_spellInfo,false))
-@@ -3467,8 +3733,9 @@ uint8 Spell::CanCast(bool strict)
+@@ -3467,8 +3739,9 @@ uint8 Spell::CanCast(bool strict)
          }
      }
  
@@ -18736,7 +18764,7 @@ index 0938a62..d79a5db 100644
  
      {
          if(uint8 castResult = CheckPower())
-@@ -3839,6 +4106,26 @@ uint8 Spell::CanCast(bool strict)
+@@ -3839,6 +4112,26 @@ uint8 Spell::CanCast(bool strict)
  
                  break;
              }
@@ -18763,7 +18791,7 @@ index 0938a62..d79a5db 100644
              case SPELL_EFFECT_SUMMON_PET:
              {
                  if(m_caster->GetPetGUID())                  //let warlock do a replacement summon
-@@ -3887,19 +4174,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3887,19 +4180,6 @@ uint8 Spell::CanCast(bool strict)
              case SPELL_EFFECT_LEAP:
              case SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER:
              {
@@ -18783,7 +18811,7 @@ index 0938a62..d79a5db 100644
                  // not allow use this effect at battleground until battleground start
                  if(m_caster->GetTypeId()==TYPEID_PLAYER)
                      if(BattleGround const *bg = ((Player*)m_caster)->GetBattleGround())
-@@ -4046,22 +4320,23 @@ int16 Spell::PetCanCast(Unit* target)
+@@ -4046,22 +4326,23 @@ int16 Spell::PetCanCast(Unit* target)
              if(!_target->isAlive())
                  return SPELL_FAILED_BAD_TARGETS;
  
@@ -18817,7 +18845,7 @@ index 0938a62..d79a5db 100644
                  }
              }
          }
-@@ -4081,9 +4356,16 @@ uint8 Spell::CheckCasterAuras() const
+@@ -4081,9 +4362,16 @@ uint8 Spell::CheckCasterAuras() const
  {
      // Flag drop spells totally immuned to caster auras
      // FIXME: find more nice check for all totally immuned spells
@@ -18862,7 +18890,7 @@ index d80936a..beea49c 100644
          //*****************************************
          // Spell target subsystem
 diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
-index 6732fc5..b6608b6 100644
+index 6732fc5..8452b8a 100644
 --- a/src/game/SpellAuras.cpp
 +++ b/src/game/SpellAuras.cpp
 @@ -40,6 +40,8 @@
@@ -19596,15 +19624,18 @@ index 6732fc5..b6608b6 100644
 +    m_target->ApplyAttackTimePercentMod(RANGED_ATTACK, m_modifier.m_amount * m_stackAmount, apply);
  }
  
- void Aura::HandleModAttackSpeed(bool apply, bool Real)
- {
+-void Aura::HandleModAttackSpeed(bool apply, bool Real)
+-{
 -    if(!m_target->isAlive() )
 -        return;
 -
 -    m_target->ApplyAttackTimePercentMod(BASE_ATTACK,m_modifier.m_amount,apply);
+-}
++ void Aura::HandleModAttackSpeed(bool apply, bool Real)
++ {
 +    m_target->ApplyAttackTimePercentMod(BASE_ATTACK,m_modifier.m_amount * m_stackAmount,apply);
 +    m_target->UpdateDamagePhysical(BASE_ATTACK);
- }
++ }
  
  void Aura::HandleHaste(bool apply, bool Real)
  {
@@ -20033,7 +20064,7 @@ index ea4f25f..c58ebf2 100644
          void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
          void SetAuraFlag(uint32 slot, bool add);
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index 61a5e32..13e5ff7 100644
+index ef129fa..a12a63e 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -48,6 +48,7 @@
@@ -20364,11 +20395,48 @@ index 61a5e32..13e5ff7 100644
      }
  }
  
+@@ -5539,10 +5480,14 @@ void Spell::EffectCharge(uint32 /*i*/)
+     if(!unitTarget || !m_caster)
+         return;
+ 
++    Unit *chargeTarget = m_targets.getUnitTarget();
++    if (!chargeTarget)
++        return;
++
+     float x, y, z;
+-    unitTarget->GetContactPoint(m_caster, x, y, z);
+-    if(unitTarget->GetTypeId() != TYPEID_PLAYER)
+-        ((Creature *)unitTarget)->StopMoving();
++    chargeTarget->GetContactPoint(m_caster, x, y, z);
++    if(chargeTarget->GetTypeId() != TYPEID_PLAYER)
++        ((Creature *)chargeTarget)->StopMoving();
+ 
+     // Only send MOVEMENTFLAG_WALK_MODE, client has strange issues with other move flags
+     m_caster->SendMonsterMove(x, y, z, 0, MOVEMENTFLAG_WALK_MODE, 1);
+@@ -5552,7 +5497,7 @@ void Spell::EffectCharge(uint32 /*i*/)
+ 
+     // not all charge effects used in negative spells
+     if ( !IsPositiveSpell(m_spellInfo->Id))
+-        m_caster->Attack(unitTarget,true);
++        m_caster->Attack(chargeTarget,true);
+ }
+ 
+ void Spell::EffectSummonCritter(uint32 i)
 diff --git a/src/game/SpellMgr.cpp b/src/game/SpellMgr.cpp
-index 044b327..dff18a2 100644
+index 044b327..67bbf82 100644
 --- a/src/game/SpellMgr.cpp
 +++ b/src/game/SpellMgr.cpp
-@@ -530,6 +530,17 @@ bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellI
+@@ -310,6 +310,9 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
+         case SPELL_EFFECT_ENERGIZE_PCT:
+             return true;
+ 
++        // Charge casted on self to run - so must be positive
++        case SPELL_EFFECT_CHARGE:
++            return true;
+             // non-positive aura use
+         case SPELL_EFFECT_APPLY_AURA:
+         case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+@@ -530,6 +533,17 @@ bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellI
      return false;
  }
  
@@ -20386,7 +20454,7 @@ index 044b327..dff18a2 100644
  uint8 GetErrorAtShapeshiftedCast (SpellEntry const *spellInfo, uint32 form)
  {
      // talents that learn spells can have stance requirements that need ignore
-@@ -806,8 +817,8 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -806,8 +820,8 @@ void SpellMgr::LoadSpellProcEvents()
  
      uint32 count = 0;
  
@@ -20397,7 +20465,7 @@ index 044b327..dff18a2 100644
      if( !result )
      {
  
-@@ -821,7 +832,7 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -821,7 +835,7 @@ void SpellMgr::LoadSpellProcEvents()
      }
  
      barGoLink bar( result->GetRowCount() );
@@ -20406,7 +20474,7 @@ index 044b327..dff18a2 100644
      do
      {
          Field *fields = result->Fetch();
-@@ -830,7 +841,8 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -830,7 +844,8 @@ void SpellMgr::LoadSpellProcEvents()
  
          uint16 entry = fields[0].GetUInt16();
  
@@ -20416,7 +20484,7 @@ index 044b327..dff18a2 100644
          {
              sLog.outErrorDb("Spell %u listed in `spell_proc_event` does not exist", entry);
              continue;
-@@ -839,23 +851,35 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -839,23 +854,35 @@ void SpellMgr::LoadSpellProcEvents()
          SpellProcEventEntry spe;
  
          spe.schoolMask      = fields[1].GetUInt32();
@@ -20459,7 +20527,7 @@ index 044b327..dff18a2 100644
  
      /*
      // Commented for now, as it still produces many errors (still quite many spells miss spell_proc_event)
-@@ -887,6 +911,7 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -887,6 +914,7 @@ void SpellMgr::LoadSpellProcEvents()
      */
  }
  
@@ -20467,7 +20535,7 @@ index 044b327..dff18a2 100644
  bool SpellMgr::IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spellProcEvent, SpellEntry const * procSpell, uint32 procFlags )
  {
      if((procFlags & spellProcEvent->procFlags) == 0)
-@@ -925,6 +950,73 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spell
+@@ -925,6 +953,73 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spell
  
      return true;
  }
@@ -20806,7 +20874,7 @@ index 7673622..3dbdb52 100644
  
      // far teleport case
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 57b0c91..9dc0b8a 100644
+index b64f538..433c19b 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -41,6 +41,7 @@
@@ -20907,28 +20975,7 @@ index 57b0c91..9dc0b8a 100644
  
          DEBUG_LOG("DealDamageAttackStop");
  
-@@ -655,11 +627,45 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
-                 }
-             }
-         }
-+        else if(pVictim->GetTypeId() == TYPEID_UNIT)
-+        {
-+            Player *killer = NULL;
-+            if(GetTypeId() == TYPEID_PLAYER)
-+                killer = ((Player*)this);
-+            else if(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
-+            {
-+                if(Unit *owner = GetOwner())
-+                    if(owner->GetTypeId() == TYPEID_PLAYER)
-+                        killer = ((Player*)owner);
-+            }
-+
-+            if(killer)
-+                if(BattleGround *bg = killer->GetBattleGround())
-+                    bg->HandleKillUnit((Creature*)pVictim,killer);
-+        }
- 
-         DEBUG_LOG("SET JUST_DIED");
+@@ -660,6 +632,24 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
          if(!spiritOfRedemtionTalentReady)
              pVictim->setDeathState(JUST_DIED);
  
@@ -20953,7 +21000,7 @@ index 57b0c91..9dc0b8a 100644
          DEBUG_LOG("DealDamageHealth1");
  
          if(spiritOfRedemtionTalentReady)
-@@ -757,6 +763,25 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -757,6 +747,41 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
  
              he->DuelComplete(DUEL_INTERUPTED);
          }
@@ -20975,6 +21022,22 @@ index 57b0c91..9dc0b8a 100644
 +            if(killer)
 +                if(BattleGround *bg = killed->GetBattleGround())
 +                    bg->HandleKillPlayer(killed, killer);   // drop flags and etc
++        }
++        else if(pVictim->GetTypeId() == TYPEID_UNIT)
++        {
++            Player *killer = NULL;
++            if(GetTypeId() == TYPEID_PLAYER)
++                killer = ((Player*)this);
++            else if(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
++            {
++                if(Unit *owner = GetOwner())
++                    if(owner->GetTypeId() == TYPEID_PLAYER)
++                        killer = ((Player*)owner);
++            }
++
++            if(killer)
++                if(BattleGround *bg = killer->GetBattleGround())
++                    bg->HandleKillUnit((Creature*)pVictim,killer);
 +        }
      }
      else                                                    // if (health <= damage)
@@ -23244,7 +23307,7 @@ index 57b0c91..9dc0b8a 100644
          }
      }
 @@ -8079,7 +9335,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
-     AuraList const& mDamageDoneCreature = this->GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
+     AuraList const& mDamageDoneCreature = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
      for(AuraList::const_iterator i = mDamageDoneCreature.begin();i != mDamageDoneCreature.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
 -            DoneFlatBenefit += (*i)->GetModifier()->m_amount;
@@ -23280,7 +23343,7 @@ index 57b0c91..9dc0b8a 100644
      if(attType!=RANGED_ATTACK)
          TakenFlatBenefit += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN);
 @@ -8147,13 +9403,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
-     AuraList const& mDamageDoneVersus = this->GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
+     AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
      for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
 -            DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
@@ -23969,7 +24032,7 @@ index 5d598fb..88c3727 100644
          uint32 m_state;                                     // Even derived shouldn't modify
          uint32 m_CombatTimer;
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 11b95cf..9eddc8e 100644
+index 11b95cf..4f359c7 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -41,6 +41,7 @@
@@ -23984,8 +24047,8 @@ index 11b95cf..9eddc8e 100644
  #include "WaypointManager.h"
  #include "GMTicketMgr.h"
  #include "Util.h"
-+#include "OutdoorPvPMgr.h"
 +#include "Language.h"
++#include "OutdoorPvPMgr.h"
  
  INSTANTIATE_SINGLETON_1( World );
  
@@ -24273,7 +24336,7 @@ index 4fd1efd..78836a9 100644
 +    return true;
 +}
 diff --git a/src/mangosd/mangosd.conf.dist.in b/src/mangosd/mangosd.conf.dist.in
-index 4c69f2d..46a1dbe 100644
+index 4c69f2d..08321a1 100644
 --- a/src/mangosd/mangosd.conf.dist.in
 +++ b/src/mangosd/mangosd.conf.dist.in
 @@ -294,6 +294,78 @@ GmLogTimestamp = 0
@@ -24582,7 +24645,7 @@ index 4c69f2d..46a1dbe 100644
 + ###################################################################################################################
 + 
 + BattleGround.PrematureFinishTimer = 300000
-+ 
++
 + ###################################################################################################################
 + # MOVEMENT ANTICHEAT
 + #
@@ -24603,11 +24666,11 @@ index 4c69f2d..46a1dbe 100644
 + #        maximum time between alarms for count it (default 5000)
 + #
 + ###################################################################################################################
-+ 
++
 + Anticheat.Movement.Enable = 1
 + Anticheat.Movement.Kick = 1
 + Anticheat.Movement.AlarmCount = 5
-+ Anticheat.Movement.AlarmTime = 5000   
++ Anticheat.Movement.AlarmTime = 5000
 diff --git a/src/shared/Database/DBCStructure.h b/src/shared/Database/DBCStructure.h
 index 61d4f9e..42e92ec 100644
 --- a/src/shared/Database/DBCStructure.h

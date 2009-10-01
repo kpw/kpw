@@ -1,5 +1,5 @@
 diff --git a/src/game/BattleGround.cpp b/src/game/BattleGround.cpp
-index dd199e2..38a87e3 100644
+index 2781ef6..7a62fe5 100644
 --- a/src/game/BattleGround.cpp
 +++ b/src/game/BattleGround.cpp
 @@ -290,6 +290,23 @@ void BattleGround::CastSpellOnTeam(uint32 SpellID, uint32 TeamID)
@@ -26,10 +26,28 @@ index dd199e2..38a87e3 100644
  void BattleGround::RewardHonorToTeam(uint32 Honor, uint32 TeamID)
  {
      for(std::map<uint64, BattleGroundPlayer>::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-@@ -932,6 +949,22 @@ void BattleGround::DoorOpen(uint32 type)
+@@ -351,7 +368,7 @@ void BattleGround::EndBattleGround(uint32 winner)
+ 
+     if(winner == ALLIANCE)
+     {
+-        winmsg = GetMangosString(LANG_BG_A_WINS);
++        winmsg = GetMangosString(LANG_BG_A_WINS); //TODO herald yells this.. (at least in bg_av)
+ 
+         PlaySoundToAll(SOUND_ALLIANCE_WINS);                // alliance wins sound
+ 
+@@ -932,6 +949,31 @@ void BattleGround::DoorOpen(uint32 type)
      }
  }
  
++int32 BattleGround::GetObjectType(uint64 guid)
++{
++    for(uint32 i = 0;i <= m_BgObjects.size(); i++)
++        if(m_BgObjects[i] == guid)
++            return i;
++    sLog.outError("BattleGround: cheating? a player used a gameobject which isnt supposed to be a usable object!");
++    return -1;
++}
++
 +GameObject* BattleGround::GetBGObject(uint32 type)
 +{
 +    GameObject *obj = HashMapHolder<GameObject>::Find(m_BgObjects[type]);
@@ -49,25 +67,21 @@ index dd199e2..38a87e3 100644
  void BattleGround::SpawnBGObject(uint32 type, uint32 respawntime)
  {
      if( respawntime == 0 )
-@@ -1151,3 +1184,19 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
-     // to be able to remove insignia
-     player->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
+@@ -1123,6 +1165,10 @@ void BattleGround::HandleTriggerBuff(uint64 const& go_guid)
+     SpawnBGObject(index, BUFF_RESPAWN_TIME);
  }
-+
-+int32 BattleGround::GetObjectType(uint64 guid)
-+{
-+    for(uint32 i = 0;i <= m_BgObjects.size(); i++)
-+        if(m_BgObjects[i] == guid)
-+            return i;
-+    sLog.outError("BattleGround: cheating? a player used a gameobject which isnt supposed to be a usable object!");
-+    return -1;
-+}
-+
+ 
 +void BattleGround::HandleKillUnit(Creature *creature, Player *killer)
 +{
 +}
 +
-+    
+ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
+ {
+     //keep in mind that for arena this will have to be changed a bit
+@@ -1151,3 +1197,4 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
+     // to be able to remove insignia
+     player->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
+ }
 +
 diff --git a/src/game/BattleGround.h b/src/game/BattleGround.h
 index 9e41e66..7f6370c 100644
@@ -107,10 +121,10 @@ index 9e41e66..7f6370c 100644
          void DoorOpen(uint32 type);
          void DoorClose(uint32 type);
 diff --git a/src/game/BattleGroundAV.cpp b/src/game/BattleGroundAV.cpp
-index 9421e97..8b117c2 100644
+index 9421e97..e33c381 100644
 --- a/src/game/BattleGroundAV.cpp
 +++ b/src/game/BattleGroundAV.cpp
-@@ -16,27 +16,426 @@
+@@ -16,27 +16,431 @@
   * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   */
  
@@ -137,7 +151,7 @@ index 9421e97..8b117c2 100644
  BattleGroundAV::~BattleGroundAV()
  {
 +}
- 
++
 +const uint16 BattleGroundAV::GetBonusHonor(uint8 kills) //TODO: move this function to Battleground.cpp (needs to find a way to get m_MaxLevel)
 +{
 +    if(m_MaxLevel==70)
@@ -185,6 +199,10 @@ index 9421e97..8b117c2 100644
 +        //spawn destroyed aura
 +        for(uint8 i=0; i<=9; i++)
 +            SpawnBGObject(BG_AV_OBJECT_BURN_BUILDING_ALLIANCE+i,RESPAWN_IMMEDIATELY);
++        Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
++        if(creature)
++            YellToAll(creature,GetMangosString(LANG_BG_AV_A_CAPTAIN_DEAD),LANG_UNIVERSAL);
++
 +    }
 +    else if ( entry == BG_AV_CreatureInfo[AV_NPC_H_CAPTAIN][0] )
 +    {
@@ -194,6 +212,9 @@ index 9421e97..8b117c2 100644
 +        //spawn destroyed aura
 +        for(uint8 i=0; i<=9; i++)
 +            SpawnBGObject(BG_AV_OBJECT_BURN_BUILDING_HORDE+i,RESPAWN_IMMEDIATELY);
++        Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
++        if(creature)
++            YellToAll(creature,GetMangosString(LANG_BG_AV_H_CAPTAIN_DEAD),LANG_UNIVERSAL);
 +    }
 +    else if ( entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_N_4][0] || entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_A_4][0] || entry == BG_AV_CreatureInfo[AV_NPC_N_MINE_H_4][0])
 +        ChangeMineOwner(AV_NORTH_MINE,killer->GetTeam());
@@ -338,7 +359,7 @@ index 9421e97..8b117c2 100644
 +    {
 +        type-=(AV_CPLACE_MAX);
 +        cinfoid=int(BG_AV_StaticCreaturePos[type][4]);
-+
+ 
 +        creature = AddCreature(BG_AV_StaticCreatureInfo[cinfoid][0],(type+AV_CPLACE_MAX),BG_AV_StaticCreatureInfo[cinfoid][1],BG_AV_StaticCreaturePos[type][0],BG_AV_StaticCreaturePos[type][1],BG_AV_StaticCreaturePos[type][2],BG_AV_StaticCreaturePos[type][3]);
 +        level = ( BG_AV_StaticCreatureInfo[cinfoid][2] == BG_AV_StaticCreatureInfo[cinfoid][3] ) ? BG_AV_StaticCreatureInfo[cinfoid][2] : urand(BG_AV_StaticCreatureInfo[cinfoid][2],BG_AV_StaticCreatureInfo[cinfoid][3]);
 +        CreatureData &data = objmgr.NewOrExistCreatureData(creature->GetDBTableGUIDLow());
@@ -372,14 +393,14 @@ index 9421e97..8b117c2 100644
 +        if (!(m_Events & 0x01))
 +        {
 +            m_Events |= 0x01;
-+            //comment this out if you are running with arenapatch
-+            /*
++
++#ifdef ARENA_PATCH
 +            if(!SetupBattleGround())
 +            {
 +                EndNow();
 +                return;
 +            }
-+            */
++#endif
 +
 +            uint16 i;
 +            sLog.outDebug("Alterac Valley: entering state STATUS_WAIT_JOIN ...");
@@ -417,16 +438,16 @@ index 9421e97..8b117c2 100644
 +			for(BG_AV_Nodes i= BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i )
 +            {
 +                if(m_Nodes[i].Owner)
-+    				PopulateNode(i);
++				PopulateNode(i);
 +            }
 +            //all creatures which don't get despawned through the script are static
 +            sLog.outDebug("BG_AV: start spawning static creatures");
 +            for(i=0; i < AV_STATICCPLACE_MAX; i++ )
 +                AddAVCreature(0,i+AV_CPLACE_MAX);
-+        	//mainspiritguides:
++		//mainspiritguides:
 +            sLog.outDebug("BG_AV: start spawning spiritguides creatures");
 +	        AddSpiritGuide(7, BG_AV_CreaturePos[7][0], BG_AV_CreaturePos[7][1], BG_AV_CreaturePos[7][2], BG_AV_CreaturePos[7][3], ALLIANCE);
-+        	AddSpiritGuide(8, BG_AV_CreaturePos[8][0], BG_AV_CreaturePos[8][1], BG_AV_CreaturePos[8][2], BG_AV_CreaturePos[8][3], HORDE);
++    		AddSpiritGuide(8, BG_AV_CreaturePos[8][0], BG_AV_CreaturePos[8][1], BG_AV_CreaturePos[8][2], BG_AV_CreaturePos[8][3], HORDE);
 +            //spawn the marshals (those who get deleted, if a tower gets destroyed)
 +            sLog.outDebug("BG_AV: start spawning marshal creatures");
 +            for(i=AV_NPC_A_MARSHAL_SOUTH; i<= AV_NPC_H_MARSHAL_WTOWER; i++)
@@ -493,7 +514,6 @@ index 9421e97..8b117c2 100644
 +                    Creature* creature = GetBGCreature(AV_CPLACE_MAX + 61);
 +                    if(creature)
 +                        YellToAll(creature,LANG_BG_AV_A_CAPTAIN_BUFF,LANG_COMMON);
-+//                    creature->Yell(LANG_BG_AV_A_CAPTAIN_BUFF,LANG_UNIVERSAL,0); //TODO look if this position here is right or if this is sd2 stuff
 +                }
 +                else
 +                {
@@ -501,7 +521,6 @@ index 9421e97..8b117c2 100644
 +                    Creature* creature = GetBGCreature(AV_CPLACE_MAX + 59); //TODO: make the captains a dynamic creature
 +                    if(creature)
 +                        YellToAll(creature,LANG_BG_AV_H_CAPTAIN_BUFF,LANG_ORCISH);
-+                        //creature->Yell(LANG_BG_AV_H_CAPTAIN_BUFF,LANG_UNIVERSAL,0); //TODO look if this position here is right or if this is sd2 stuff
 +                }
 +                m_CaptainBuffTimer[i] = 120000 + urand(0,4)* 60000; //as far as i could see, the buff is randomly so i make 2minutes (thats the duration of the buff itself) + 0-4minutes TODO get the right times
 +            }
@@ -538,7 +557,7 @@ index 9421e97..8b117c2 100644
  }
  
  void BattleGroundAV::AddPlayer(Player *plr)
-@@ -44,15 +443,26 @@ void BattleGroundAV::AddPlayer(Player *plr)
+@@ -44,15 +448,26 @@ void BattleGroundAV::AddPlayer(Player *plr)
      BattleGround::AddPlayer(plr);
      //create score and add it to map, default values are set in constructor
      BattleGroundAVScore* sc = new BattleGroundAVScore;
@@ -568,7 +587,7 @@ index 9421e97..8b117c2 100644
  void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
  {
      // this is wrong way to implement these things. On official it done by gameobject spell cast.
-@@ -63,18 +473,29 @@ void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
+@@ -63,18 +478,29 @@ void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
      switch(Trigger)
      {
          case 95:
@@ -601,7 +620,7 @@ index 9421e97..8b117c2 100644
              break;
      }
  
-@@ -118,3 +539,841 @@ void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
+@@ -118,3 +544,840 @@ void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
              break;
      }
  }
@@ -636,7 +655,6 @@ index 9421e97..8b117c2 100644
 +        RewardReputationToTeam((owner == ALLIANCE)?730:729,BG_AV_REP_TOWER,owner);
 +        RewardHonorToTeam(GetBonusHonor(BG_AV_KILL_TOWER),owner);
 +
-+        //despawn big banner+aura on top of tower TODO: look if this works (i think it doesn't)
 +        SpawnBGObject(BG_AV_OBJECT_TAURA_A_DUNBALDAR_SOUTH+GetTeamIndexByTeamId(owner)+(2*tmp),RESPAWN_ONE_DAY);
 +        SpawnBGObject(BG_AV_OBJECT_TFLAG_A_DUNBALDAR_SOUTH+GetTeamIndexByTeamId(owner)+(2*tmp),RESPAWN_ONE_DAY);
 +    }
@@ -664,7 +682,7 @@ index 9421e97..8b117c2 100644
 +        sprintf(buf, GetMangosString(LANG_BG_AV_TOWER_TAKEN) , GetNodeName(node),( owner == ALLIANCE ) ? GetMangosString(LANG_BG_AV_ALLY) : GetMangosString(LANG_BG_AV_HORDE)  );
 +    else
 +        sprintf(buf, GetMangosString(LANG_BG_AV_GRAVE_TAKEN) , GetNodeName(node),( owner == ALLIANCE ) ? GetMangosString(LANG_BG_AV_ALLY) :GetMangosString(LANG_BG_AV_HORDE)  );
-+        
++
 +    Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
 +    if(creature)
 +        YellToAll(creature,buf,LANG_UNIVERSAL);
@@ -743,7 +761,7 @@ index 9421e97..8b117c2 100644
 +    if(team == ALLIANCE || team == HORDE)
 +    {
 +        m_Mine_Reclaim_Timer[mine]=AV_MINE_RECLAIM_TIMER;
-+    	char buf[256];
++	char buf[256];
 +	    sprintf(buf, GetMangosString(LANG_BG_AV_MINE_TAKEN), GetMangosString(( mine == AV_NORTH_MINE ) ? LANG_BG_AV_MINE_NORTH : LANG_BG_AV_MINE_SOUTH), ( team == ALLIANCE ) ?  GetMangosString(LANG_BG_AV_ALLY) : GetMangosString(LANG_BG_AV_HORDE));
 +        Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
 +        if(creature)
@@ -781,7 +799,7 @@ index 9421e97..8b117c2 100644
 +    else
 +    {
 +        uint8 team2 = GetTeamIndexByTeamId(owner);
-+    	if (m_Team_QuestStatus[team2][0] < 500 )
++	if (m_Team_QuestStatus[team2][0] < 500 )
 +            creatureid = ( owner == ALLIANCE )? AV_NPC_A_GRAVEDEFENSE0 : AV_NPC_H_GRAVEDEFENSE0;
 +        else if ( m_Team_QuestStatus[team2][0] < 1000 )
 +            creatureid = ( owner == ALLIANCE )? AV_NPC_A_GRAVEDEFENSE1 : AV_NPC_H_GRAVEDEFENSE1;
@@ -866,7 +884,7 @@ index 9421e97..8b117c2 100644
 +        return BG_AV_OBJECT_FLAG_N_SNOWFALL_GRAVE;
 +    sLog.outError("BattleGroundAV: Error! GetPlaceNode couldn't resolve node %i",node);
 +    assert(false);
-+    return 0; //i don't know what i should return, maybe I should crash the server at this point :>
++    return 0;
 +}
 +
 +
@@ -1419,7 +1437,7 @@ index 9421e97..8b117c2 100644
 +    {
 +        for(uint8 j=0; j<9; j++)
 +            m_Team_QuestStatus[i][j]=0;
-+    	m_Team_Scores[i]=BG_AV_SCORE_INITIAL_POINTS;
++	m_Team_Scores[i]=BG_AV_SCORE_INITIAL_POINTS;
 +        m_IsInformedNearVictory[i]=false;
 +        m_CaptainAlive[i] = true;
 +        m_CaptainBuffTimer[i] = 120000 + urand(0,4)* 60; //as far as i could see, the buff is randomly so i make 2minutes (thats the duration of the buff itself) + 0-4minutes TODO get the right times
@@ -1444,14 +1462,14 @@ index 9421e97..8b117c2 100644
 +}
 +
 diff --git a/src/game/BattleGroundAV.h b/src/game/BattleGroundAV.h
-index 11bd08b..e4a0ff8 100644
+index 11bd08b..79951bc 100644
 --- a/src/game/BattleGroundAV.h
 +++ b/src/game/BattleGroundAV.h
 @@ -21,6 +21,1459 @@
  
  class BattleGround;
  
-+#define LANG_BG_AV_A_CAPTAIN_BUFF       "Take heart, Alliance! Throw these villains from Alterac Valley!"
++#define LANG_BG_AV_A_CAPTAIN_BUFF       "Begone. Uncouth scum! The Alliance shall prevail in Alterac Valley!"
 +#define LANG_BG_AV_H_CAPTAIN_BUFF       "Now is the time to attack! For the Horde!"
 +
 +#define LANG_BG_AV_S_MINE_BOSS_CLAIMS   "Snivvle is here! Snivvle claims the Coldtooth Mine!"
@@ -2021,7 +2039,7 @@ index 11bd08b..e4a0ff8 100644
 +    AV_CPLACE_MINE_S_S_MAX      = 299,
 +    //boss
 +    AV_CPLACE_MINE_S_3          = 300,
-+    
++
 +    //herald
 +    AV_CPLACE_HERALD          = 301,
 +
@@ -2986,7 +3004,7 @@ index 11bd08b..e4a0ff8 100644
 +
  #endif
 diff --git a/src/game/GameObject.cpp b/src/game/GameObject.cpp
-index dc2aee4..3f62fcf 100644
+index 1f17d6f..4b8a6f9 100644
 --- a/src/game/GameObject.cpp
 +++ b/src/game/GameObject.cpp
 @@ -35,6 +35,7 @@
@@ -3013,15 +3031,15 @@ index dc2aee4..3f62fcf 100644
          }
          case GAMEOBJECT_TYPE_GOOBER:
 diff --git a/src/game/Language.h b/src/game/Language.h
-index 4d4c155..2722aa6 100644
+index 7dcee62..a889462 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
-@@ -620,7 +620,43 @@ enum MangosStrings
+@@ -645,7 +645,45 @@ enum MangosStrings
      LANG_HIS_ARENA_LEVEL_REQ_ERROR      = 714,
      LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
      LANG_YOUR_ARENA_TEAM_FULL           = 716,
 -    // Room for BG/ARENA                  717-799 not used
-+    
++
 +    LANG_BG_AV_ALLY                     = 717,
 +    LANG_BG_AV_HORDE                    = 718,
 +    LANG_BG_AV_TOWER_TAKEN              = 719,
@@ -3056,8 +3074,10 @@ index 4d4c155..2722aa6 100644
 +    LANG_BG_AV_STARTED                  = 745,
 +    LANG_BG_AV_A_NEAR_LOSE              = 746,
 +    LANG_BG_AV_H_NEAR_LOSE              = 747,
++    LANG_BG_AV_H_CAPTAIN_DEAD           = 748,
++    LANG_BG_AV_A_CAPTAIN_DEAD           = 749,
 +
-+    // Room for BG/ARENA                  748-799 not used
++    // Room for BG/ARENA                  750-799 not used
  
      // in game strings
      //                                  = 800, not used
@@ -3091,7 +3111,7 @@ index 9731442..38d780d 100644
      {
          Creature* pCreature =
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index 25b35a9..51dc3de 100644
+index bdda338..15c01f7 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -52,6 +52,7 @@
@@ -3102,7 +3122,7 @@ index 25b35a9..51dc3de 100644
  #include "BattleGroundMgr.h"
  #include "ArenaTeam.h"
  #include "Chat.h"
-@@ -4050,7 +4051,7 @@ void Player::RepopAtGraveyard()
+@@ -4045,7 +4046,7 @@ void Player::RepopAtGraveyard()
      // Special handle for battleground maps
      BattleGround *bg = sBattleGroundMgr.GetBattleGround(GetBattleGroundId());
  
@@ -3111,7 +3131,7 @@ index 25b35a9..51dc3de 100644
          ClosestGrave = bg->GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetTeam());
      else
          ClosestGrave = objmgr.GetClosestGraveYard( GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam() );
-@@ -7047,9 +7048,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
+@@ -7022,9 +7023,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
      sLog.outDebug("Player::SendLoot");
      if (IS_GAMEOBJECT_GUID(guid))
      {
@@ -3122,7 +3142,7 @@ index 25b35a9..51dc3de 100644
  
          // not check distance for GO in case owned GO (fishing bobber case, for example)
          // And permit out of range GO with no owner in case fishing hole
-@@ -7063,18 +7062,24 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
+@@ -7038,18 +7037,24 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
  
          if(go->getLootState() == GO_READY)
          {
@@ -3151,7 +3171,7 @@ index 25b35a9..51dc3de 100644
              go->SetLootState(GO_ACTIVATED);
          }
      }
-@@ -7141,6 +7146,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
+@@ -7116,6 +7121,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
              bones->lootForBody = true;
              uint32 pLevel = bones->loot.gold;
              bones->loot.clear();
@@ -3160,7 +3180,7 @@ index 25b35a9..51dc3de 100644
              // It may need a better formula
              // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
              bones->loot.gold = (uint32)( urand(50, 150) * 0.016f * pow( ((float)pLevel)/5.76f, 2.5f) * sWorld.getRate(RATE_DROP_MONEY) );
-@@ -7271,32 +7278,27 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
+@@ -7246,32 +7253,27 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
      SetLootGUID(guid);
  
      QuestItemList *q_list = 0;
@@ -3177,11 +3197,10 @@ index 25b35a9..51dc3de 100644
          else
              q_list = itr->second;
 -    }
--
+ 
 -    QuestItemList *ffa_list = 0;
 -    if (permission != NONE_PERMISSION)
 -    {
-+        
          QuestItemMap const& lootPlayerFFAItems = loot->GetPlayerFFAItems();
 -        QuestItemMap::const_iterator itr = lootPlayerFFAItems.find(GetGUIDLow());
 +        itr = lootPlayerFFAItems.find(GetGUIDLow());
@@ -3190,18 +3209,17 @@ index 25b35a9..51dc3de 100644
          else
              ffa_list = itr->second;
 -    }
--
+ 
 -    QuestItemList *conditional_list = 0;
 -    if (permission != NONE_PERMISSION)
 -    {
-+        
          QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = loot->GetPlayerNonQuestNonFFAConditionalItems();
 -        QuestItemMap::const_iterator itr = lootPlayerNonQuestNonFFAConditionalItems.find(GetGUIDLow());
 +        itr = lootPlayerNonQuestNonFFAConditionalItems.find(GetGUIDLow());
          if (itr == lootPlayerNonQuestNonFFAConditionalItems.end())
              conditional_list = loot->FillNonQuestNonFFAConditionalLoot(this);
          else
-@@ -7440,81 +7442,86 @@ void Player::SendInitWorldStates()
+@@ -7415,81 +7417,86 @@ void Player::SendInitWorldStates()
          case 2257:
              break;
          case 2597:                                          // AV
@@ -3285,7 +3303,7 @@ index 25b35a9..51dc3de 100644
 +            else
 +            {
 +                data << uint32(0x7ae) << uint32(0x1);           // 7 snowfall n
-+                data << uint32(0x532) << uint32(0x1);           // 8 frostwolfhut hc 
++                data << uint32(0x532) << uint32(0x1);           // 8 frostwolfhut hc
 +                data << uint32(0x531) << uint32(0x0);           // 9 frostwolfhut ac
 +                data << uint32(0x52e) << uint32(0x0);           // 10 stormpike firstaid a_a
 +                data << uint32(0x571) << uint32(0x0);           // 11 east frostwolf tower horde assaulted -unused
@@ -3363,7 +3381,7 @@ index 25b35a9..51dc3de 100644
              break;
          case 3277:                                          // WS
              if (bg && bg->GetTypeID() == BATTLEGROUND_WS)
-@@ -13012,7 +13019,8 @@ bool Player::HasQuestForItem( uint32 itemid ) const
+@@ -12999,7 +13006,8 @@ bool Player::HasQuestForItem( uint32 itemid ) const
  
              // hide quest if player is in raid-group and quest is no raid quest
              if(GetGroup() && GetGroup()->isRaidGroup() && qinfo->GetType() != QUEST_TYPE_RAID)
@@ -3373,7 +3391,7 @@ index 25b35a9..51dc3de 100644
  
              // There should be no mixed ReqItem/ReqSource drop
              // This part for ReqItem drop
-@@ -17506,6 +17514,7 @@ uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
+@@ -17493,6 +17501,7 @@ uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
      return 10*(queue_id+2)-1;
  }
  
@@ -3382,7 +3400,7 @@ index 25b35a9..51dc3de 100644
  {
      uint32 level = getLevel();
 diff --git a/src/game/QuestHandler.cpp b/src/game/QuestHandler.cpp
-index 42eea50..154198f 100644
+index 5b68829..e84cc31 100644
 --- a/src/game/QuestHandler.cpp
 +++ b/src/game/QuestHandler.cpp
 @@ -29,6 +29,8 @@
@@ -3394,11 +3412,11 @@ index 42eea50..154198f 100644
  
  void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
  {
-@@ -395,9 +397,15 @@ void WorldSession::HandleQuestComplete(WorldPacket& recv_data)
+@@ -396,9 +398,15 @@ void WorldSession::HandleQuestComplete(WorldPacket& recv_data)
  
      sLog.outDebug( "WORLD: Received CMSG_QUESTGIVER_COMPLETE_QUEST npc = %u, quest = %u",uint32(GUID_LOPART(guid)),quest );
  
-+    
++
      Quest const *pQuest = objmgr.GetQuestTemplate(quest);
      if( pQuest )
      {
@@ -3411,10 +3429,10 @@ index 42eea50..154198f 100644
          {
              if( pQuest->IsRepeatable() )
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index 614d6d2..886692b 100644
+index ef129fa..1b8fdbb 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
-@@ -2844,7 +2844,7 @@ void Spell::EffectOpenLock(uint32 /*i*/)
+@@ -2845,7 +2845,7 @@ void Spell::EffectOpenLock(uint32 /*i*/)
              if(BattleGround *bg = player->GetBattleGround())
              {
                  // check if it's correct bg
@@ -3424,10 +3442,10 @@ index 614d6d2..886692b 100644
                  return;
              }
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 339a590..094a385 100644
+index b64f538..a3103ce 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
-@@ -616,6 +616,22 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -618,6 +618,22 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                  if(BattleGround *bg = killed->GetBattleGround())
                      bg->HandleKillPlayer(killed, killer);   // drop flags and etc
          }
@@ -3450,7 +3468,7 @@ index 339a590..094a385 100644
  
          DEBUG_LOG("DealDamage: victim just died");
  
-@@ -3607,7 +3623,7 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_
+@@ -3611,7 +3627,7 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_
  bool Unit::AddAura(Aura *Aur)
  {
      // ghost spell check, allow apply any auras at player loading in ghost mode (will be cleanup after load)

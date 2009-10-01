@@ -1,5 +1,5 @@
 diff --git a/src/game/Creature.cpp b/src/game/Creature.cpp
-index 899a7ab..f4f6704 100644
+index 899a7ab..f4a1ae7 100644
 --- a/src/game/Creature.cpp
 +++ b/src/game/Creature.cpp
 @@ -42,6 +42,7 @@
@@ -16,8 +16,8 @@ index 899a7ab..f4f6704 100644
                          break;                              // no checks
 +                    case GOSSIP_OPTION_OUTDOORPVP:
 +                        if ( !sOutdoorPvPMgr.CanTalkTo(pPlayer,this,(*gso)) )
-+                            cantalking = false;
-+                        break;
++                             cantalking = false;
++                         break;
                      default:
                          sLog.outErrorDb("Creature %u (entry: %u) have unknown gossip option %u",GetDBTableGUIDLow(),GetEntry(),gso->Action);
                          break;
@@ -25,8 +25,8 @@ index 899a7ab..f4f6704 100644
              player->PlayerTalkClass->SendTalking(textid);
              break;
          }
-+        case GOSSIP_OPTION_OUTDOORPVP:
-+            sOutdoorPvPMgr.HandleGossipOption(player, GetGUID(), gossip->GossipId);
++		case GOSSIP_OPTION_OUTDOORPVP:
++             sOutdoorPvPMgr.HandleGossipOption(player, GetGUID(), gossip->GossipId);
 +            break;
          case GOSSIP_OPTION_SPIRITHEALER:
              if (player->isDead())
@@ -66,7 +66,7 @@ index b76a721..ca2ddfc 100644
          (new MovementGeneratorFactory<RandomMovementGenerator<Creature> >(RANDOM_MOTION_TYPE))->RegisterSelf();
          (new MovementGeneratorFactory<WaypointMovementGenerator<Creature> >(WAYPOINT_MOTION_TYPE))->RegisterSelf();
 diff --git a/src/game/GameObject.cpp b/src/game/GameObject.cpp
-index dc2aee4..1cb91f8 100644
+index 1f17d6f..2d35108 100644
 --- a/src/game/GameObject.cpp
 +++ b/src/game/GameObject.cpp
 @@ -36,6 +36,7 @@
@@ -243,10 +243,10 @@ index 7dcee62..b84e10a 100644
      LANG_NOT_EQUIPPED_ITEM              = 706,
      LANG_PLAYER_DND                     = 707,
 diff --git a/src/game/Makefile.am b/src/game/Makefile.am
-index ad3315d..17a1dcc 100644
+index 03dbeef..0f23700 100644
 --- a/src/game/Makefile.am
 +++ b/src/game/Makefile.am
-@@ -177,6 +177,24 @@ libmangosgame_a_SOURCES = \
+@@ -179,6 +179,24 @@ libmangosgame_a_SOURCES = \
      ObjectPosSelector.h \
      Opcodes.cpp \
      Opcodes.h \
@@ -272,7 +272,7 @@ index ad3315d..17a1dcc 100644
      PetAI.cpp \
      PetAI.h \
 diff --git a/src/game/MiscHandler.cpp b/src/game/MiscHandler.cpp
-index 4bdbbd3..2f614e0 100644
+index 2d77c73..07240ae 100644
 --- a/src/game/MiscHandler.cpp
 +++ b/src/game/MiscHandler.cpp
 @@ -38,6 +38,7 @@
@@ -283,7 +283,7 @@ index 4bdbbd3..2f614e0 100644
  #include "SpellAuras.h"
  #include "Pet.h"
  #include "SocialMgr.h"
-@@ -562,6 +563,11 @@ void WorldSession::HandleTogglePvP( WorldPacket & recv_data )
+@@ -379,6 +380,11 @@ void WorldSession::HandleTogglePvP( WorldPacket & recv_data )
          if(!GetPlayer()->pvpInfo.inHostileArea && GetPlayer()->IsPvP())
              GetPlayer()->pvpInfo.endTimer = time(NULL);     // start toggle-off
      }
@@ -295,7 +295,7 @@ index 4bdbbd3..2f614e0 100644
  }
  
  void WorldSession::HandleZoneUpdateOpcode( WorldPacket & recv_data )
-@@ -573,10 +579,13 @@ void WorldSession::HandleZoneUpdateOpcode( WorldPacket & recv_data )
+@@ -390,10 +396,13 @@ void WorldSession::HandleZoneUpdateOpcode( WorldPacket & recv_data )
  
      sLog.outDetail("WORLD: Recvd ZONE_UPDATE: %u", newZone);
  
@@ -312,7 +312,7 @@ index 4bdbbd3..2f614e0 100644
  }
  
  void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
-@@ -1006,6 +1015,12 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
+@@ -823,6 +832,12 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
          return;
      }
  
@@ -348,7 +348,7 @@ index 0b6bb20..2511104 100644
                  else if(index >= UNIT_FIELD_BASEATTACKTIME && index <= UNIT_FIELD_RANGEDATTACKTIME)
                  {
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
-index 724880f..c291fab 100644
+index 7740f83..ce8691f 100644
 --- a/src/game/ObjectMgr.cpp
 +++ b/src/game/ObjectMgr.cpp
 @@ -1159,6 +1159,7 @@ void ObjectMgr::LoadGameobjects()
@@ -415,7 +415,7 @@ index 724880f..c291fab 100644
  {
      mAreaTriggers.clear();                                  // need for reload case
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index c9b4e9b..c9ea935 100644
+index a849df1..f97740f 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
 @@ -440,6 +440,7 @@ class ObjectMgr
@@ -5912,7 +5912,7 @@ index 0000000..ae94f59
 +// todo: flag carrier death/leave/mount/activitychange should give back the gossip options
 +#endif
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index df3d925..46a5ae5 100644
+index bdda338..59a3953 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -53,6 +53,8 @@
@@ -5924,7 +5924,7 @@ index df3d925..46a5ae5 100644
  #include "ArenaTeam.h"
  #include "Chat.h"
  #include "Database/DatabaseImpl.h"
-@@ -6102,6 +6104,7 @@ void Player::UpdateArea(uint32 newArea)
+@@ -6085,6 +6087,7 @@ void Player::UpdateArea(uint32 newArea)
  
  void Player::UpdateZone(uint32 newZone)
  {
@@ -5932,7 +5932,7 @@ index df3d925..46a5ae5 100644
      m_zoneUpdateId    = newZone;
      m_zoneUpdateTimer = ZONE_UPDATE_INTERVAL;
  
-@@ -6112,6 +6115,13 @@ void Player::UpdateZone(uint32 newZone)
+@@ -6095,6 +6098,13 @@ void Player::UpdateZone(uint32 newZone)
      if(!zone)
          return;
  
@@ -5946,7 +5946,7 @@ index df3d925..46a5ae5 100644
      if (sWorld.getConfig(CONFIG_WEATHER))
      {
          Weather *wth = sWorld.FindWeather(zone->ID);
-@@ -6245,6 +6255,11 @@ void Player::CheckDuelDistance(time_t currTime)
+@@ -6228,6 +6238,11 @@ void Player::CheckDuelDistance(time_t currTime)
      }
  }
  
@@ -5958,7 +5958,7 @@ index df3d925..46a5ae5 100644
  void Player::DuelComplete(DuelCompleteType type)
  {
      // duel not requested
-@@ -7339,13 +7354,17 @@ void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
+@@ -7322,13 +7337,17 @@ void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
      GetSession()->SendPacket(&data);
  }
  
@@ -5978,7 +5978,7 @@ index df3d925..46a5ae5 100644
      uint32 areaid = GetAreaId();
      sLog.outDebug("Sending SMSG_INIT_WORLD_STATES to Map:%u, Zone: %u", mapid, zoneid);
      // may be exist better way to do this...
-@@ -7370,6 +7389,12 @@ void Player::SendInitWorldStates()
+@@ -7353,6 +7372,12 @@ void Player::SendInitWorldStates()
          case 2918:
              NumberOfFields = 6;
              break;
@@ -5991,7 +5991,7 @@ index df3d925..46a5ae5 100644
          case 2597:
              NumberOfFields = 81;
              break;
-@@ -7381,7 +7406,10 @@ void Player::SendInitWorldStates()
+@@ -7364,7 +7389,10 @@ void Player::SendInitWorldStates()
              NumberOfFields = 38;
              break;
          case 3483:
@@ -6003,7 +6003,7 @@ index df3d925..46a5ae5 100644
              break;
          case 3519:
              NumberOfFields = 36;
-@@ -7431,6 +7459,68 @@ void Player::SendInitWorldStates()
+@@ -7414,6 +7442,68 @@ void Player::SendInitWorldStates()
          case 1537:
          case 2257:
              break;
@@ -6072,7 +6072,7 @@ index df3d925..46a5ae5 100644
          case 2597:                                          // AV
              data << uint32(0x7ae) << uint32(0x1);           // 7
              data << uint32(0x532) << uint32(0x1);           // 8
-@@ -7602,77 +7692,150 @@ void Player::SendInitWorldStates()
+@@ -7585,77 +7675,150 @@ void Player::SendInitWorldStates()
                  // and some more ... unknown
              }
              break;
@@ -6289,7 +6289,7 @@ index df3d925..46a5ae5 100644
              break;
          case 3698:                                          // Nagrand Arena
              data << uint32(0xa0f) << uint32(0x0);           // 7
-@@ -17677,6 +17840,11 @@ void Player::AutoUnequipOffhandIfNeed()
+@@ -17658,6 +17821,11 @@ void Player::AutoUnequipOffhandIfNeed()
      }
  }
  
@@ -6302,7 +6302,7 @@ index df3d925..46a5ae5 100644
  {
      if(spellInfo->EquippedItemClass < 0)
 diff --git a/src/game/Player.h b/src/game/Player.h
-index ca6e50b..9c8c4f3 100644
+index a5222d3..2d97934 100644
 --- a/src/game/Player.h
 +++ b/src/game/Player.h
 @@ -45,6 +45,7 @@ class PlayerMenu;
@@ -6338,10 +6338,10 @@ index ca6e50b..9c8c4f3 100644
          /*********************************************************/
  
 diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
-index a18a8cd..76598ab 100644
+index 7faf701..bdc4d1e 100644
 --- a/src/game/Spell.cpp
 +++ b/src/game/Spell.cpp
-@@ -3841,6 +3841,26 @@ uint8 Spell::CanCast(bool strict)
+@@ -3839,6 +3839,26 @@ uint8 Spell::CanCast(bool strict)
  
                  break;
              }
@@ -6369,7 +6369,7 @@ index a18a8cd..76598ab 100644
              {
                  if(m_caster->GetPetGUID())                  //let warlock do a replacement summon
 diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
-index 0beaf61..9b91146 100644
+index 6732fc5..e25b219 100644
 --- a/src/game/SpellAuras.cpp
 +++ b/src/game/SpellAuras.cpp
 @@ -40,6 +40,8 @@
@@ -6381,7 +6381,7 @@ index 0beaf61..9b91146 100644
  #include "CreatureAI.h"
  #include "Util.h"
  #include "GridNotifiers.h"
-@@ -3254,10 +3256,18 @@ void Aura::HandleModStealth(bool apply, bool Real)
+@@ -3258,10 +3260,18 @@ void Aura::HandleModStealth(bool apply, bool Real)
  {
      if(apply)
      {
@@ -6404,7 +6404,7 @@ index 0beaf61..9b91146 100644
  
          // only at real aura add
          if(Real)
-@@ -3302,6 +3312,12 @@ void Aura::HandleModStealth(bool apply, bool Real)
+@@ -3306,6 +3316,12 @@ void Aura::HandleModStealth(bool apply, bool Real)
                  }
                  else
                      m_target->SetVisibility(VISIBILITY_ON);
@@ -6417,7 +6417,7 @@ index 0beaf61..9b91146 100644
              }
          }
      }
-@@ -3334,6 +3350,9 @@ void Aura::HandleInvisibility(bool apply, bool Real)
+@@ -3338,6 +3354,9 @@ void Aura::HandleInvisibility(bool apply, bool Real)
          {
              // apply glow vision
              m_target->SetFlag(PLAYER_FIELD_BYTES2,PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
@@ -6427,7 +6427,7 @@ index 0beaf61..9b91146 100644
  
              // drop flag at invisible in bg
              if(((Player*)m_target)->InBattleGround())
-@@ -3370,6 +3389,13 @@ void Aura::HandleInvisibility(bool apply, bool Real)
+@@ -3374,6 +3393,13 @@ void Aura::HandleInvisibility(bool apply, bool Real)
                  // if have stealth aura then already have stealth visibility
                  if(!m_target->HasAuraType(SPELL_AURA_MOD_STEALTH))
                      m_target->SetVisibility(VISIBILITY_ON);
@@ -6441,7 +6441,7 @@ index 0beaf61..9b91146 100644
              }
          }
      }
-@@ -3809,6 +3835,8 @@ void Aura::HandleAuraModEffectImmunity(bool apply, bool Real)
+@@ -3813,6 +3839,8 @@ void Aura::HandleAuraModEffectImmunity(bool apply, bool Real)
                      }
                  }
              }
@@ -6451,7 +6451,7 @@ index 0beaf61..9b91146 100644
      }
  
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index 0e08b9c..1740c79 100644
+index ef129fa..9d9c2cb 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -48,6 +48,7 @@
@@ -6474,7 +6474,7 @@ index 0e08b9c..1740c79 100644
          guid = gameObjTarget->GetGUID();
      }
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 46f5a15..9e745a1 100644
+index b64f538..ce17771 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -41,6 +41,7 @@
@@ -6511,7 +6511,7 @@ index 46f5a15..9e745a1 100644
  
          if(spiritOfRedemtionTalentReady)
 diff --git a/src/game/Unit.h b/src/game/Unit.h
-index ee5b94b..a0eb97a 100644
+index 5d598fb..14c72ec 100644
 --- a/src/game/Unit.h
 +++ b/src/game/Unit.h
 @@ -512,6 +512,7 @@ enum NPCFlags
@@ -6523,18 +6523,18 @@ index ee5b94b..a0eb97a 100644
  
  enum MovementFlags
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 4f9dcb0..a592e58 100644
+index 11b95cf..55cbff0 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
-@@ -57,6 +57,7 @@
- #include "InstanceSaveMgr.h"
+@@ -58,6 +58,7 @@
  #include "WaypointManager.h"
+ #include "GMTicketMgr.h"
  #include "Util.h"
 +#include "OutdoorPvPMgr.h"
  
  INSTANTIATE_SINGLETON_1( World );
  
-@@ -1186,6 +1187,9 @@ void World::SetInitialWorldSettings()
+@@ -1189,6 +1190,9 @@ void World::SetInitialWorldSettings()
      sLog.outString( "Starting BattleGround System" );
      sBattleGroundMgr.CreateInitialBattleGrounds();
  
@@ -6544,7 +6544,7 @@ index 4f9dcb0..a592e58 100644
      //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
      sLog.outString( "Loading Transports..." );
      MapManager::Instance().LoadTransports();
-@@ -1379,6 +1383,8 @@ void World::Update(time_t diff)
+@@ -1382,6 +1386,8 @@ void World::Update(time_t diff)
              ScriptsProcess();
  
          sBattleGroundMgr.Update(diff);
@@ -6577,10 +6577,10 @@ index 59e236c..a3e48b9 100644
          {
              if(int32 bgTypeId = _player->GetBattleGroundQueueId(i))
 diff --git a/win/VC71/game.vcproj b/win/VC71/game.vcproj
-index 17ce916..2b8d087 100644
+index d131d0f..070bee4 100644
 --- a/win/VC71/game.vcproj
 +++ b/win/VC71/game.vcproj
-@@ -352,6 +352,70 @@
+@@ -355,6 +355,70 @@
  				RelativePath="..\..\src\game\ObjectGridLoader.h">
  			</File>
  			<File
@@ -6651,7 +6651,7 @@ index 17ce916..2b8d087 100644
  				RelativePath="..\..\src\game\Path.h">
  			</File>
  			<File
-@@ -643,6 +707,14 @@
+@@ -649,6 +713,14 @@
  				RelativePath="..\..\src\game\ObjectPosSelector.h">
  			</File>
  			<File
@@ -6667,10 +6667,10 @@ index 17ce916..2b8d087 100644
  			</File>
  			<File
 diff --git a/win/VC80/game.vcproj b/win/VC80/game.vcproj
-index b05cb19..86e90cc 100644
+index 80aa58b..c982393 100644
 --- a/win/VC80/game.vcproj
 +++ b/win/VC80/game.vcproj
-@@ -643,6 +643,70 @@
+@@ -647,6 +647,70 @@
  				>
  			</File>
  			<File
@@ -6741,7 +6741,7 @@ index b05cb19..86e90cc 100644
  				RelativePath="..\..\src\game\Path.h"
  				>
  			</File>
-@@ -1031,6 +1095,14 @@
+@@ -1039,6 +1103,14 @@
  				>
  			</File>
  			<File
@@ -6757,10 +6757,10 @@ index b05cb19..86e90cc 100644
  				>
  			</File>
 diff --git a/win/VC90/game.vcproj b/win/VC90/game.vcproj
-index 8d914b3..56d3e9d 100644
+index 19b0ae4..8111f75 100644
 --- a/win/VC90/game.vcproj
 +++ b/win/VC90/game.vcproj
-@@ -644,6 +644,70 @@
+@@ -648,6 +648,70 @@
  				>
  			</File>
  			<File
@@ -6831,7 +6831,7 @@ index 8d914b3..56d3e9d 100644
  				RelativePath="..\..\src\game\Path.h"
  				>
  			</File>
-@@ -1032,6 +1096,14 @@
+@@ -1040,6 +1104,14 @@
  				>
  			</File>
  			<File
