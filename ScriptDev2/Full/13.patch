@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 725)
+--- Makefile.am	(revision 732)
 +++ Makefile.am	(working copy)
 @@ -51,10 +51,20 @@
  scripts/custom/custom_example.cpp \
@@ -62,7 +62,7 @@ Index: Makefile.am
  scripts/zone/zulaman/zulaman.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 725)
+--- ScriptMgr.cpp	(revision 732)
 +++ ScriptMgr.cpp	(working copy)
 @@ -77,12 +77,22 @@
  extern void AddSC_custom_example();
@@ -112,14 +112,14 @@ Index: ScriptMgr.cpp
  extern void AddSC_netherspite_infernal();
  extern void AddSC_boss_moroes();
  extern void AddSC_bosses_opera();
-@@ -492,6 +506,7 @@
- //--The Eye
+@@ -493,6 +507,7 @@
  extern void AddSC_boss_kaelthas();
  extern void AddSC_boss_void_reaver();
-+extern void AddSC_boss_alar();
  extern void AddSC_boss_high_astromancer_solarian();
++extern void AddSC_boss_alar();
  extern void AddSC_instance_the_eye();
  extern void AddSC_the_eye();
+ 
 @@ -561,9 +576,14 @@
  extern void AddSC_boss_renataki();
  extern void AddSC_boss_wushoolay();
@@ -183,14 +183,14 @@ Index: ScriptMgr.cpp
      AddSC_netherspite_infernal();
      AddSC_boss_moroes();
      AddSC_bosses_opera();
-@@ -1670,6 +1704,7 @@
-     //--The Eye
+@@ -1671,6 +1705,7 @@
      AddSC_boss_kaelthas();
      AddSC_boss_void_reaver();
-+    AddSC_boss_alar();
      AddSC_boss_high_astromancer_solarian();
++    AddSC_boss_alar();
      AddSC_instance_the_eye();
      AddSC_the_eye();
+ 
 @@ -1741,8 +1776,12 @@
      AddSC_instance_zulgurub();
  
@@ -1706,7 +1706,7 @@ Index: scripts/guard/g_marcus_jonathan.cpp
 +}
 Index: scripts/guard/guard_ai.cpp
 ===================================================================
---- scripts/guard/guard_ai.cpp	(revision 725)
+--- scripts/guard/guard_ai.cpp	(revision 732)
 +++ scripts/guard/guard_ai.cpp	(working copy)
 @@ -1,26 +1,12 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -2251,7 +2251,7 @@ Index: scripts/guard/guard_ai.cpp
      else
 Index: scripts/guard/guard_ai.h
 ===================================================================
---- scripts/guard/guard_ai.h	(revision 725)
+--- scripts/guard/guard_ai.h	(revision 732)
 +++ scripts/guard/guard_ai.h	(working copy)
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -3855,7 +3855,7 @@ Index: scripts/guard/thrall.cpp
 +}
 Index: scripts/item/item_scripts.cpp
 ===================================================================
---- scripts/item/item_scripts.cpp	(revision 725)
+--- scripts/item/item_scripts.cpp	(revision 732)
 +++ scripts/item/item_scripts.cpp	(working copy)
 @@ -393,6 +393,25 @@
  }
@@ -3897,9 +3897,9 @@ Index: scripts/item/item_scripts.cpp
      m_scripts[nrscripts++] = newscript;
 Index: scripts/zone/black_temple/boss_supremus.cpp
 ===================================================================
---- scripts/zone/black_temple/boss_supremus.cpp	(revision 725)
+--- scripts/zone/black_temple/boss_supremus.cpp	(revision 732)
 +++ scripts/zone/black_temple/boss_supremus.cpp	(working copy)
-@@ -115,7 +115,7 @@
+@@ -122,7 +122,7 @@
          CheckTimer = 1000;
          SupremusGUID = 0;
          FireballTimer = 500;
@@ -3908,26 +3908,26 @@ Index: scripts/zone/black_temple/boss_supremus.cpp
      }
  
      void Aggro(Unit *who) {}
-@@ -332,15 +332,7 @@
+@@ -357,15 +357,7 @@
  
-                 if(target)
+                 if (target)
                  {
 -                    Creature* Volcano = NULL;
 -                    Volcano = SummonCreature(CREATURE_VOLCANO, target);
 -
--                    if(Volcano)
+-                    if (Volcano)
 -                    {
 -                        DoCast(target, SPELL_VOLCANIC_ERUPTION);
 -                        ((npc_volcanoAI*)Volcano->AI())->SetSupremusGUID(m_creature->GetGUID());
 -                    }
 -
 +                    DoCast(target, SPELL_VOLCANIC_ERUPTION);
-                     DoTextEmote("roars and the ground begins to crack open!", NULL);
+                     DoScriptText(EMOTE_GROUND_CRACK, m_creature);
                      SummonVolcanoTimer = 10000;
                  }
 Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
 ===================================================================
---- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 725)
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 732)
 +++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
 @@ -66,7 +66,7 @@
  #define TAINTED_ELEMENTAL           22009
@@ -4009,7 +4009,7 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
      newscript = new Script;
 Index: scripts/zone/deadmines/deadmines.cpp
 ===================================================================
---- scripts/zone/deadmines/deadmines.cpp	(revision 725)
+--- scripts/zone/deadmines/deadmines.cpp	(revision 732)
 +++ scripts/zone/deadmines/deadmines.cpp	(working copy)
 @@ -22,3 +22,223 @@
  EndScriptData */
@@ -4256,7 +4256,7 @@ Index: scripts/zone/deadmines/def_deadmines.h
 +#endif
 Index: scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
 ===================================================================
---- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 725)
+--- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 732)
 +++ scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(working copy)
 @@ -179,6 +179,8 @@
                  m_creature->setFaction(14);
@@ -4388,7 +4388,7 @@ Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_blade
 +}
 Index: scripts/zone/karazhan/boss_nightbane.cpp
 ===================================================================
---- scripts/zone/karazhan/boss_nightbane.cpp	(revision 725)
+--- scripts/zone/karazhan/boss_nightbane.cpp	(revision 732)
 +++ scripts/zone/karazhan/boss_nightbane.cpp	(working copy)
 @@ -22,12 +22,370 @@
  EndScriptData */
@@ -4773,7 +4773,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 ===================================================================
 --- scripts/zone/tempest_keep/the_eye/boss_alar.cpp	(revision 0)
 +++ scripts/zone/tempest_keep/the_eye/boss_alar.cpp	(revision 0)
-@@ -0,0 +1,617 @@
+@@ -0,0 +1,590 @@
 +/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
 +* This program is free software; you can redistribute it and/or modify
 +* it under the terms of the GNU General Public License as published by
@@ -4799,7 +4799,6 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +
 +#include "precompiled.h"
 +#include "def_the_eye.h"
-+#include "Player.h"
 +
 +#define SPELL_FLAME_BUFFET            34121 // Flame Buffet - every 1,5 secs in phase 1 if there is no victim in melee range and after Dive Bomb in phase 2 with same conditions
 +#define SPELL_FLAME_QUILLS            34229 // Randomly after changing position in phase after watching tonns of movies, set probability 20%
@@ -4823,7 +4822,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +    {388.09, 31.54, 20.18},
 +    {388.18, -32.85, 20.18},
 +    {340.29, -60.19, 17.72},
-+    {331, 0.01, 39},
++    {332, 0.01, 39},
 +    {331, 0.01, -2.39}
 +};
 +
@@ -4870,9 +4869,9 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +
 +    void Reset()
 +    {
-+        Platforms_Move_Timer = 30000+rand()%5000;
++        Platforms_Move_Timer = 0;
 +        FlameQuills = false;
-+        cur_wp = 0;
++        cur_wp = 4;
 +        FlameBuffet_Timer = 1500;
 +        CorpseDisappear_Timer = 9999999;
 +        Enrage_Timer = 600000;
@@ -4896,47 +4895,14 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +    
 +    void Aggro (Unit *who)
 +    {
-+        StartEvent();
-+    }
-+
-+    void StartEvent()
-+    {
 +        if(pInstance)
 +            pInstance->SetData(DATA_ALAREVENT, 1);
-+        
-+        CreaturePointMove(0, waypoint[0][0], waypoint[0][1], waypoint[0][2]);
 +    }
-+ 
++
 +    void JustDied(Unit *victim)
 +    {
 +        if(pInstance)
 +            pInstance->SetData(DATA_ALAREVENT, 0);
-+    }
-+
-+    void MoveInLineOfSight(Unit *who)
-+    {
-+        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
-+        {
-+            if (m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
-+                return;
-+
-+            float attackRadius = m_creature->GetAttackDistance(who);
-+            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
-+            {
-+                if (Phase1)
-+                    DoStartNoMovement(who);
-+                else
-+                    DoStartMovement(who);
-+                
-+                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-+
-+                if (!InCombat)
-+                {
-+                    Aggro(who);
-+                    InCombat = true;
-+                }
-+            }
-+        }
 +    }
 +
 +    void AttackStart(Unit* who)
@@ -4944,19 +4910,22 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +        if (!who)
 +            return;
 +
-+        if (who->isTargetableForAttack())
++        if (m_creature->Attack(who, true))
 +        {
-+            //Begin attack
-+            if (Phase1)
-+                DoStartNoMovement(who);
-+            else
-+                DoStartMovement(who);
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
 +
 +            if (!InCombat)
 +            {
-+                Aggro(who);
 +                InCombat = true;
++                Aggro(who);
 +            }
++
++            if (Phase1)
++			    DoStartNoMovement(who);
++			else
++				DoStartMovement(who);
 +        }
 +    }
 +
@@ -5131,24 +5100,28 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +            }
 +            if (Platforms_Move_Timer < diff)
 +            {
-+                Creature* Summoned = NULL;
-+                Summoned = m_creature->SummonCreature(CREATURE_EMBER_OF_ALAR, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-+                if (Summoned)
-+                {
-+                    Unit* target = NULL;
-+                    target = SelectUnit(SELECT_TARGET_RANDOM, 0);
-+                    if (target)
-+                        Summoned->AI()->AttackStart(target);
-+                }
-+                if (rand()%100 <= 20)
-+                {
-+                    cur_wp = 4;
-+                    FlameQuills = true;
-+                } else
-+                {
-+                    cur_wp++;
-+                    if (cur_wp == 4)
-+                        cur_wp = 0;
++                if (cur_wp == 4)
++				{
++					cur_wp = 0;
++				}else
++				{
++				    Creature* Summoned = NULL;
++                    Summoned = m_creature->SummonCreature(CREATURE_EMBER_OF_ALAR, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
++                    if (Summoned)
++                    {
++                        Unit* target = NULL;
++                        target = SelectUnit(SELECT_TARGET_RANDOM, 0);
++                        if (target)
++                            Summoned->AI()->AttackStart(target);
++                    }
++                    if (rand()%100 <= 20)
++                    {
++                        cur_wp = 4;
++                        FlameQuills = true;
++                    }else
++					{
++                        cur_wp++;
++					}
 +                }
 +                CreaturePointMove(cur_wp, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2]);
 +            }else Platforms_Move_Timer -= diff;
@@ -5237,7 +5210,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +                DoCast(target, SPELL_DIVE_BOMB);
 +                m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, DefaultSize);
 +                m_creature->RemoveAurasDueToSpell(SPELL_DIVE_BOMB_VISUAL);
-+                m_creature->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate*2.0f);
++                m_creature->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate*1.5f);
 +                if (target)
 +                    CreaturePointMove(7, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
 +                Creature* Summoned = NULL;
@@ -5393,7 +5366,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +}
 Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 725)
+--- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 732)
 +++ scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(working copy)
 @@ -121,7 +121,7 @@
                  target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
@@ -5420,7 +5393,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
          }else ArcaneOrb_Timer -= diff;
 Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 725)
+--- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 732)
 +++ scripts/zone/tempest_keep/the_eye/def_the_eye.h	(working copy)
 @@ -17,4 +17,5 @@
  #define DATA_SOLARIANEVENT                  10
@@ -5430,7 +5403,7 @@ Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
  #endif
 Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 725)
+--- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 732)
 +++ scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(working copy)
 @@ -43,8 +43,10 @@
      uint64 MasterEngineerTelonicus;
@@ -5454,15 +5427,18 @@ Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
  
          for(uint8 i = 0; i < ENCOUNTERS; i++)
              Encounters[i] = false;
-@@ -81,6 +85,7 @@
+@@ -81,6 +85,10 @@
              case 20060: LordSanguinar = creature->GetGUID(); break;
              case 19622: Kaelthas = creature->GetGUID(); break;
              case 18805: Astromancer = creature->GetGUID(); break;
-+            case 19514: Alar = creature->GetGUID(); break;
++
++            case 19514:
++                Alar = creature->GetGUID();
++                break;
          }
      }
  
-@@ -105,6 +110,9 @@
+@@ -105,6 +113,9 @@
  
              case DATA_ASTROMANCER:
                  return Astromancer;
@@ -5472,7 +5448,7 @@ Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
          }
  
          return 0;
-@@ -115,6 +123,7 @@
+@@ -115,6 +126,7 @@
          switch(type)
          {
              case DATA_ALAREVENT:
@@ -5480,7 +5456,7 @@ Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
                  Encounters[0] = (data) ? true : false;
                  break;
  
-@@ -143,7 +152,7 @@
+@@ -143,7 +155,7 @@
          switch(type)
          {
              case DATA_ALAREVENT:
@@ -7364,9 +7340,18 @@ Index: scripts/zone/zulaman/boss_hexlord.cpp
 +}
 Index: scripts/zone/zulaman/boss_janalai.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_janalai.cpp	(revision 725)
+--- scripts/zone/zulaman/boss_janalai.cpp	(revision 732)
 +++ scripts/zone/zulaman/boss_janalai.cpp	(working copy)
-@@ -29,14 +29,14 @@
+@@ -16,7 +16,7 @@
+ 
+ /* ScriptData
+ SDName: Boss_Janalai
+-SD%Complete: 75
++SD%Complete: 100
+ SDComment:
+ SDCategory: Zul'Aman
+ EndScriptData */
+@@ -40,25 +40,27 @@
  #define SPELL_FLAME_BREATH          43140
  #define SPELL_FIRE_WALL             43113
  #define SPELL_ENRAGE                44779
@@ -7387,31 +7372,6 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +#define SPELL_FIRE_BOMB_DUMMY       42629 // bomb visual
  #define SPELL_FIRE_BOMB_DAMAGE      42630
  
- // -- SAYs
-@@ -45,7 +45,7 @@
- #define SOUND_FIRE_BOMBS            12032
- #define SAY_FIRE_BOMBS              "I burn ya now!"
- #define SOUND_SUMMON_HATCHER        12033
--#define SAY_SUMMON_HATCHER          "Where ma hatcha? Get to work on dem eggs!"
-+#define SAY_SUMMON_HATCHER          "Where ma hatcha? Get to work on dem templist!"
- #define SOUND_ALL_EGGS              12034
- #define SAY_ALL_EGGS                "I show you strength... in numbers."
- #define SOUND_BERSERK               12035
-@@ -59,22 +59,22 @@
- #define SOUND_DEATH                 12038
- #define SAY_DEATH                   "Zul'jin... got a surprise for you..."
- 
--#define SOUND_AGGRO_1               12039                   //NOT USED need more information
--                                                            //NOT USED need more information (random say before aggro?)
--#define SAY_AGGRO_1                 "Come, strangers. The spirit of the dragonhawk hot be hungry for worthy souls."
--#define SOUND_AGGRO_2               12040                   //NOT USED need more information
--                                                            //NOT USED need more information (random say before aggro?)
--#define SAY_AGGRO_2                 "Come, friends. Your bodies gonna feed ma hatchlings, and your souls are going to feed me with power!"
-+#define SOUND_AGGRO_1               12039 //NOT USED need more information
-+#define SAY_AGGRO_1                 "Come, strangers. The spirit of the dragonhawk hot be hungry for worthy souls." //NOT USED need more information(random say before aggro?)
-+#define SOUND_AGGRO_2               12040 //NOT USED need more information
-+#define SAY_AGGRO_2                 "Come, friends. Your bodies gonna feed ma HatchNum, and your souls are going to feed me with power!" //NOT USED need more information(random say before aggro?)
- 
  // --Summons
  #define MOB_AMANI_HATCHER           23818
 -#define MOB_HATCHLING               23598
@@ -7429,7 +7389,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  
  const int area_dx = 44;
  const int area_dy = 51;
-@@ -92,76 +92,74 @@
+@@ -76,76 +78,74 @@
      {-33.93, 1175.68, 19, 1.5*3.1415}
  };
  
@@ -7509,8 +7469,9 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  
      void Reset()
      {
-         if(pInstance)
-             pInstance->SetData(DATA_JANALAIEVENT, NOT_STARTED);
+         if (pInstance)
+-            pInstance->SetData(TYPE_JANALAIEVENT, NOT_STARTED);
++            pInstance->SetData(DATA_JANALAIEVENT, NOT_STARTED);
  
 -        fire_breath_timer = 8000;
 -        bomb_timer = 30000;
@@ -7546,35 +7507,21 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
      }
  
      void JustDied(Unit* Killer)
-@@ -176,15 +174,15 @@
-     void KilledUnit(Unit* victim)
-     {
-         switch(rand()%2)
--        {
--            case 0:
--                DoYell(SAY_SLAY_1, LANG_UNIVERSAL, NULL);
--                DoPlaySoundToSet(m_creature,SOUND_SLAY_1);
--                break;
--            case 1:
--                DoYell(SAY_SLAY_2, LANG_UNIVERSAL, NULL);
--                DoPlaySoundToSet(m_creature,SOUND_SLAY_1);
--                break;
-+        {        
-+        case 0:
-+            DoYell(SAY_SLAY_1, LANG_UNIVERSAL, NULL);
-+            DoPlaySoundToSet(m_creature,SOUND_SLAY_1);
-+            break;
-+        case 1:
-+            DoYell(SAY_SLAY_2, LANG_UNIVERSAL, NULL);
-+            DoPlaySoundToSet(m_creature,SOUND_SLAY_1);
-+            break;        
-         }
+@@ -153,7 +153,7 @@
+         DoScriptText(SAY_DEATH, m_creature);
+ 
+         if (pInstance)
+-            pInstance->SetData(TYPE_JANALAIEVENT, DONE);
++            pInstance->SetData(DATA_JANALAIEVENT, DONE);
      }
  
-@@ -195,280 +193,289 @@
+     void KilledUnit(Unit* victim)
+@@ -170,278 +170,289 @@
+         DoScriptText(SAY_AGGRO, m_creature);
  
-         DoYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
-         DoPlaySoundToSet(m_creature,SOUND_AGGRO);
+         if (pInstance)
+-            pInstance->SetData(TYPE_JANALAIEVENT, IN_PROGRESS);
++            pInstance->SetData(DATA_JANALAIEVENT, IN_PROGRESS);
 +        DoZoneInCombat();
      }
  
@@ -7593,7 +7540,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +        uint8 WallNum;
          Creature* wall = NULL;
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[0][0],FireWallCoords[0][1],FireWallCoords[0][2],FireWallCoords[0][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +        for(uint8 i = 0; i < 4; i++)
 +        {
@@ -7603,7 +7550,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +                WallNum = 2;
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[0][0],FireWallCoords[0][1]+5,FireWallCoords[0][2],FireWallCoords[0][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +            for(uint8 j = 0; j < WallNum; j++)
 +            {
@@ -7617,7 +7564,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +    }
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[0][0],FireWallCoords[0][1]-5,FireWallCoords[0][2],FireWallCoords[0][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +    void SpawnBombs()
 +    {
@@ -7628,7 +7575,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            dy =(rand()%(area_dy))-(area_dy/2);
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[1][0]-2,FireWallCoords[1][1]-2,FireWallCoords[1][2],FireWallCoords[1][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +            Creature* bomb = DoSpawnCreature(MOB_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
 +            if(bomb) FireBombGUIDs[i] = bomb->GetGUID();
@@ -7637,7 +7584,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +    }
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[1][0]+2,FireWallCoords[1][1]+2,FireWallCoords[1][2],FireWallCoords[1][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +    bool HatchAllEggs(uint32 action) //1: reset, 2: isHatching all
 +    {
@@ -7646,7 +7593,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +        m_creature->GetPosition(x, y, z);
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[2][0],FireWallCoords[2][1],FireWallCoords[2][2],FireWallCoords[2][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +        {
 +            CellPair pair(MaNGOS::ComputeCellPair(x, y));
@@ -7655,25 +7602,25 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            cell.SetNoCreate();
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[2][0],FireWallCoords[2][1]-5,FireWallCoords[2][2],FireWallCoords[2][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +            AllCreaturesOfEntryInRange check(m_creature, MOB_EGG, 100);
 +            MaNGOS::CreatureListSearcher<AllCreaturesOfEntryInRange> searcher(templist, check);
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[2][0],FireWallCoords[2][1]+5,FireWallCoords[2][2],FireWallCoords[2][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +            TypeContainerVisitor<MaNGOS::CreatureListSearcher<AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[3][0]-2,FireWallCoords[3][1],FireWallCoords[3][2],FireWallCoords[3][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +            CellLock<GridReadGuard> cell_lock(cell, pair);
 +            cell_lock->Visit(cell_lock, cSearcher, *(m_creature->GetMap()));
 +        }
  
 -        wall = m_creature->SummonCreature(MOB_FIRE_BOMB,FireWallCoords[3][0]+2,FireWallCoords[3][1],FireWallCoords[3][2],FireWallCoords[3][3],TEMPSUMMON_TIMED_DESPAWN,11500);
--        if(wall)
+-        if (wall)
 -            wall->CastSpell(wall,SPELL_FIRE_WALL,false);
 +        //error_log("Eggs %d at middle", templist.size());
 +        if(!templist.size())
@@ -7708,14 +7655,14 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            cell.SetNoCreate();
  
 -            Creature* bomb = DoSpawnCreature(MOB_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 13000);
--            if(bomb)
+-            if (bomb)
 -                FireBombGUIDs[i] = bomb->GetGUID();
 -        }
 +            AllCreaturesOfEntryInRange check(m_creature, MOB_FIRE_BOMB, 100);
 +            MaNGOS::CreatureListSearcher<AllCreaturesOfEntryInRange> searcher(templist, check);
  
 -        Creature* ThrowController = DoSpawnCreature(MOB_FIRE_BOMB,0,0,1,0,TEMPSUMMON_TIMED_DESPAWN,10000);
--        if(ThrowController)
+-        if (ThrowController)
 -            ThrowControllerGUID = ThrowController->GetGUID();
 +            TypeContainerVisitor<MaNGOS::CreatureListSearcher<AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
  
@@ -7738,13 +7685,13 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
          {
 -            Unit* ThrowController = NULL;
 -            Unit* FireBomb = NULL;
--            if(ThrowControllerGUID)
+-            if (ThrowControllerGUID)
 -                ThrowController = Unit::GetUnit((*m_creature), ThrowControllerGUID);
 -
--            if(FireBombGUIDs[bombcounter])
+-            if (FireBombGUIDs[bombcounter])
 -                FireBomb = Unit::GetUnit((*m_creature), FireBombGUIDs[bombcounter]);
 -
--            if(ThrowController && FireBomb)
+-            if (ThrowController && FireBomb)
 +            if(Unit *FireBomb = Unit::GetUnit((*m_creature), FireBombGUIDs[BombCount]))
              {
 -                ThrowController->CastSpell(FireBomb,SPELL_FIRE_BOMB_THROW,true);
@@ -7778,16 +7725,14 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -        if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
 -            return;
 -
--        if(!bombing)                                        // every Spell if NOT Bombing
+-        if (!bombing)                                        // every Spell if NOT Bombing
 +        if(isFlameBreathing)
          {
 -            //FIRE BREATH  several videos says every 8Secounds
--            if(fire_breath_timer < diff)
+-            if (fire_breath_timer < diff)
 +            if(!m_creature->IsNonMeleeSpellCasted(false))
              {
--                Unit* target = NULL;
--                target = SelectUnit(SELECT_TARGET_RANDOM,0);
--                if(target)
+-                if (Unit* target = SelectUnit(SELECT_TARGET_RANDOM,0))
 -                    DoCast(target,SPELL_FLAME_BREATH);
 -                fire_breath_timer = 8000;
 -            }else fire_breath_timer -=diff;
@@ -7795,23 +7740,29 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            }else return;
 +        }
  
--            if(bomb_timer < diff)
+-            if (bomb_timer < diff)
 +        if(isBombing)
 +        {
 +            if(BombSequenceTimer < diff)
              {
--                FireWall();
--                bomb_timer = 20000+rand()%20000;
--                m_creature->Relocate(JanalainPos[0][0],JanalainPos[0][1],JanalainPos[0][2],0);
--                m_creature->SendMonsterMove(JanalainPos[0][0], JanalainPos[0][1],JanalainPos[0][2],0,0,100);
--                DoYell(SAY_FIRE_BOMBS, LANG_UNIVERSAL, NULL);
--                DoPlaySoundToSet(m_creature,SOUND_FIRE_BOMBS);
--                throwBombs();
--                bombing = true;
+-                DoScriptText(SAY_FIRE_BOMBS, m_creature);
 +                HandleBombSequence();
 +            }else BombSequenceTimer -= diff;
 +            return;
 +        }
+ 
+-                FireWall();
+-                bomb_timer = 20000+rand()%20000;
+-                m_creature->Relocate(JanalainPos[0][0],JanalainPos[0][1],JanalainPos[0][2],0);
+-                m_creature->SendMonsterMove(JanalainPos[0][0], JanalainPos[0][1],JanalainPos[0][2],0,0,100);
++        if(!m_creature->SelectHostilTarget() && !m_creature->getVictim())
++            return;   
+ 
+-                throwBombs();
+-                bombing = true;
++        //enrage if under 25% hp before 5 min.
++        if(!enraged && m_creature->GetHealth() * 4 < m_creature->GetMaxHealth())
++            EnrageTimer = 0;
  
 -                //Teleport every Player into the middle
 -                Unit* Temp = NULL;
@@ -7822,19 +7773,14 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -                    if (Temp && m_creature->GetDistance(Temp) > 30.0)
 -                        DoTeleportPlayer(Temp, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0);
 -                }
+-
 -                DoCast(m_creature,SPELL_TELETOCENTER,true); // only Effect Spell
 -                DoCast(m_creature,SPELL_FIRE_BOMB_CHANNEL,false);
 -                finishedbomb_timer = 11000;
 -            }else bomb_timer -=diff;
-+        if(!m_creature->SelectHostilTarget() && !m_creature->getVictim())
-+            return;   
- 
+-
 -            //enrage if under 25% hp before 5 min.
 -            if (((m_creature->GetHealth()*100 / m_creature->GetMaxHealth()) < 25) && !enraged)
-+        //enrage if under 25% hp before 5 min.
-+        if(!enraged && m_creature->GetHealth() * 4 < m_creature->GetMaxHealth())
-+            EnrageTimer = 0;
-+
 +        if(EnrageTimer < diff)
 +        {
 +            if(!enraged)
@@ -7847,15 +7793,14 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
              }
 -
 -            //Enrage but only if not bombing
--            if(enragetime && !enraged)
+-            if (enragetime && !enraged)
 +            else
              {
-                 DoYell(SAY_BERSERK, LANG_UNIVERSAL, NULL);
--                DoPlaySoundToSet(m_creature,SOUND_BERSERK);
+                 DoScriptText(SAY_BERSERK, m_creature);
+ 
 -                m_creature->InterruptNonMeleeSpells(false);
 -                DoCast(m_creature,SPELL_ENRAGE);
 -                enraged = true;
-+                DoPlaySoundToSet(m_creature,SOUND_BERSERK);  
 +                m_creature->CastSpell(m_creature, SPELL_BERSERK, true);
 +                EnrageTimer = 300000;            
              }
@@ -7863,18 +7808,17 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +        }else EnrageTimer -= diff;
  
 -        //Enrage after 5 minutes
--        if(enrage_timer < diff)
+-        if (enrage_timer < diff)
 +        if(BombTimer < diff)
          {
 -            enragetime = true;
 -            enrage_timer = 600000;
 -        }else enrage_timer -=diff;
-+            DoYell(SAY_FIRE_BOMBS, LANG_UNIVERSAL, NULL);
-+            DoPlaySoundToSet(m_creature, SOUND_FIRE_BOMBS);
++            DoScriptText(SAY_FIRE_BOMBS, m_creature);
  
--        if(bombing)                                         // every Spell if Bombing
+-        if (bombing)                                        // every Spell if Bombing
 -        {
--            if(bombcounter < 40)
+-            if (bombcounter < 40)
 +            m_creature->AttackStop();
 +            m_creature->GetMotionMaster()->Clear();
 +            m_creature->Relocate(JanalainPos[0][0],JanalainPos[0][1],JanalainPos[0][2],0);
@@ -7895,7 +7839,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            InstanceMap::PlayerList const &PlayerList =((InstanceMap*)map)->GetPlayers();
 +            for(InstanceMap::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
              {
--                if(throw_timer < diff)
+-                if (throw_timer < diff)
 -                {
 -                    throw5Bombs();
 -                    throw_timer = 1000;
@@ -7907,7 +7851,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            return;
 +        }else BombTimer -= diff;
  
--            if(finishedbomb_timer < diff)
+-            if (finishedbomb_timer < diff)
 -            {
 -                bombing = false;
 -                finishedbomb_timer = 6000;
@@ -7917,12 +7861,12 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -        }
 -
 -        //Call Hatcher
-         if(!noeggs)
+         if (!noeggs)
          {
--            if(hatchertime < diff)
+-            if (hatchertime < diff)
 +            if(100 * m_creature->GetHealth() < 35 * m_creature->GetMaxHealth()) 
              {
--                if(pInstance->GetData(DATA_J_EGGSLEFT)>0 || pInstance->GetData(DATA_J_EGGSRIGHT) > 0)
+-                if (pInstance->GetData(DATA_J_EGGSLEFT)>0 || pInstance->GetData(DATA_J_EGGSRIGHT) > 0)
 +                m_creature->AttackStop();
 +                m_creature->GetMotionMaster()->Clear();
 +                m_creature->Relocate(JanalainPos[0][0],JanalainPos[0][1],JanalainPos[0][2],0);
@@ -7936,15 +7880,15 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            {
 +                if(HatchAllEggs(0))
                  {
+                     DoScriptText(SAY_SUMMON_HATCHER, m_creature);
+ 
 -                    Unit* hatcher = NULL;
-                     DoYell(SAY_SUMMON_HATCHER, LANG_UNIVERSAL, NULL);
-                     DoPlaySoundToSet(m_creature,SOUND_SUMMON_HATCHER);
 -                    hatcher = m_creature->SummonCreature(MOB_AMANI_HATCHER,hatcherway_l[0][0],hatcherway_l[0][1],hatcherway_l[0][2],0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,10000);
--                    if(hatcher)
+-                    if (hatcher)
 -                        hatcher->GetMotionMaster()->MovePoint(0, hatcherway_l[0][0], hatcherway_l[0][1], hatcherway_l[0][2]);
 -
 -                    hatcher = m_creature->SummonCreature(MOB_AMANI_HATCHER,hatcherway_r[0][0],hatcherway_r[0][1],hatcherway_r[0][2],0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,10000);
--                    if(hatcher)
+-                    if (hatcher)
 -                        hatcher->GetMotionMaster()->MovePoint(0, hatcherway_r[0][0],hatcherway_r[0][1],hatcherway_r[0][2]);
 -                    hatchertime = 45000;
 +                    m_creature->SummonCreature(MOB_AMANI_HATCHER,hatcherway[0][0][0],hatcherway[0][0][1],hatcherway[0][0][2],0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,10000);
@@ -7960,12 +7904,13 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
          }
  
 -        //WIPE after 10 minutes
--        if(wipetimer < diff)
+-        if (wipetimer < diff)
 +        if(ResetTimer < diff)
          {
--            DoYell(SAY_BERSERK, LANG_UNIVERSAL, NULL);
--            DoPlaySoundToSet(m_creature,SOUND_BERSERK);
+-            DoScriptText(SAY_BERSERK, m_creature);
 -            DoCast(m_creature,SPELL_ENRAGE);
+-            wipetimer = 30000;
+-        }else wipetimer -=diff;
 +            float x, y, z;
 +            m_creature->GetPosition(x, y, z);
 +            if(x < -70 || x > 0 || y > 1176 || y < 1121 || z < 18)
@@ -7973,17 +7918,13 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            ResetTimer = 5000;
 +        }else ResetTimer -= diff;
  
--            wipetimer = 30000;
--        }else wipetimer -=diff;
+-        //Hatch All
+-        if (!noeggs && (m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 35)
+-        {
+-            DoScriptText(SAY_ALL_EGGS, m_creature);
 +        DoMeleeAttackIfReady();    
  
--        //Hatch All
--        if(!noeggs && (m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 35)
--        {
--            DoYell(SAY_ALL_EGGS , LANG_UNIVERSAL, NULL);
--            DoPlaySoundToSet(m_creature,SOUND_BERSERK);
--
--            if(pInstance)
+-            if (pInstance)
 -                eggs = pInstance->GetData(DATA_J_EGGSLEFT);
 -
 -            int i;
@@ -7996,7 +7937,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -                int s = (rand()%20 - 10);
 -                m_creature->SummonCreature(MOB_HATCHLING,JanalainPos[0][0]+s,JanalainPos[0][1]+r,JanalainPos[0][2],0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,15000);
 -
--                if(pInstance)
+-                if (pInstance)
 -                    pInstance->SetData(DATA_J_HATCHLEFT,1);
 +                m_creature->AttackStop();
 +                m_creature->GetMotionMaster()->Clear();
@@ -8005,7 +7946,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +                isFlameBreathing = true;
              }
 -
--            if(pInstance)
+-            if (pInstance)
 -                eggs = pInstance->GetData(DATA_J_EGGSRIGHT);
 -
 -            for(i=1;i<=eggs;i=i+1)
@@ -8013,7 +7954,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -                int r = (rand()%20 - 10);
 -                int s = (rand()%20 - 10);
 -                m_creature->SummonCreature(MOB_HATCHLING,JanalainPos[0][0]+s,JanalainPos[0][1]+r,JanalainPos[0][2],0,TEMPSUMMON_CORPSE_TIMED_DESPAWN,15000);
--                if(pInstance)
+-                if (pInstance)
 -                    pInstance->SetData(DATA_J_HATCHRIGHT,1);
 -            }
 -
@@ -8021,9 +7962,9 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -        }
 -
 -        //check for reset ... exploit preventing ... pulled from his podest
--        if(reset_timer < diff)
+-        if (reset_timer < diff)
 -        {
--            if(m_creature->GetPositionX() < -70 || m_creature->GetPositionX() > 0)
+-            if (m_creature->GetPositionX() < -70 || m_creature->GetPositionX() > 0)
 -            {
 -                EnterEvadeMode();
 -                reset_timer = 5000;                         //every 5 Seca
@@ -8059,13 +8000,13 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
      }
  
      void Aggro(Unit* who) {}
-@@ -477,263 +484,221 @@
+@@ -450,256 +461,221 @@
  
      void MoveInLineOfSight(Unit* who) {}
  
 -    void UpdateAI(const uint32 diff)
 -    {
--        if(bomb_timer < diff)                               //Boom
+-        if (bomb_timer < diff)                               //Boom
 -        {
 -            m_creature->CastSpell(m_creature,SPELL_FIRE_BOMB_DAMAGE,false);
 -            bomb_timer = 1800000;
@@ -8119,11 +8060,6 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -        hatchlings = 0;
 -        eggs = 0;
 -        delete_timer = 10000;
--
--        //m_creature->RemoveAllAuras();
--        //m_creature->DeleteThreatList();
--        //m_creature->CombatStop();
--        //DoGoHome();
 +        isHatching = false;
 +        hasChangedSide = false;
 +        WaitTimer = 1;
@@ -8140,9 +8076,9 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  
 -    void UpdateAI(const uint32 diff)
 -    {
--        if(pInstance && (pInstance->GetData(DATA_JANALAIEVENT) == 1))
+-        if (pInstance && (pInstance->GetData(TYPE_JANALAIEVENT) == IN_PROGRESS))
          {
--            if(!start && !hatch)
+-            if (!start && !hatch)
 -            {
 -                waytype = ( m_creature->GetPositionY() > 1150);
 -                waypoint = 1;
@@ -8153,11 +8089,11 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            cell.data.Part.reserved = ALL_DISTRICT;
 +            cell.SetNoCreate();
  
--            if(start && !hatch)
+-            if (start && !hatch)
 -            {
--                if(wait)
+-                if (wait)
 -                {
--                    if(waittimer < diff)
+-                    if (waittimer < diff)
 -                    {
 -                        wait = false;
 -                        waittimer = 4000;
@@ -8180,7 +8116,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -                else
 -                {
 -                    m_creature->GetMotionMaster()->Clear();
--                    if(waytype)
+-                    if (waytype)
 -                        m_creature->GetMotionMaster()->MovePoint(0,hatcherway_l[waypoint][0],hatcherway_l[waypoint][1],hatcherway_l[waypoint][2]);
 -                    else
 -                        m_creature->GetMotionMaster()->MovePoint(0,hatcherway_r[waypoint][0],hatcherway_r[waypoint][1],hatcherway_r[waypoint][2]);
@@ -8189,11 +8125,11 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -            }
 +            TypeContainerVisitor<MaNGOS::CreatureListSearcher<AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
  
--            if(start && hatch)
+-            if (start && hatch)
 -            {
--                if(waittimer < diff)
+-                if (waittimer < diff)
 -                {
--                    if(!pInstance)
+-                    if (!pInstance)
 -                        return;
 +            CellLock<GridReadGuard> cell_lock(cell, pair);
 +            cell_lock->Visit(cell_lock, cSearcher, *(m_creature->GetMap()));
@@ -8203,7 +8139,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -                    Unit* hatchling;
 +        //error_log("Eggs %d at %d", templist.size(), side);
  
--                    if(waytype)
+-                    if (waytype)
 -                    {
 -                        eggs = pInstance->GetData(DATA_J_EGGSLEFT);
 +        for(std::list<Creature*>::iterator i = templist.begin(); i != templist.end() && num > 0; ++i)
@@ -8215,7 +8151,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            }
 +        }
  
--                        if(eggs > 0)
+-                        if (eggs > 0)
 -                            DoCast(m_creature,SPELL_HATCH_EGG);
 +        if(num)
 +            return false;   // no more templist
@@ -8227,7 +8163,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -                        for(i=1;i<=hatchlings;i=i+1)
 -                        {
 -                            eggs = pInstance->GetData(DATA_J_EGGSLEFT);
--                            if(eggs <= 0)
+-                            if (eggs <= 0)
 -                            {
 -                                if (waytype) waytype = false; else waytype = true;
 -                                waittimer = 15000;
@@ -8267,21 +8203,21 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            return;
 +        }
  
--                        if(hatchlings < 5)
+-                        if (hatchlings < 5)
 -                            hatchlings++;
 -                    }
 -                    else
 -                    {
 -                        eggs = pInstance->GetData(DATA_J_EGGSRIGHT);
 -
--                        if(eggs > 0)
+-                        if (eggs > 0)
 -                            DoCast(m_creature,SPELL_HATCH_EGG);
 -
 -                        int i;
 -                        for(i=1;i<=hatchlings;i=i+1)
 -                        {
 -                            eggs = pInstance->GetData(DATA_J_EGGSRIGHT);
--                            if(eggs <= 0)
+-                            if (eggs <= 0)
 -                            {
 -                                if (waytype) waytype = false; else waytype = true;
 -                                waittimer = 15000;
@@ -8313,7 +8249,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
          }
          else
 -        {
--            if(delete_timer < diff)
+-            if (delete_timer < diff)
 +        {   
 +            if(WaitTimer < diff)
              {
@@ -8386,10 +8322,10 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +
      void UpdateAI(const uint32 diff)
      {
--        if(!start)
+-        if (!start)
 +        if(!pInstance || !(pInstance->GetData(DATA_JANALAIEVENT) == IN_PROGRESS))
          {
--            if(m_creature->GetPositionY() > 1150)
+-            if (m_creature->GetPositionY() > 1150)
 -                m_creature->GetMotionMaster()->MovePoint(0, hatcherway_l[3][0]+rand()%4-2,hatcherway_l[3][1]+rand()%4-2,hatcherway_l[3][2]);
 -            else
 -                m_creature->GetMotionMaster()->MovePoint(0,hatcherway_r[3][0]+rand()%4-2,hatcherway_r[3][1]+rand()%4-2,hatcherway_r[3][2]);
@@ -8399,9 +8335,9 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 +            return;
          }
  
--        if(delete_timer < diff && (pInstance && !(pInstance->GetData(DATA_JANALAIEVENT) == 1)))
+-        if (delete_timer < diff && (pInstance && !(pInstance->GetData(TYPE_JANALAIEVENT) == IN_PROGRESS)))
 -        {
--            if(!(m_creature->getVictim()))
+-            if (!(m_creature->getVictim()))
 -                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
 -            delete_timer = 10000;
 -        }else delete_timer -=diff;
@@ -8413,9 +8349,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
 -        if (buffer_timer < diff)
 +        if(BuffetTimer < diff)
          {
--            Unit* target = NULL;
--            target = SelectUnit(SELECT_TARGET_RANDOM,0);
--            if(target)
+-            if (Unit* target = SelectUnit(SELECT_TARGET_RANDOM,0))
 -                DoCast(target,SPELL_FLAMEBUFFED);
 +            m_creature->CastSpell(m_creature->getVictim(), SPELL_FLAMEBUFFET, false);
 +            BuffetTimer = 5000;
@@ -8461,7 +8395,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  void AddSC_boss_janalai()
  {
      Script *newscript;
-@@ -744,17 +709,22 @@
+@@ -710,17 +686,22 @@
      m_scripts[nrscripts++] = newscript;
  
      newscript = new Script;
@@ -8489,7 +8423,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  }
 Index: scripts/zone/zulaman/boss_nalorakk.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 725)
+--- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 732)
 +++ scripts/zone/zulaman/boss_nalorakk.cpp	(working copy)
 @@ -22,6 +22,7 @@
  EndScriptData */
@@ -8497,11 +8431,11 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
  #include "precompiled.h"
 +#include "def_zulaman.h"
  
- //TODO: Trash Waves
- 
-@@ -49,11 +50,11 @@
- #define YELL_BERSERK            "You had your chance, now it be too late!"
- #define SOUND_YELL_BERSERK      12074
+ #define SAY_WAVE1_AGGRO         -1568010
+ #define SAY_WAVE2_STAIR1        -1568011
+@@ -40,11 +41,11 @@
+ #define SAY_SLAY2               -1568022
+ #define SAY_DEATH               -1568023
  
 -#define SPELL_BERSERK           45078                       //unsure, this increases damage, size and speed
 +#define SPELL_BERSERK           45078
@@ -8513,20 +8447,11 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
  #define SPELL_MANGLEEFFECT      44955
  #define SPELL_SURGE             42402
  #define SPELL_BEARFORM          42377
-@@ -74,182 +75,217 @@
+@@ -64,43 +65,58 @@
  
- struct MANGOS_DLL_DECL boss_nalorakkAI : public ScriptedAI
- {
--    boss_nalorakkAI(Creature *c) : ScriptedAI(c) {Reset();}
-+    boss_nalorakkAI(Creature *c) : ScriptedAI(c)
-+    {
-+        pInstance = ((ScriptedInstance*)c->GetInstanceData());
-+        Reset();
-+    }
+     ScriptedInstance *pInstance;
  
 -    uint32 ChangeForm_Timer;
-+    ScriptedInstance *pInstance;
-+
      uint32 BrutalSwipe_Timer;
      uint32 Mangle_Timer;
      uint32 Surge_Timer;
@@ -8581,8 +8506,7 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 +        if(pInstance)
 +            pInstance->SetData(DATA_NALORAKKEVENT, IN_PROGRESS);
 +
-         DoYell(YELL_AGGRO, LANG_UNIVERSAL, NULL);
-         DoPlaySoundToSet(m_creature, SOUND_YELL_AGGRO);
+         DoScriptText(SAY_AGGRO, m_creature);
 +        DoZoneInCombat();
      }
  
@@ -8592,38 +8516,21 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 +        if(pInstance)
 +            pInstance->SetData(DATA_NALORAKKEVENT, DONE);
 +
-+        DoYell(YELL_DEATH,LANG_UNIVERSAL,NULL);		
-+        DoPlaySoundToSet(m_creature, SOUND_YELL_DEATH);  
++        DoScriptText(SAY_DEATH, m_creature);
 +    }
 +
 +    void KilledUnit(Unit* victim)    
      {
          switch(rand()%2)
          {
--            case 0:
--                DoYell(YELL_KILL_ONE, LANG_UNIVERSAL, NULL);
--                DoPlaySoundToSet(m_creature, SOUND_YELL_KILL_ONE);
--                break;
--            case 1:
--                DoYell(YELL_KILL_TWO, LANG_UNIVERSAL, NULL);
--                DoPlaySoundToSet(m_creature, SOUND_YELL_KILL_TWO);
--                break;
-+        case 0:
-+            DoYell(YELL_KILL_ONE, LANG_UNIVERSAL, NULL);
-+            DoPlaySoundToSet(m_creature, SOUND_YELL_KILL_ONE);
-+            break;
-+        case 1:
-+            DoYell(YELL_KILL_TWO, LANG_UNIVERSAL, NULL);
-+            DoPlaySoundToSet(m_creature, SOUND_YELL_KILL_TWO);
-+            break;        
+@@ -109,124 +125,138 @@
          }
      }
  
 -    void JustDied(Unit* Killer)
 +    void MovementInform(uint32, uint32)
      {
--        DoYell(YELL_DEATH,LANG_UNIVERSAL,NULL);
--        DoPlaySoundToSet(m_creature, SOUND_YELL_DEATH);
+-        DoScriptText(SAY_DEATH, m_creature);
 +        if(ChargeTargetGUID)
 +        {
 +            if(Unit* target = Unit::GetUnit(*m_creature, ChargeTargetGUID))
@@ -8659,11 +8566,10 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 +
 +        if(Berserk_Timer < diff)
          {
+             DoScriptText(SAY_BERSERK, m_creature);
 -            DoCast(m_creature, SPELL_BERSERK);
-+            DoCast(m_creature, SPELL_BERSERK, true);
-             DoYell(YELL_BERSERK, LANG_UNIVERSAL, NULL);
-             DoPlaySoundToSet(m_creature, SOUND_YELL_BERSERK);
 -            Berserking = true;
++            DoCast(m_creature, SPELL_BERSERK, true);
 +            Berserk_Timer = 600000;
          }else Berserk_Timer -= diff;
  
@@ -8683,9 +8589,8 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 -            if (!ChangedToTroll)
 +            if(inBearForm)
              {
-+                m_creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + 1, 5122);
-                 DoYell(YELL_SHIFTEDTOTROLL, LANG_UNIVERSAL, NULL);
-                 DoPlaySoundToSet(m_creature, SOUND_YELL_TOTROLL);
+                 DoScriptText(SAY_TOTROLL, m_creature);
+ 
 -                ChangedToTroll = true;
 -                ChangedToBear = false;
 -                //Reset spell timers
@@ -8693,6 +8598,7 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 -                RendFlesh_Timer = 6000 + rand()%19000;
 -                DeafeningRoar_Timer = 15000 + rand()%10000;
 -                ShapeShiftCheck_Timer = 40000;
++                m_creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + 1, 5122);
 +                m_creature->RemoveAurasDueToSpell(SPELL_BEARFORM);
 +                Surge_Timer = 15000 + rand()%5000;
 +                BrutalSwipe_Timer = 7000 + rand()%5000;
@@ -8702,9 +8608,8 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
              }
 +            else
 +            {
++                DoScriptText(SAY_TOBEAR, m_creature);
 +                m_creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + 1, 0);
-+                DoYell(YELL_SHIFTEDTOBEAR, LANG_UNIVERSAL, NULL);
-+                DoPlaySoundToSet(m_creature, SOUND_YELL_TOBEAR);
 +                DoCast(m_creature, SPELL_BEARFORM, true);
 +                LaceratingSlash_Timer = 2000; // dur 18s
 +                RendFlesh_Timer = 3000;  // dur 5s
@@ -8744,8 +8649,7 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 +            if(Surge_Timer < diff)
              {
 -                //select a random unit other than the main tank
-+                DoYell(YELL_SURGE, LANG_UNIVERSAL, NULL);
-+                DoPlaySoundToSet(m_creature, SOUND_YELL_SURGE);
++                DoScriptText(SAY_SURGE, m_creature);
 +
                  Unit *target = SelectUnit(SELECT_TARGET_RANDOM, 1);
 +                if(!target) target = m_creature->getVictim();
@@ -8753,7 +8657,7 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 +                ChargeTargetGUID = target->GetGUID();
  
 -                //if there aren't other units, cast on the tank
--                if(!target)
+-                if (!target)
 -                    target = m_creature->getVictim();
 +                float x, y, z;
 +                target->GetContactPoint(m_creature, x, y, z);
@@ -8762,9 +8666,7 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 +                m_creature->GetMotionMaster()->MovePoint(0, x, y, z);
  
 -                DoCast(target, SPELL_SURGE);
--
--                DoYell(YELL_SURGE, LANG_UNIVERSAL, NULL);
--                DoPlaySoundToSet(m_creature, SOUND_YELL_SURGE);
+-                DoScriptText(SAY_SURGE, m_creature);
 -
 -                Surge_Timer = 15000 + rand()%17500;
 +                Surge_Timer = 15000 + rand()%5000;
@@ -8786,8 +8688,8 @@ Index: scripts/zone/zulaman/boss_nalorakk.cpp
 -            if (!ChangedToBear)
 +            if(LaceratingSlash_Timer < diff)
              {
--                DoYell(YELL_SHIFTEDTOBEAR, LANG_UNIVERSAL, NULL);
--                DoPlaySoundToSet(m_creature, SOUND_YELL_TOBEAR);
+-                DoScriptText(SAY_TOBEAR, m_creature);
+-
 -                ChangedToBear = true;
 -                ChangedToTroll = false;
 -                //Reset spell timers
@@ -8842,7 +8744,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 ===================================================================
 --- scripts/zone/zulaman/boss_zuljin.cpp	(revision 0)
 +++ scripts/zone/zulaman/boss_zuljin.cpp	(revision 0)
-@@ -0,0 +1,677 @@
+@@ -0,0 +1,687 @@
 +/* Copyright (C) 2006,2007,2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
 +* This program is free software; you can redistribute it and/or modify
 +* it under the terms of the GNU General Public License as published by
@@ -9111,17 +9013,27 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +            Temp->SetUInt32Value(UNIT_FIELD_BYTES_1,PLAYER_STATE_DEAD);
 +    }
 +
-+    void AttackStart(Unit *who)
++    void AttackStart(Unit* who)
 +    {
-+        if(!who)
++        if (!who)
 +            return;
 +
-+        if (who->isTargetableForAttack())
++        if (m_creature->Attack(who, true))
 +        {
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
++
++            if (!InCombat)
++            {
++                InCombat = true;
++                Aggro(who);
++            }
++
 +            if(Phase == 2)
-+                m_creature->Attack(who, false);
++                DoStartNoMovement(who);
 +            else
-+                AttackStart(who);
++                DoStartMovement(who);
 +        }
 +    }
 +
@@ -9522,18 +9434,17 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +}
 Index: scripts/zone/zulaman/def_zulaman.h
 ===================================================================
---- scripts/zone/zulaman/def_zulaman.h	(revision 725)
+--- scripts/zone/zulaman/def_zulaman.h	(revision 732)
 +++ scripts/zone/zulaman/def_zulaman.h	(working copy)
-@@ -5,13 +5,14 @@
+@@ -5,26 +5,14 @@
  #ifndef DEF_ZULAMAN_H
  #define DEF_ZULAMAN_H
  
--#define DATA_JANALAI        1
--#define DATA_JANALAIEVENT   2
--#define DATA_J_EGGSLEFT     3
--#define DATA_J_EGGSRIGHT    4
--#define DATA_J_HATCHLEFT    5
--#define DATA_J_HATCHRIGHT   6
+-#define TYPE_EVENT_RUN      1
+-#define TYPE_AKILZONEVENT   2
+-#define TYPE_NALORAKKEVENT  3
+-#define TYPE_JANALAIEVENT   4
+-#define TYPE_HALAZZIEVENT   5
 +#define DATA_NALORAKKEVENT  1
 +#define DATA_AKILZONEVENT   2
 +#define DATA_JANALAIEVENT   3
@@ -9544,18 +9455,41 @@ Index: scripts/zone/zulaman/def_zulaman.h
 +#define TYPE_RAND_VENDOR_1  8
 +#define TYPE_RAND_VENDOR_2  9
  
--#define TYPE_RAND_VENDOR_1  7
--#define TYPE_RAND_VENDOR_2  8
+-#define TYPE_RAND_VENDOR_1  6
+-#define TYPE_RAND_VENDOR_2  7
+-
+-#define DATA_AKILZON        8
+-#define DATA_NALORAKK       9
+-#define DATA_JANALAI        10
+-#define DATA_HALAZZI        11
+-
+-#define DATA_J_EGGSLEFT     12
+-#define DATA_J_EGGSRIGHT    13
+-#define DATA_J_HATCHLEFT    14
+-#define DATA_J_HATCHRIGHT   15
+-
+-#define DATA_GONG           16
+-#define DATA_HEXLORD_GATE   17
+-
  #endif
 Index: scripts/zone/zulaman/instance_zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/instance_zulaman.cpp	(revision 725)
+--- scripts/zone/zulaman/instance_zulaman.cpp	(revision 732)
 +++ scripts/zone/zulaman/instance_zulaman.cpp	(working copy)
-@@ -24,26 +24,58 @@
+@@ -16,7 +16,7 @@
+ 
+ /* ScriptData
+ SDName: Instance_Zulaman
+-SD%Complete: 60
++SD%Complete: 80
+ SDComment:
+ SDCategory: Zul'Aman
+ EndScriptData */
+@@ -24,40 +24,58 @@
  #include "precompiled.h"
  #include "def_zulaman.h"
  
--#define ENCOUNTERS     1
+-#define ENCOUNTERS     5
 +#define ENCOUNTERS     6
  #define RAND_VENDOR    2
  
@@ -9581,49 +9515,62 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
  {
      instance_zulaman(Map *Map) : ScriptedInstance(Map) {Initialize();};
  
--    uint64 janalai;
--    uint32 janalai_eggs_l;
--    uint32 janalai_eggs_r;
+-    uint64 akilzonGUID;
+-    uint64 nalorakkGUID;
+-    uint64 janalaiGUID;
+-    uint64 halazziGUID;
 +    uint64 HexLordGateGUID;
 +    uint64 ZulJinGateGUID;
 +    uint64 AkilzonDoorGUID;
 +    uint64 ZulJinDoorGUID;
 +    uint64 HalazziDoorGUID;
  
+-    uint64 StrangeGongGUID;
+-    uint64 HexlordEntranceGUID;
 +    uint32 QuestTimer;
 +    uint16 BossKilled;
 +    uint16 QuestMinute;
 +    uint16 ChestLooted;
-+
+ 
+-    uint32 janalai_eggs_l;
+-    uint32 janalai_eggs_r;
+-
      uint32 Encounters[ENCOUNTERS];
      uint32 RandVendor[RAND_VENDOR];
  
      void Initialize()
      {
--        janalai = 0;
--        janalai_eggs_l = 20;
--        janalai_eggs_r = 20;
+-        akilzonGUID = 0;
+-        nalorakkGUID = 0;
+-        janalaiGUID = 0;
+-        halazziGUID = 0;
 +        uint64 HexLordGateGUID = 0;
 +        uint64 ZulJinGateGUID = 0;
 +        uint64 AkilzonDoorGUID = 0;
 +        uint64 HalazziDoorGUID = 0;
 +        uint64 ZulJinDoorGUID = 0;
  
+-        StrangeGongGUID = 0;
+-        HexlordEntranceGUID = 0;
 +        QuestTimer = 0;
 +        QuestMinute = 21;
 +        BossKilled = 0;
 +        ChestLooted = 0;
-+
+ 
+-        janalai_eggs_l = 20;
+-        janalai_eggs_r = 20;
+-
          for(uint8 i = 0; i < ENCOUNTERS; i++)
              Encounters[i] = NOT_STARTED;
          for(uint8 i = 0; i < RAND_VENDOR; i++)
-@@ -62,64 +94,200 @@
+@@ -76,10 +94,12 @@
      {
          switch(creature_entry)
          {
--            case 23578:
--                janalai = creature->GetGUID();
--                break;
+-            case 23574: akilzonGUID  = creature->GetGUID(); break;
+-            case 23576: nalorakkGUID = creature->GetGUID(); break;
+-            case 23578: janalaiGUID  = creature->GetGUID(); break;
+-            case 23577: halazziGUID  = creature->GetGUID(); break;
 +        case 23578://janalai
 +        case 23863://zuljin
 +        case 24239://hexlord
@@ -9633,32 +9580,32 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
          }
      }
  
--    uint64 GetData64(uint32 identifier)
-+    void OnObjectCreate(GameObject *go)
+@@ -87,87 +107,186 @@
      {
--        if(identifier  == DATA_JANALAI && janalai)
--            return janalai;
-+        switch(go->GetEntry())
-+        {
+         switch(go->GetEntry())
+         {
+-            case 187359: StrangeGongGUID        = go->GetGUID(); break;
+-            case 186305: HexlordEntranceGUID    = go->GetGUID(); break;
 +        case 186303: HalazziDoorGUID = go->GetGUID(); break;
 +        case 186304: ZulJinGateGUID  = go->GetGUID(); break;
 +        case 186305: HexLordGateGUID = go->GetGUID(); break;
 +        case 186858: AkilzonDoorGUID = go->GetGUID(); break;
 +        case 186859: ZulJinDoorGUID  = go->GetGUID(); break;
 +        default: break;
-+        }
+         }
 +        CheckInstanceStatus();
-+    }
+     }
  
--        return 0;
+-    uint64 GetData64(uint32 data)
 +    void OpenDoor(uint64 DoorGUID, bool open)
-+    {
+     {
+-        switch(data)
 +        if(((InstanceMap*)instance)->GetPlayers().size())
 +            if(Player* first = ((InstanceMap*)instance)->GetPlayers().front())
 +                if(GameObject *Door = GameObject::GetGameObject(*first, DoorGUID))
 +                    Door->SetUInt32Value(GAMEOBJECT_STATE, open ? 0 : 1);
-     }
- 
++    }
++
 +    void SummonHostage(uint8 num)
 +    {
 +        if(QuestMinute && ((InstanceMap*)instance)->GetPlayers().size())
@@ -9706,19 +9653,33 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
 +        ss >> dataHead >> data1 >> data2 >> data3;
 +        //error_log("SD2: Zul'aman loaded, %d %d %d.", data1, data2, data3);
 +        if(dataHead == 'S')
-+        {
+         {
+-            case DATA_AKILZON:
+-                return akilzonGUID;
+-            case DATA_NALORAKK:
+-                return nalorakkGUID;
+-            case DATA_JANALAI:
+-                return janalaiGUID;
+-            case DATA_HALAZZI:
+-                return halazziGUID;
+-            case DATA_GONG:
+-                return StrangeGongGUID;
+-            case DATA_HEXLORD_GATE:
+-                return HexlordEntranceGUID;
+-        }
+-        return 0;
 +            BossKilled = data1;
 +            ChestLooted = data2;
 +            QuestMinute = data3;
 +        }else error_log("SD2: Zul'aman: corrupted save data.");
-+    }
-+
+     }
+ 
      void SetData(uint32 type, uint32 data)
      {
          switch(type)
          {
--            case DATA_JANALAIEVENT:
--                if(data == 0)
+-            case TYPE_JANALAIEVENT:
+-                if(data == NOT_STARTED)
 +        case DATA_NALORAKKEVENT:
 +            Encounters[0] = data;
 +            if(data == DONE)
@@ -9730,7 +9691,7 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
 +                    QuestMinute += 15;
 +                    UpdateWorldState(3106, QuestMinute);
                  }
--                Encounters[0] = data;
+-                Encounters[4] = data;
 -                break;
 -            case DATA_J_HATCHLEFT:
 -                janalai_eggs_l -= data;
@@ -9743,6 +9704,9 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
 -                break;
 -            case TYPE_RAND_VENDOR_2:
 -                RandVendor[1] = data;
+-                break;
+-            default:
+-                error_log("SD2: Zul'Aman: ERROR SetData = %u for type %u does not exist/not implemented.",data,type);
 -                break;
 +                SummonHostage(0);
 +            }
@@ -9809,16 +9773,16 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
      {
          switch(type)
          {
--            case DATA_JANALAIEVENT:
+-            case TYPE_EVENT_RUN:
 -                return Encounters[0];
--            case DATA_J_EGGSLEFT:
--                return janalai_eggs_l;
--            case DATA_J_EGGSRIGHT:
--                return janalai_eggs_r;
--            case TYPE_RAND_VENDOR_1:
--                return RandVendor[0];
--            case TYPE_RAND_VENDOR_2:
--                return RandVendor[1];
+-            case TYPE_AKILZONEVENT:
+-                return Encounters[1];
+-            case TYPE_NALORAKKEVENT:
+-                return Encounters[2];
+-            case TYPE_JANALAIEVENT:
+-                return Encounters[3];
+-            case TYPE_HALAZZIEVENT:
+-                return Encounters[4];
 +        case DATA_NALORAKKEVENT: return Encounters[0];
 +        case DATA_AKILZONEVENT:  return Encounters[1];
 +        case DATA_JANALAIEVENT:  return Encounters[2];
@@ -9829,10 +9793,18 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
 +        case TYPE_RAND_VENDOR_1: return RandVendor[0];
 +        case TYPE_RAND_VENDOR_2: return RandVendor[1];                
 +        default:                 return 0;
-         }
--        return 0;
-     }
-+
++        }
++    }
+ 
+-            case DATA_J_EGGSLEFT:
+-                return janalai_eggs_l;
+-            case DATA_J_EGGSRIGHT:
+-                return janalai_eggs_r;
+-
+-            case TYPE_RAND_VENDOR_1:
+-                return RandVendor[0];
+-            case TYPE_RAND_VENDOR_2:
+-                return RandVendor[1];
 +    void Update(uint32 diff)
 +    {
 +        if(QuestMinute)
@@ -9849,14 +9821,14 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
 +                }else UpdateWorldState(3104, 0);
 +            }
 +            QuestTimer -= diff;
-+        }
-+    }
+         }
+-        return 0;
+     }
  };
  
- InstanceData* GetInstanceData_instance_zulaman(Map* map)
 Index: scripts/zone/zulaman/zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/zulaman.cpp	(revision 725)
+--- scripts/zone/zulaman/zulaman.cpp	(revision 732)
 +++ scripts/zone/zulaman/zulaman.cpp	(working copy)
 @@ -97,6 +97,74 @@
      return new npc_forest_frogAI (_Creature);
@@ -9945,35 +9917,9 @@ Index: scripts/zone/zulaman/zulaman.cpp
 +    newscript->pGossipSelect = GossipSelect_npc_zulaman_hostage;
 +    m_scripts[nrscripts++] = newscript;
  }
-Index: VC71/71ScriptDev2.vcproj
-===================================================================
---- VC71/71ScriptDev2.vcproj	(revision 725)
-+++ VC71/71ScriptDev2.vcproj	(working copy)
-@@ -263,6 +263,10 @@
- 					<File
- 						RelativePath="..\scripts\zone\deadmines\deadmines.cpp">
- 					</File>
-+					<File
-+						RelativePath="..\scripts\zone\deadmines\def_deadmines.h"
-+						>
-+					</File>
- 				</Filter>
- 				<Filter
- 					Name="Deadwind Pass">
-@@ -1172,6 +1176,10 @@
- 					<Filter
- 						Name="The Eye">
- 						<File
-+							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_alar.cpp"
-+							>
-+						</File>
-+						<File
- 							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_astromancer.cpp">
- 						</File>
- 						<File
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 725)
+--- VC80/80ScriptDev2.vcproj	(revision 732)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="Windows-1252"?>
@@ -10111,17 +10057,16 @@ Index: VC80/80ScriptDev2.vcproj
  					</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 725)
+--- VC90/90ScriptDev2.vcproj	(revision 732)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
-@@ -407,7 +407,23 @@
- 			<Filter
+@@ -408,6 +408,18 @@
  				Name="guard"
  				>
-+ 				<File
+ 				<File
 +					RelativePath="..\scripts\guard\ancient_of_war.cpp"
 +					>
 +				</File>
- 				<File
++				<File
 +					RelativePath="..\scripts\guard\archbishop_benedictus.cpp"
 +					>
 +				</File>
@@ -10130,14 +10075,10 @@ Index: VC90/90ScriptDev2.vcproj
 +					>
 +				</File>
 +				<File
-+ 					RelativePath="..\scripts\guard\guard_ai.cpp"
-+ 					>
-+ 				</File>
-+				<File
  					RelativePath="..\scripts\guard\guard_ai.cpp"
  					>
  				</File>
-@@ -419,6 +435,30 @@
+@@ -419,6 +431,30 @@
  					RelativePath="..\scripts\guard\guards.cpp"
  					>
  				</File>
@@ -10168,7 +10109,7 @@ Index: VC90/90ScriptDev2.vcproj
  			</Filter>
  			<Filter
  				Name="honor"
-@@ -464,6 +504,10 @@
+@@ -464,6 +500,10 @@
  					>
  				</File>
  				<File
@@ -10179,7 +10120,7 @@ Index: VC90/90ScriptDev2.vcproj
  					RelativePath="..\scripts\custom\test.cpp"
  					>
  				</File>
-@@ -550,6 +594,10 @@
+@@ -550,6 +590,10 @@
  						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"
  						>
  					</File>
@@ -10190,7 +10131,7 @@ Index: VC90/90ScriptDev2.vcproj
  				</Filter>
  				<Filter
  					Name="Deadwind Pass"
-@@ -1614,6 +1662,10 @@
+@@ -1614,6 +1658,10 @@
  							>
  						</File>
  						<File
@@ -10201,7 +10142,7 @@ Index: VC90/90ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
  							>
  						</File>
-@@ -1766,6 +1818,10 @@
+@@ -1766,6 +1814,10 @@
  							>
  						</File>
  						<File
@@ -10212,7 +10153,7 @@ Index: VC90/90ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_kaelthas.cpp"
  							>
  						</File>
-@@ -2099,14 +2155,30 @@
+@@ -2099,14 +2151,30 @@
  					Name="Zul&apos;Aman"
  					>
  					<File

@@ -6,7 +6,7 @@ index 4d4c155..49fd9fb 100644
  
  enum MangosStrings
  {
-+	LANG_AUTO_BROADCAST                 = 1001,
++	LANG_AUTO_BROADCAST                 = 2001,
 +
      // for chat commands
      LANG_SELECT_CHAR_OR_CREATURE        = 1,

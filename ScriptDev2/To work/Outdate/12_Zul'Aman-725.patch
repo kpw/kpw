@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 715)
+--- Makefile.am	(revision 725)
 +++ Makefile.am	(working copy)
 @@ -363,8 +363,12 @@
  scripts/zone/western_plaguelands/western_plaguelands.cpp \
@@ -17,7 +17,7 @@ Index: Makefile.am
  scripts/zone/zulaman/zulaman.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 715)
+--- ScriptMgr.cpp	(revision 725)
 +++ ScriptMgr.cpp	(working copy)
 @@ -561,9 +561,14 @@
  extern void AddSC_boss_renataki();
@@ -1922,7 +1922,7 @@ Index: scripts/zone/zulaman/boss_hexlord.cpp
 +}
 Index: scripts/zone/zulaman/boss_janalai.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_janalai.cpp	(revision 715)
+--- scripts/zone/zulaman/boss_janalai.cpp	(revision 725)
 +++ scripts/zone/zulaman/boss_janalai.cpp	(working copy)
 @@ -29,14 +29,14 @@
  #define SPELL_FLAME_BREATH          43140
@@ -3047,7 +3047,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  }
 Index: scripts/zone/zulaman/boss_nalorakk.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 715)
+--- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 725)
 +++ scripts/zone/zulaman/boss_nalorakk.cpp	(working copy)
 @@ -22,6 +22,7 @@
  EndScriptData */
@@ -3400,7 +3400,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 ===================================================================
 --- scripts/zone/zulaman/boss_zuljin.cpp	(revision 0)
 +++ scripts/zone/zulaman/boss_zuljin.cpp	(revision 0)
-@@ -0,0 +1,677 @@
+@@ -0,0 +1,687 @@
 +/* Copyright (C) 2006,2007,2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
 +* This program is free software; you can redistribute it and/or modify
 +* it under the terms of the GNU General Public License as published by
@@ -3669,17 +3669,27 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +            Temp->SetUInt32Value(UNIT_FIELD_BYTES_1,PLAYER_STATE_DEAD);
 +    }
 +
-+    void AttackStart(Unit *who)
++    void AttackStart(Unit* who)
 +    {
-+        if(!who)
++        if (!who)
 +            return;
 +
-+        if (who->isTargetableForAttack())
++        if (m_creature->Attack(who, true))
 +        {
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
++
++            if (!InCombat)
++            {
++                InCombat = true;
++                Aggro(who);
++            }
++
 +            if(Phase == 2)
-+                m_creature->Attack(who, false);
++                DoStartNoMovement(who);
 +            else
-+                AttackStart(who);
++                DoStartMovement(who);
 +        }
 +    }
 +
@@ -4080,7 +4090,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +}
 Index: scripts/zone/zulaman/def_zulaman.h
 ===================================================================
---- scripts/zone/zulaman/def_zulaman.h	(revision 715)
+--- scripts/zone/zulaman/def_zulaman.h	(revision 725)
 +++ scripts/zone/zulaman/def_zulaman.h	(working copy)
 @@ -5,13 +5,14 @@
  #ifndef DEF_ZULAMAN_H
@@ -4107,7 +4117,7 @@ Index: scripts/zone/zulaman/def_zulaman.h
  #endif
 Index: scripts/zone/zulaman/instance_zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/instance_zulaman.cpp	(revision 715)
+--- scripts/zone/zulaman/instance_zulaman.cpp	(revision 725)
 +++ scripts/zone/zulaman/instance_zulaman.cpp	(working copy)
 @@ -24,26 +24,58 @@
  #include "precompiled.h"
@@ -4414,7 +4424,7 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
  InstanceData* GetInstanceData_instance_zulaman(Map* map)
 Index: scripts/zone/zulaman/zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/zulaman.cpp	(revision 715)
+--- scripts/zone/zulaman/zulaman.cpp	(revision 725)
 +++ scripts/zone/zulaman/zulaman.cpp	(working copy)
 @@ -97,6 +97,74 @@
      return new npc_forest_frogAI (_Creature);
@@ -4505,7 +4515,7 @@ Index: scripts/zone/zulaman/zulaman.cpp
  }
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 715)
+--- VC80/80ScriptDev2.vcproj	(revision 725)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -2100,14 +2100,30 @@
  					Name="Zul&apos;Aman"
@@ -4540,7 +4550,7 @@ Index: VC80/80ScriptDev2.vcproj
  					</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 715)
+--- VC90/90ScriptDev2.vcproj	(revision 725)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -2099,14 +2099,30 @@
  					Name="Zul&apos;Aman"

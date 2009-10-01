@@ -279,21 +279,6 @@ Index: scripts/zone/deadmines/def_deadmines.h
 +
 +#define EVENT_STATE 0
 +#endif
-Index: VC71/71ScriptDev2.vcproj
-===================================================================
---- VC71/71ScriptDev2.vcproj	(revision 667)
-+++ VC71/71ScriptDev2.vcproj	(working copy)
-@@ -312,6 +312,10 @@
- 						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"
- 						>
- 					</File>
-+					<File
-+						RelativePath="..\scripts\zone\deadmines\def_deadmines.h"
-+						>
-+					</File>
- 				</Filter>
- 				<Filter
- 					Name="Deadwind Pass"
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
 --- VC80/80ScriptDev2.vcproj	(revision 667)

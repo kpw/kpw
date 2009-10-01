@@ -149,21 +149,6 @@ Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_blade
 +    m_scripts[nrscripts++] = newscript; 
 +   return; 
 +}
-Index: VC71/71ScriptDev2.vcproj
-===================================================================
---- VC71/71ScriptDev2.vcproj	(revision 667)
-+++ VC71/71ScriptDev2.vcproj	(working copy)
-@@ -1376,6 +1376,10 @@
- 							>
- 						</File>
- 						<File
-+							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\boss_warchief_kargath_bladefist.cpp"
-+							>
-+						</File>
-+						<File
- 							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
- 							>
- 						</File>
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
 --- VC80/80ScriptDev2.vcproj	(revision 667)

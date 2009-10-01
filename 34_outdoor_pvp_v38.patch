@@ -2073,7 +2073,7 @@ index 0000000..dd6ae0f
 +        GossipOption * gso = new GossipOption;
 +        gso->Action = GOSSIP_OPTION_OUTDOORPVP;
 +        gso->GossipId = 0;
-+        gso->Option.assign("As the breeze whips straight as an arrow, let her go over Kill Devil Hill!");
++        gso->OptionText.assign("As the breeze whips straight as an arrow, let her go over Kill Devil Hill!");
 +        gso->Id = 50;
 +        gso->Icon = 1;
 +        gso->NpcFlag = 0;
@@ -5616,12 +5616,12 @@ index 0000000..83b22cc
 +    {
 +        if(itr->second == ZM_ALLIANCE_FIELD_SCOUT && plr->GetTeam() == ALLIANCE && m_BothControllingFaction == ALLIANCE && !m_FlagCarrierGUID && m_GraveYardState != ZM_GRAVEYARD_A)
 +        {
-+            gso.Option.assign("Give me the flag, I'll take it to the Central Tower for the glory of the Alliance!");
++            gso.OptionText.assign("Give me the flag, I'll take it to the Central Tower for the glory of the Alliance!");
 +            return true;
 +        }
 +        else if(itr->second == ZM_HORDE_FIELD_SCOUT && plr->GetTeam() == HORDE && m_BothControllingFaction == HORDE && !m_FlagCarrierGUID && m_GraveYardState != ZM_GRAVEYARD_H)
 +        {
-+            gso.Option.assign("Give me the flag, I'll take it to the Central Tower for the glory of the Horde!");
++            gso.OptionText.assign("Give me the flag, I'll take it to the Central Tower for the glory of the Horde!");
 +            return true;
 +        }
 +    }

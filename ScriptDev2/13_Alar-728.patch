@@ -1,8 +1,8 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 691)
+--- Makefile.am	(revision 728)
 +++ Makefile.am	(working copy)
-@@ -333,6 +333,7 @@
+@@ -332,6 +332,7 @@
  scripts/zone/tempest_keep/the_eye/boss_astromancer.cpp \
  scripts/zone/tempest_keep/the_eye/boss_kaelthas.cpp \
  scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp \
@@ -12,29 +12,29 @@ Index: Makefile.am
  scripts/zone/tempest_keep/the_eye/the_eye.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 691)
+--- ScriptMgr.cpp	(revision 728)
 +++ ScriptMgr.cpp	(working copy)
-@@ -508,6 +508,7 @@
- //--The Eye
+@@ -493,6 +493,7 @@
  extern void AddSC_boss_kaelthas();
  extern void AddSC_boss_void_reaver();
-+extern void AddSC_boss_alar();
  extern void AddSC_boss_high_astromancer_solarian();
++extern void AddSC_boss_alar();
  extern void AddSC_instance_the_eye();
  extern void AddSC_the_eye();
-@@ -1693,6 +1694,7 @@
-     //--The Eye
+ 
+@@ -1671,6 +1672,7 @@
      AddSC_boss_kaelthas();
      AddSC_boss_void_reaver();
-+    AddSC_boss_alar();
      AddSC_boss_high_astromancer_solarian();
++    AddSC_boss_alar();
      AddSC_instance_the_eye();
      AddSC_the_eye();
+ 
 Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 ===================================================================
 --- scripts/zone/tempest_keep/the_eye/boss_alar.cpp	(revision 0)
 +++ scripts/zone/tempest_keep/the_eye/boss_alar.cpp	(revision 0)
-@@ -0,0 +1,617 @@
+@@ -0,0 +1,590 @@
 +/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
 +* This program is free software; you can redistribute it and/or modify
 +* it under the terms of the GNU General Public License as published by
@@ -60,7 +60,6 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +
 +#include "precompiled.h"
 +#include "def_the_eye.h"
-+#include "Player.h"
 +
 +#define SPELL_FLAME_BUFFET            34121 // Flame Buffet - every 1,5 secs in phase 1 if there is no victim in melee range and after Dive Bomb in phase 2 with same conditions
 +#define SPELL_FLAME_QUILLS            34229 // Randomly after changing position in phase after watching tonns of movies, set probability 20%
@@ -84,7 +83,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +    {388.09, 31.54, 20.18},
 +    {388.18, -32.85, 20.18},
 +    {340.29, -60.19, 17.72},
-+    {331, 0.01, 39},
++    {332, 0.01, 39},
 +    {331, 0.01, -2.39}
 +};
 +
@@ -131,9 +130,9 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +
 +    void Reset()
 +    {
-+        Platforms_Move_Timer = 30000+rand()%5000;
++        Platforms_Move_Timer = 0;
 +        FlameQuills = false;
-+        cur_wp = 0;
++        cur_wp = 4;
 +        FlameBuffet_Timer = 1500;
 +        CorpseDisappear_Timer = 9999999;
 +        Enrage_Timer = 600000;
@@ -157,47 +156,14 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +    
 +    void Aggro (Unit *who)
 +    {
-+        StartEvent();
-+    }
-+
-+    void StartEvent()
-+    {
 +        if(pInstance)
 +            pInstance->SetData(DATA_ALAREVENT, 1);
-+        
-+        CreaturePointMove(0, waypoint[0][0], waypoint[0][1], waypoint[0][2]);
 +    }
-+ 
++
 +    void JustDied(Unit *victim)
 +    {
 +        if(pInstance)
 +            pInstance->SetData(DATA_ALAREVENT, 0);
-+    }
-+
-+    void MoveInLineOfSight(Unit *who)
-+    {
-+        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
-+        {
-+            if (m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
-+                return;
-+
-+            float attackRadius = m_creature->GetAttackDistance(who);
-+            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
-+            {
-+                if (Phase1)
-+                    DoStartNoMovement(who);
-+                else
-+                    DoStartMovement(who);
-+                
-+                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-+
-+                if (!InCombat)
-+                {
-+                    Aggro(who);
-+                    InCombat = true;
-+                }
-+            }
-+        }
 +    }
 +
 +    void AttackStart(Unit* who)
@@ -205,19 +171,22 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +        if (!who)
 +            return;
 +
-+        if (who->isTargetableForAttack())
++        if (m_creature->Attack(who, true))
 +        {
-+            //Begin attack
-+            if (Phase1)
-+                DoStartNoMovement(who);
-+            else
-+                DoStartMovement(who);
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
 +
 +            if (!InCombat)
 +            {
-+                Aggro(who);
 +                InCombat = true;
++                Aggro(who);
 +            }
++
++            if (Phase1)
++			    DoStartNoMovement(who);
++			else
++				DoStartMovement(who);
 +        }
 +    }
 +
@@ -392,24 +361,28 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +            }
 +            if (Platforms_Move_Timer < diff)
 +            {
-+                Creature* Summoned = NULL;
-+                Summoned = m_creature->SummonCreature(CREATURE_EMBER_OF_ALAR, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-+                if (Summoned)
-+                {
-+                    Unit* target = NULL;
-+                    target = SelectUnit(SELECT_TARGET_RANDOM, 0);
-+                    if (target)
-+                        Summoned->AI()->AttackStart(target);
-+                }
-+                if (rand()%100 <= 20)
-+                {
-+                    cur_wp = 4;
-+                    FlameQuills = true;
-+                } else
-+                {
-+                    cur_wp++;
-+                    if (cur_wp == 4)
-+                        cur_wp = 0;
++                if (cur_wp == 4)
++				{
++					cur_wp = 0;
++				}else
++				{
++				    Creature* Summoned = NULL;
++                    Summoned = m_creature->SummonCreature(CREATURE_EMBER_OF_ALAR, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
++                    if (Summoned)
++                    {
++                        Unit* target = NULL;
++                        target = SelectUnit(SELECT_TARGET_RANDOM, 0);
++                        if (target)
++                            Summoned->AI()->AttackStart(target);
++                    }
++                    if (rand()%100 <= 20)
++                    {
++                        cur_wp = 4;
++                        FlameQuills = true;
++                    }else
++					{
++                        cur_wp++;
++					}
 +                }
 +                CreaturePointMove(cur_wp, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2]);
 +            }else Platforms_Move_Timer -= diff;
@@ -498,7 +471,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +                DoCast(target, SPELL_DIVE_BOMB);
 +                m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, DefaultSize);
 +                m_creature->RemoveAurasDueToSpell(SPELL_DIVE_BOMB_VISUAL);
-+                m_creature->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate*2.0f);
++                m_creature->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate*1.5f);
 +                if (target)
 +                    CreaturePointMove(7, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
 +                Creature* Summoned = NULL;
@@ -654,7 +627,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +}
 Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 691)
+--- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 728)
 +++ scripts/zone/tempest_keep/the_eye/def_the_eye.h	(working copy)
 @@ -17,4 +17,5 @@
  #define DATA_SOLARIANEVENT                  10
@@ -664,7 +637,7 @@ Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
  #endif
 Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 691)
+--- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 728)
 +++ scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(working copy)
 @@ -43,8 +43,10 @@
      uint64 MasterEngineerTelonicus;
@@ -688,15 +661,18 @@ Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
  
          for(uint8 i = 0; i < ENCOUNTERS; i++)
              Encounters[i] = false;
-@@ -81,6 +85,7 @@
+@@ -81,6 +85,10 @@
              case 20060: LordSanguinar = creature->GetGUID(); break;
              case 19622: Kaelthas = creature->GetGUID(); break;
              case 18805: Astromancer = creature->GetGUID(); break;
-+            case 19514: Alar = creature->GetGUID(); break;
++
++            case 19514:
++                Alar = creature->GetGUID();
++                break;
          }
      }
  
-@@ -105,6 +110,9 @@
+@@ -105,6 +113,9 @@
  
              case DATA_ASTROMANCER:
                  return Astromancer;
@@ -706,7 +682,7 @@ Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
          }
  
          return 0;
-@@ -115,6 +123,7 @@
+@@ -115,6 +126,7 @@
          switch(type)
          {
              case DATA_ALAREVENT:
@@ -714,7 +690,7 @@ Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
                  Encounters[0] = (data) ? true : false;
                  break;
  
-@@ -143,7 +152,7 @@
+@@ -143,7 +155,7 @@
          switch(type)
          {
              case DATA_ALAREVENT:
@@ -723,24 +699,9 @@ Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
  
              case DATA_SOLARIANEVENT:
                  return Encounters[1];
-Index: VC71/71ScriptDev2.vcproj
-===================================================================
---- VC71/71ScriptDev2.vcproj	(revision 691)
-+++ VC71/71ScriptDev2.vcproj	(working copy)
-@@ -1172,6 +1172,10 @@
- 					<Filter
- 						Name="The Eye">
- 						<File
-+							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_alar.cpp"
-+							>
-+						</File>
-+						<File
- 							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_astromancer.cpp">
- 						</File>
- 						<File
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 691)
+--- VC80/80ScriptDev2.vcproj	(revision 728)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -1767,6 +1767,10 @@
  							>
@@ -755,7 +716,7 @@ Index: VC80/80ScriptDev2.vcproj
  						</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 691)
+--- VC90/90ScriptDev2.vcproj	(revision 728)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -1766,6 +1766,10 @@
  							>

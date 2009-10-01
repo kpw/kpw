@@ -1,0 +1,13 @@
+Index: scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
+===================================================================
+--- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 728)
++++ scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(working copy)
+@@ -179,6 +179,8 @@
+                 m_creature->setFaction(14);
+                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN9);
++                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN2);
+ 
+                 DoScriptText(SAY_FREED, m_creature);
+ 

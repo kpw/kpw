@@ -1,8 +1,8 @@
 Index: scripts/zone/black_temple/boss_supremus.cpp
 ===================================================================
---- scripts/zone/black_temple/boss_supremus.cpp	(revision 667)
+--- scripts/zone/black_temple/boss_supremus.cpp	(revision 729)
 +++ scripts/zone/black_temple/boss_supremus.cpp	(working copy)
-@@ -115,7 +115,7 @@
+@@ -122,7 +122,7 @@
          CheckTimer = 1000;
          SupremusGUID = 0;
          FireballTimer = 500;
@@ -11,20 +11,20 @@ Index: scripts/zone/black_temple/boss_supremus.cpp
      }
  
      void Aggro(Unit *who) {}
-@@ -332,15 +332,7 @@
+@@ -357,15 +357,7 @@
  
-                 if(target)
+                 if (target)
                  {
 -                    Creature* Volcano = NULL;
 -                    Volcano = SummonCreature(CREATURE_VOLCANO, target);
 -
--                    if(Volcano)
+-                    if (Volcano)
 -                    {
 -                        DoCast(target, SPELL_VOLCANIC_ERUPTION);
 -                        ((npc_volcanoAI*)Volcano->AI())->SetSupremusGUID(m_creature->GetGUID());
 -                    }
 -
 +                    DoCast(target, SPELL_VOLCANIC_ERUPTION);
-                     DoTextEmote("roars and the ground begins to crack open!", NULL);
+                     DoScriptText(EMOTE_GROUND_CRACK, m_creature);
                      SummonVolcanoTimer = 10000;
                  }
