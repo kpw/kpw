@@ -1,0 +1,60 @@
+Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
+===================================================================
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 715)
++++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
+@@ -66,7 +66,7 @@
+ #define TAINTED_ELEMENTAL           22009
+ #define COILFANG_STRIDER            22056
+ #define COILFANG_ELITE              22055
+-#define FATHOM_SPOREBAT             22140
++#define TOXIC_SPORE_BAT             22140
+ 
+ float ElementPos[8][4] =
+ {
+@@ -329,7 +329,7 @@
+                 if (SummonSporebat_Timer < diff)
+                 {
+                     Creature *Sporebat = NULL;
+-                    Sporebat = m_creature->SummonCreature(FATHOM_SPOREBAT, SPOREBAT_X, SPOREBAT_Y, SPOREBAT_Z, SPOREBAT_O, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
++                    Sporebat = m_creature->SummonCreature(TOXIC_SPORE_BAT, SPOREBAT_X, SPOREBAT_Y, SPOREBAT_Z, SPOREBAT_O, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
+ 
+                     if (Sporebat)
+                     {
+@@ -594,11 +594,11 @@
+     }
+ };
+ 
+-//Fathom Sporebat
++//Toxic Spore Bat
+ //Toxic Spores: Used in Phase 3 by the Spore Bats, it creates a contaminated green patch of ground, dealing about 2775-3225 nature damage every second to anyone who stands in it.
+-struct MANGOS_DLL_DECL mob_fathom_sporebatAI : public ScriptedAI
++struct MANGOS_DLL_DECL mob_toxic_spore_batAI : public ScriptedAI
+ {
+-    mob_fathom_sporebatAI(Creature *c) : ScriptedAI(c)
++    mob_toxic_spore_batAI(Creature *c) : ScriptedAI(c)
+     {
+         pInstance = ((ScriptedInstance*)c->GetInstanceData());
+         Reset();
+@@ -827,9 +827,9 @@
+     return new mob_tainted_elementalAI (_Creature);
+ }
+ 
+-CreatureAI* GetAI_mob_fathom_sporebat(Creature *_Creature)
++CreatureAI* GetAI_mob_toxic_spore_bat(Creature *_Creature)
+ {
+-    return new mob_fathom_sporebatAI (_Creature);
++    return new mob_toxic_spore_batAI (_Creature);
+ }
+ 
+ CreatureAI* GetAI_mob_shield_generator_channel(Creature *_Creature)
+@@ -856,8 +856,8 @@
+     m_scripts[nrscripts++] = newscript;
+ 
+     newscript = new Script;
+-    newscript->Name="mob_fathom_sporebat";
+-    newscript->GetAI = GetAI_mob_fathom_sporebat;
++    newscript->Name="mob_toxic_spore_bat";
++    newscript->GetAI = GetAI_mob_toxic_spore_bat;
+     m_scripts[nrscripts++] = newscript;
+ 
+     newscript = new Script;

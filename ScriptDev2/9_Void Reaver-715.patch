@@ -1,17 +1,17 @@
 Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 700)
+--- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 715)
 +++ scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(working copy)
-@@ -144,7 +144,7 @@
-             {
+@@ -121,7 +121,7 @@
                  target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
-                                                             //15 yard radius minimum
--                if(target && target->GetDistance2d(m_creature) > 15)
-+                if(target && target->GetDistance2d(m_creature) > 18)
+ 
+                 //15 yard radius minimum
+-                if (target && target->GetDistance2d(m_creature) > 15)
++                if (target && target->GetDistance2d(m_creature) > 18)
                      target_list.push_back(target);
+ 
                  target = NULL;
-             }
-@@ -152,12 +152,7 @@
+@@ -131,12 +131,7 @@
                  target = *(target_list.begin()+rand()%target_list.size());
  
              if (target)

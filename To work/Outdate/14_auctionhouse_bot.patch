@@ -718,23 +718,23 @@ index 0000000..04815b7
 +
 +#endif
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 797b48b..b44799a 100644
+index a45c217..7472e4d 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
-@@ -479,6 +479,8 @@ ChatCommand * ChatHandler::getCommandTable()
-         { "gps",            SEC_MODERATOR,      false, &ChatHandler::HandleGPSCommand,                 "", NULL },
-         { "guid",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGUIDCommand,                "", NULL },
-         { "help",           SEC_PLAYER,         true,  &ChatHandler::HandleHelpCommand,                "", NULL },
-+        { "ahexpire",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAHExpireCommand,            "", NULL },
-+        { "ahdelete",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleAHDeleteCommand,            "", NULL },
-         { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", NULL },
-         { "cooldown",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleCooldownCommand,            "", NULL },
-         { "unlearn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnLearnCommand,             "", NULL },
+@@ -417,6 +417,8 @@ ChatCommand * ChatHandler::getCommandTable()
+         { "gps",            SEC_MODERATOR,      &ChatHandler::HandleGPSCommand,                 "", NULL },
+         { "guid",           SEC_GAMEMASTER,     &ChatHandler::HandleGUIDCommand,                "", NULL },
+         { "help",           SEC_PLAYER,         &ChatHandler::HandleHelpCommand,                "", NULL },
++        { "ahexpire",       SEC_ADMINISTRATOR,  &ChatHandler::HandleAHExpireCommand,            "",   NULL },
++        { "ahdelete",       SEC_ADMINISTRATOR,  &ChatHandler::HandleAHDeleteCommand,            "",   NULL },
+         { "itemmove",       SEC_GAMEMASTER,     &ChatHandler::HandleItemMoveCommand,            "", NULL },
+         { "cooldown",       SEC_ADMINISTRATOR,  &ChatHandler::HandleCooldownCommand,            "", NULL },
+         { "unlearn",        SEC_ADMINISTRATOR,  &ChatHandler::HandleUnLearnCommand,             "", NULL },
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 8c6f19d..3977ef0 100644
+index a6da30a..1c8d7ba 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
-@@ -319,6 +319,8 @@ class ChatHandler
+@@ -291,6 +291,8 @@ class ChatHandler
          bool HandleLookupSkillCommand(const char* args);
          bool HandleLookupSpellCommand(const char* args);
          bool HandleLookupTeleCommand(const char * args);
@@ -744,10 +744,10 @@ index 8c6f19d..3977ef0 100644
          bool HandleCooldownCommand(const char* args);
          bool HandleUnLearnCommand(const char* args);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 0c81d4d..41ddb5a 100644
+index ca00ab0..b750a8b 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
-@@ -4735,6 +4735,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
+@@ -4835,6 +4835,92 @@ bool ChatHandler::HandleBanInfoCommand(const char* args)
      return true;
  }
  
@@ -837,9 +837,9 @@ index 0c81d4d..41ddb5a 100644
 +   return true;
 +}
 +
- bool ChatHandler::HandleBanAccountCommand(const char* args)
+ bool ChatHandler::HandleBanListCommand(const char* args)
  {
-     return HandleBanHelper(BAN_ACCOUNT,args);
+     loginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 diff --git a/src/game/Makefile.am b/src/game/Makefile.am
 index ad3315d..f6a04ab 100644
 --- a/src/game/Makefile.am
@@ -854,7 +854,7 @@ index ad3315d..f6a04ab 100644
      AuctionHouseObject.h \
      Bag.cpp \
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
-index 9ce7fad..32a3aaa 100644
+index 8b018d0..48faaf9 100644
 --- a/src/game/ObjectMgr.cpp
 +++ b/src/game/ObjectMgr.cpp
 @@ -20,6 +20,7 @@
@@ -865,7 +865,7 @@ index 9ce7fad..32a3aaa 100644
  #include "Log.h"
  #include "MapManager.h"
  #include "ObjectMgr.h"
-@@ -415,6 +416,9 @@ void ObjectMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
+@@ -414,6 +415,9 @@ void ObjectMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
  //call this method to send mail to auction owner, when auction is successful, it does not clear ram
  void ObjectMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
  {
@@ -876,10 +876,10 @@ index 9ce7fad..32a3aaa 100644
      Player *owner = GetPlayer(owner_guid);
  
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 5c0d0b6..c8cac82 100644
+index 2badcae..5f67c0f 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
-@@ -41,6 +41,7 @@
+@@ -40,6 +40,7 @@
  #include "Database/DBCStores.h"
  #include "LootMgr.h"
  #include "ItemEnchantmentMgr.h"
@@ -887,7 +887,7 @@ index 5c0d0b6..c8cac82 100644
  #include "MapManager.h"
  #include "ScriptCalls.h"
  #include "CreatureAIRegistry.h"
-@@ -1194,6 +1195,8 @@ void World::SetInitialWorldSettings()
+@@ -1193,6 +1194,8 @@ void World::SetInitialWorldSettings()
      uint32 nextGameEvent = gameeventmgr.Initialize();
      m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
  
@@ -896,7 +896,7 @@ index 5c0d0b6..c8cac82 100644
      sLog.outString( "WORLD: World initialized" );
  }
  
-@@ -1262,6 +1265,7 @@ void World::Update(time_t diff)
+@@ -1261,6 +1264,7 @@ void World::Update(time_t diff)
      /// <ul><li> Handle auctions when the timer has passed
      if (m_timers[WUPDATE_AUCTIONS].Passed())
      {
@@ -904,11 +904,111 @@ index 5c0d0b6..c8cac82 100644
          m_timers[WUPDATE_AUCTIONS].Reset();
  
          ///- Update mails (return old mails with item, or delete them)
+diff --git a/src/mangosd/CliRunnable.cpp b/src/mangosd/CliRunnable.cpp
+index ce4eb7e..01c7038 100644
+--- a/src/mangosd/CliRunnable.cpp
++++ b/src/mangosd/CliRunnable.cpp
+@@ -72,6 +72,8 @@ void CliSave(char*,pPrintf);
+ void CliSend(char*,pPrintf);
+ void CliPLimit(char*,pPrintf);
+ void CliSetPassword(char*,pPrintf);
++void CliHandleAHExpireCommand(char*,pPrintf);
++void CliHandleAHDeleteCommand(char*,pPrintf);
+ /// Table of known commands
+ const CliCommand Commands[]=
+ {
+@@ -105,11 +107,86 @@ const CliCommand Commands[]=
+     {"saveall", &CliSave,"Save all players"},
+     {"send", &CliSend,"Send message to a player"},
+     {"tele", &CliTele,"Teleport player to location"},
++    {"ahexpire", &CliHandleAHExpireCommand,"Expire all auctions from AuctionBot character"},
++    {"ahdelete", &CliHandleAHDeleteCommand,"Delete all auctions from AuctionBot character"},
+     {"plimit", &CliPLimit,"Show or set player login limitations"}
+ };
+ /// \todo Need some pragma pack? Else explain why in a comment.
+ #define CliTotalCmds sizeof(Commands)/sizeof(CliCommand)
+ 
++void CliHandleAHExpireCommand(char*command,pPrintf zprintf)
++{
++    char * ahMapIdStr = strtok(command, " ");
++    char * playerGuidStr = strtok(NULL, " ");
++    if(!ahMapIdStr || !playerGuidStr)
++    {
++        zprintf("Syntax is: ahexpire $ahMapID (2, 6 or 7) $playerGUID\r\n");
++        return;
++    }
++   uint32 ahMapID = (uint32) strtoul(ahMapIdStr, NULL, 0);
++   uint32 playerGUID = (uint32) strtoul(playerGuidStr, NULL, 0);
++
++   AuctionHouseObject* auctionHouse = objmgr.GetAuctionsMap(ahMapID);
++
++   AuctionHouseObject::AuctionEntryMap::iterator itr;
++   itr = auctionHouse->GetAuctionsBegin();
++
++   while (itr != auctionHouse->GetAuctionsEnd())
++   {
++      if (itr->second->owner == playerGUID)
++         itr->second->time = sWorld.GetGameTime();
++
++      ++itr;
++   }
++
++}
++
++void CliHandleAHDeleteCommand(char*command,pPrintf zprintf)
++{
++    char * ahMapIdStr = strtok(command, " ");
++    char * playerGuidStr = strtok(NULL, " ");
++    if(!ahMapIdStr || !playerGuidStr)
++    {
++        zprintf("Syntax is: ahdelete $ahMapID (2, 6 or 7) $playerGUID\r\n");
++        return;
++    }
++   uint32 ahMapID = (uint32) strtoul(ahMapIdStr, NULL, 0);
++   uint32 playerGUID = (uint32) strtoul(playerGuidStr, NULL, 0);
++
++   AuctionHouseObject* auctionHouse = objmgr.GetAuctionsMap(ahMapID);
++
++   AuctionHouseObject::AuctionEntryMap::iterator itr;
++   itr = auctionHouse->GetAuctionsBegin();
++
++   while (itr != auctionHouse->GetAuctionsEnd())
++   {
++      AuctionHouseObject::AuctionEntryMap::iterator tmp = itr;
++      ++itr;
++
++      if (tmp->second->owner != playerGUID)
++         continue;
++
++      Item* item = objmgr.GetAItem(tmp->second->item_guidlow);
++      if (item != NULL)
++      {
++         objmgr.RemoveAItem(tmp->second->item_guidlow);
++         item->DeleteFromDB();
++         delete item;
++      }
++      else
++      {
++         sLog.outString("ahdelete: "
++                        "clearing auction for non-existant item_guidlow (%d)",
++                        tmp->second->item_guidlow);
++      }
++
++      CharacterDatabase.PExecute("DELETE FROM `auctionhouse` WHERE `id` = '%u'",
++                                 tmp->second->Id);
++      auctionHouse->RemoveAuction(tmp->second->Id);
++      delete tmp->second;
++   }
++
++}
+ #if PLATFORM == PLATFORM_WINDOWS
+ int utf8printf(const char* str,...)
+ {
 diff --git a/src/mangosd/mangosd.conf.dist.in b/src/mangosd/mangosd.conf.dist.in
-index d43f220..bcc51f6 100644
+index 65ba1a8..55da64e 100644
 --- a/src/mangosd/mangosd.conf.dist.in
 +++ b/src/mangosd/mangosd.conf.dist.in
-@@ -1079,3 +1079,162 @@ Ra.IP = 0.0.0.0
+@@ -1080,3 +1080,162 @@ Ra.IP = 0.0.0.0
  Ra.Port = 3443
  Ra.MinLevel = 3
  Ra.Secure = 1
@@ -1108,10 +1208,10 @@ index e3ed6b5..3de1e73 100644
  				>
  			</File>
 diff --git a/win/VC90/game.vcproj b/win/VC90/game.vcproj
-index 58e3675..b907476 100644
+index c6f3aa3..f50cc77 100644
 --- a/win/VC90/game.vcproj
 +++ b/win/VC90/game.vcproj
-@@ -804,6 +804,14 @@
+@@ -810,6 +810,14 @@
  				>
  			</File>
  			<File

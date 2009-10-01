@@ -4864,38 +4864,38 @@ index ef2fcbf..fd10616 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index a45c217..01cf8a5 100644
+index 2fdfc42..d941bcc 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
-@@ -107,6 +107,7 @@ ChatCommand * ChatHandler::getCommandTable()
-         { "Mod32Value",     SEC_ADMINISTRATOR,  &ChatHandler::HandleMod32Value,                 "", NULL },
-         { "anim",           SEC_GAMEMASTER,     &ChatHandler::HandleAnimCommand,                "", NULL },
-         { "lootrecipient",  SEC_GAMEMASTER,     &ChatHandler::HandleGetLootRecipient,           "", NULL },
-+        { "arena",          SEC_ADMINISTRATOR,  &ChatHandler::HandleDebugArenaCommand,          "", NULL },
-         { NULL,             0,                  NULL,                                           "", NULL }
+@@ -136,6 +136,7 @@ ChatCommand * ChatHandler::getCommandTable()
+         { "Mod32Value",     SEC_ADMINISTRATOR,  false, &ChatHandler::HandleMod32Value,                 "", NULL },
+         { "anim",           SEC_GAMEMASTER,     false, &ChatHandler::HandleAnimCommand,                "", NULL },
+         { "lootrecipient",  SEC_GAMEMASTER,     false, &ChatHandler::HandleGetLootRecipient,           "", NULL },
++        { "arena",          SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugArenaCommand,          "", NULL },
+         { NULL,             0,                  false, NULL,                                           "", NULL }
      };
  
-@@ -464,6 +465,7 @@ ChatCommand * ChatHandler::getCommandTable()
-         { "cometome",       SEC_ADMINISTRATOR,  &ChatHandler::HandleComeToMeCommand,            "", NULL },
-         { "damage",         SEC_ADMINISTRATOR,  &ChatHandler::HandleDamageCommand,              "", NULL },
-         { "combatstop",     SEC_GAMEMASTER,     &ChatHandler::HandleCombatStopCommand,          "", NULL },
-+        { "flusharenapoints",    SEC_ADMINISTRATOR, &ChatHandler::HandleFlushArenaPointsCommand,         "",   NULL },
+@@ -495,6 +496,7 @@ ChatCommand * ChatHandler::getCommandTable()
+         { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
+         { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCombatStopCommand,          "", NULL },
+         { "sendmessage",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
++        { "flusharenapoints",    SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,         "",   NULL },
  
-         { NULL,             0,                  NULL,                                           "", NULL }
+         { NULL,             0,                  false, NULL,                                           "", NULL }
      };
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index a6da30a..692fcf0 100644
+index a3960da..4215457 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
-@@ -375,6 +375,7 @@ class ChatHandler
-         bool HandleCastTargetCommand(const char *args);
+@@ -396,6 +396,7 @@ class ChatHandler
          bool HandleComeToMeCommand(const char *args);
          bool HandleCombatStopCommand(const char *args);
+         bool HandleSendMessageCommand(const char * args);
 +        bool HandleFlushArenaPointsCommand(const char *args);
  
          //! Development Commands
          bool HandleSetValue(const char* args);
-@@ -387,6 +388,7 @@ class ChatHandler
+@@ -408,6 +409,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
          bool HandleGetLootRecipient(const char * args);
@@ -4975,10 +4975,10 @@ index e30e847..b999b10 100644
          void ChangeMembersGroup(const uint64 &guid, const uint8 &group);
          void ChangeMembersGroup(Player *player, const uint8 &group);
 diff --git a/src/game/Language.h b/src/game/Language.h
-index 4d4c155..4bda99f 100644
+index be2a7cf..c2fdfa2 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
-@@ -616,11 +616,30 @@ enum MangosStrings
+@@ -629,11 +629,30 @@ enum MangosStrings
      LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
      LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
  
@@ -5011,7 +5011,7 @@ index 4d4c155..4bda99f 100644
      // in game strings
      //                                  = 800, not used
 diff --git a/src/game/Level1.cpp b/src/game/Level1.cpp
-index 48be118..9ee75cd 100644
+index 57330ee..dc728d0 100644
 --- a/src/game/Level1.cpp
 +++ b/src/game/Level1.cpp
 @@ -350,7 +350,14 @@ bool ChatHandler::HandleNamegoCommand(const char* args)
@@ -5060,19 +5060,19 @@ index 48be118..9ee75cd 100644
              Map* pMap = MapManager::Instance().GetMap(_player->GetMapId(),_player);
  
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index ca00ab0..7b25508 100644
+index 455e190..762a71f 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
-@@ -46,6 +46,7 @@
+@@ -47,6 +47,7 @@
  #include "Config/ConfigEnv.h"
  #include "Util.h"
  #include "ItemEnchantmentMgr.h"
 +#include "BattleGroundMgr.h"
  #include "InstanceSaveMgr.h"
  #include "InstanceData.h"
- 
-@@ -5515,3 +5516,9 @@ bool ChatHandler::HandleInstanceSaveDataCommand(const char * /*args*/)
-     ((InstanceMap*)map)->GetInstanceData()->SaveToDB();
+ #include "AccountMgr.h"
+@@ -5818,3 +5819,9 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
+     PSendSysMessage(LANG_SENDMESSAGE,name.c_str(),msg_str);
      return true;
  }
 +
@@ -5211,7 +5211,7 @@ index 694bde8..5ad7778 100644
  }
  
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index 2b70725..3f56205 100644
+index a1711fa..54af4f8 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
 @@ -309,6 +309,8 @@ class ObjectMgr
@@ -5508,10 +5508,10 @@ index aaaaac6..69322c0 100644
          BgBattleGroundQueueID_Rec m_bgBattleGroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
          uint32 m_bgEntryPointMap;
 diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
-index 26e77c8..db48f2c 100644
+index 7f82341..52a29bd 100644
 --- a/src/game/SpellAuras.cpp
 +++ b/src/game/SpellAuras.cpp
-@@ -2133,7 +2133,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
+@@ -2139,7 +2139,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                              return;
  
                      // final heal
@@ -5614,10 +5614,10 @@ index 339a590..ef2be14 100644
  {
      // used just after dieing to remove all visible auras
 diff --git a/src/game/Unit.h b/src/game/Unit.h
-index c4495a2..e98efe0 100644
+index 6eb6438..3b09385 100644
 --- a/src/game/Unit.h
 +++ b/src/game/Unit.h
-@@ -1005,6 +1005,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
+@@ -1004,6 +1004,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
          void RemoveAurasWithDispelType( DispelType type );
  
          void RemoveAllAuras();
@@ -5626,7 +5626,7 @@ index c4495a2..e98efe0 100644
          void DelayAura(uint32 spellId, uint32 effindex, int32 delaytime);
  
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 2badcae..38fe986 100644
+index 7f96992..f756b7b 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -793,6 +793,13 @@ void World::LoadConfigSettings(bool reload)
@@ -5677,10 +5677,10 @@ index 2badcae..38fe986 100644
  void World::SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self, uint32 team)
  {
 diff --git a/src/game/World.h b/src/game/World.h
-index f70ea7b..79f20ea 100644
+index 4de067f..715da65 100644
 --- a/src/game/World.h
 +++ b/src/game/World.h
-@@ -160,6 +160,11 @@ enum WorldConfigs
+@@ -159,6 +159,11 @@ enum WorldConfigs
      CONFIG_LISTEN_RANGE_SAY,
      CONFIG_LISTEN_RANGE_TEXTEMOTE,
      CONFIG_LISTEN_RANGE_YELL,
@@ -5692,7 +5692,7 @@ index f70ea7b..79f20ea 100644
      CONFIG_VALUE_COUNT
  };
  
-@@ -403,6 +408,7 @@ class World
+@@ -388,6 +393,7 @@ class World
          void LoadConfigSettings(bool reload = false);
  
          void SendWorldText(int32 string_id, ...);

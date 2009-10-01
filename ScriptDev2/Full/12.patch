@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 697)
+--- Makefile.am	(revision 715)
 +++ Makefile.am	(working copy)
 @@ -51,10 +51,20 @@
  scripts/custom/custom_example.cpp \
@@ -39,15 +39,7 @@ Index: Makefile.am
  scripts/zone/hellfire_citadel/shattered_halls/def_shattered_halls.h \
  scripts/zone/hellfire_citadel/shattered_halls/instance_shattered_halls.cpp \
  scripts/zone/hellfire_peninsula/boss_doomlord_kazzak.cpp \
-@@ -332,6 +344,7 @@
- scripts/zone/tempest_keep/the_eye/boss_astromancer.cpp \
- scripts/zone/tempest_keep/the_eye/boss_kaelthas.cpp \
- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp \
-+scripts/zone/tempest_keep/the_eye/boss_alar.cpp \
- scripts/zone/tempest_keep/the_eye/def_the_eye.h \
- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp \
- scripts/zone/tempest_keep/the_eye/the_eye.cpp \
-@@ -360,8 +373,12 @@
+@@ -363,8 +375,12 @@
  scripts/zone/western_plaguelands/western_plaguelands.cpp \
  scripts/zone/winterspring/winterspring.cpp \
  scripts/zone/zangarmarsh/zangarmarsh.cpp \
@@ -62,7 +54,7 @@ Index: Makefile.am
  scripts/zone/zulaman/zulaman.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 697)
+--- ScriptMgr.cpp	(revision 715)
 +++ ScriptMgr.cpp	(working copy)
 @@ -77,12 +77,22 @@
  extern void AddSC_custom_example();
@@ -112,15 +104,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_netherspite_infernal();
  extern void AddSC_boss_moroes();
  extern void AddSC_bosses_opera();
-@@ -492,6 +506,7 @@
- //--The Eye
- extern void AddSC_boss_kaelthas();
- extern void AddSC_boss_void_reaver();
-+extern void AddSC_boss_alar();
- extern void AddSC_boss_high_astromancer_solarian();
- extern void AddSC_instance_the_eye();
- extern void AddSC_the_eye();
-@@ -559,9 +574,14 @@
+@@ -561,9 +575,14 @@
  extern void AddSC_boss_renataki();
  extern void AddSC_boss_wushoolay();
  extern void AddSC_instance_zulgurub();
@@ -135,7 +119,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_instance_zulaman();
  extern void AddSC_zulaman();
  
-@@ -1253,12 +1273,22 @@
+@@ -1255,12 +1274,22 @@
      AddSC_custom_example();
      AddSC_custom_gossip_codebox();
      AddSC_test();
@@ -158,7 +142,7 @@ Index: ScriptMgr.cpp
  
      // -- Honor --
  
-@@ -1422,6 +1452,8 @@
+@@ -1424,6 +1453,8 @@
      //Darkshore
      //Darnassus
      //Deadmines
@@ -167,7 +151,7 @@ Index: ScriptMgr.cpp
      //Deadwind pass
      //Desolace
      //Dire Maul
-@@ -1471,6 +1503,7 @@
+@@ -1473,6 +1504,7 @@
      //--Shattered Halls
      AddSC_boss_grand_warlock_nethekurse();
      AddSC_boss_warbringer_omrogg();
@@ -175,7 +159,7 @@ Index: ScriptMgr.cpp
      AddSC_instance_shattered_halls();
  
      //--Ramparts
-@@ -1496,6 +1529,7 @@
+@@ -1498,6 +1530,7 @@
      AddSC_boss_shade_of_aran();
      AddSC_boss_malchezaar();
      AddSC_boss_terestian_illhoof();
@@ -183,15 +167,7 @@ Index: ScriptMgr.cpp
      AddSC_netherspite_infernal();
      AddSC_boss_moroes();
      AddSC_bosses_opera();
-@@ -1668,6 +1702,7 @@
-     //--The Eye
-     AddSC_boss_kaelthas();
-     AddSC_boss_void_reaver();
-+    AddSC_boss_alar();
-     AddSC_boss_high_astromancer_solarian();
-     AddSC_instance_the_eye();
-     AddSC_the_eye();
-@@ -1737,8 +1772,12 @@
+@@ -1741,8 +1774,12 @@
      AddSC_instance_zulgurub();
  
      //Zul'Aman
@@ -1706,7 +1682,7 @@ Index: scripts/guard/g_marcus_jonathan.cpp
 +}
 Index: scripts/guard/guard_ai.cpp
 ===================================================================
---- scripts/guard/guard_ai.cpp	(revision 697)
+--- scripts/guard/guard_ai.cpp	(revision 715)
 +++ scripts/guard/guard_ai.cpp	(working copy)
 @@ -1,26 +1,12 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -2251,7 +2227,7 @@ Index: scripts/guard/guard_ai.cpp
      else
 Index: scripts/guard/guard_ai.h
 ===================================================================
---- scripts/guard/guard_ai.h	(revision 697)
+--- scripts/guard/guard_ai.h	(revision 715)
 +++ scripts/guard/guard_ai.h	(working copy)
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -3855,7 +3831,7 @@ Index: scripts/guard/thrall.cpp
 +}
 Index: scripts/item/item_scripts.cpp
 ===================================================================
---- scripts/item/item_scripts.cpp	(revision 697)
+--- scripts/item/item_scripts.cpp	(revision 715)
 +++ scripts/item/item_scripts.cpp	(working copy)
 @@ -393,6 +393,25 @@
  }
@@ -3897,7 +3873,7 @@ Index: scripts/item/item_scripts.cpp
      m_scripts[nrscripts++] = newscript;
 Index: scripts/zone/black_temple/boss_supremus.cpp
 ===================================================================
---- scripts/zone/black_temple/boss_supremus.cpp	(revision 697)
+--- scripts/zone/black_temple/boss_supremus.cpp	(revision 715)
 +++ scripts/zone/black_temple/boss_supremus.cpp	(working copy)
 @@ -115,7 +115,7 @@
          CheckTimer = 1000;
@@ -3927,115 +3903,27 @@ Index: scripts/zone/black_temple/boss_supremus.cpp
                  }
 Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
 ===================================================================
---- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 697)
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 715)
 +++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
-@@ -79,7 +79,7 @@
- #define TAINTED_ELEMENTAL             22009
- #define COILFANG_STRIDER              22056
- #define COILFANG_ELITE                22055
--#define FATHOM_SPOREBAT               22140
-+#define TOXIC_SPORE_BAT               22140
+@@ -66,7 +66,7 @@
+ #define TAINTED_ELEMENTAL           22009
+ #define COILFANG_STRIDER            22056
+ #define COILFANG_ELITE              22055
+-#define FATHOM_SPOREBAT             22140
++#define TOXIC_SPORE_BAT             22140
  
  float ElementPos[8][4] =
  {
-@@ -368,7 +368,7 @@
-                 if(SummonSporebat_Timer < diff)
+@@ -329,7 +329,7 @@
+                 if (SummonSporebat_Timer < diff)
                  {
                      Creature *Sporebat = NULL;
 -                    Sporebat = m_creature->SummonCreature(FATHOM_SPOREBAT, SPOREBAT_X, SPOREBAT_Y, SPOREBAT_Z, SPOREBAT_O, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
 +                    Sporebat = m_creature->SummonCreature(TOXIC_SPORE_BAT, SPOREBAT_X, SPOREBAT_Y, SPOREBAT_Z, SPOREBAT_O, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
  
-                     if(Sporebat)
+                     if (Sporebat)
                      {
-@@ -529,19 +529,40 @@
- {
-     mob_enchanted_elementalAI(Creature *c) : ScriptedAI(c)
-     {
--        pInstance = ((ScriptedInstance*)c->GetInstanceData());
--        Reset();
-+        pInstance = (c->GetInstanceData()) ? ((ScriptedInstance*)c->GetInstanceData()) : NULL;
-+        EnterEvadeMode();
-     }
- 
-     ScriptedInstance *pInstance;
- 
-     uint32 Check_Timer;
-     uint32 Movement_Timer;
--
-+    float angle;
-+    float distance;
-+    float newX;
-+    float newY;
-+    float newZ;
-+    bool waipontReached;
-     void Reset()
-     {
-         Check_Timer = 5000;
-         Movement_Timer = 500;
-+        waipontReached = false;
-+        Unit *Vashj = NULL;
-+        Vashj = Unit::GetUnit((*m_creature), pInstance->GetData64(DATA_LADYVASHJ));
-+        if(Vashj)
-+        {
-+            angle = m_creature->GetAngle(Vashj);
-+            distance = m_creature->GetDistance(Vashj);
-+            newX = m_creature->GetPositionX() + cos(angle)*(distance - 60);
-+            newY = m_creature->GetPositionY() + sin(angle)*(distance - 60);
-+            newZ = Vashj->GetPositionZ() - 2;
-+        }
-+
-+        //m_creature->RemoveAllAuras();
-+        //m_creature->DeleteThreatList();
-+        //m_creature->CombatStop();
-+        //DoGoHome();
-     }
- 
-     void Aggro(Unit *who) { return; }
-@@ -550,6 +571,24 @@
- 
-     void UpdateAI(const uint32 diff)
-     {
-+        if(!m_creature->isAlive())
-+            return;
-+        //Movement_Timer
-+        if(Movement_Timer < diff)
-+        {
-+            Unit *Vashj = NULL;
-+            Vashj = Unit::GetUnit((*m_creature), pInstance->GetData64(DATA_LADYVASHJ));
-+            if(Vashj)
-+            {
-+                m_creature->GetMotionMaster()->Clear();
-+                m_creature->GetMotionMaster()->MovePoint(0, newX, newY, newZ);
-+                //m_creature->GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*Vashj));
-+            }
-+
-+            //if first movement doesn't work, apply the same movement after 10 seconds
-+            Movement_Timer = 5000;
-+        }else Movement_Timer -= diff;
-+
-         //Check_Timer
-         if(Check_Timer < diff)
-         {
-@@ -575,9 +614,17 @@
-                         //call Unsummon()
-                         m_creature->setDeathState(JUST_DIED);
-                     }
-+                    else if (Vashj->IsWithinDistInMap(m_creature, 61)){
-+                        if (!waipontReached){
-+                            Movement_Timer = 500;
-+                            newX = Vashj->GetPositionX();
-+                            newY = Vashj->GetPositionY();
-+                            newZ = newZ + 2;
-+                            waipontReached = true;
-+                        }
-+                    }
-                 }
-             }
--            else error_log("ERROR: Instance Data for Serpentshrine Caverns not set");
-             Check_Timer = 1000;
-         }else Check_Timer -= diff;
-     }
-@@ -634,11 +681,11 @@
+@@ -594,11 +594,11 @@
      }
  };
  
@@ -4050,7 +3938,7 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
      {
          pInstance = ((ScriptedInstance*)c->GetInstanceData());
          Reset();
-@@ -847,10 +894,19 @@
+@@ -807,10 +807,19 @@
  
              //remove this item
              player->DestroyItemCount(31088, 1, true);
@@ -4072,7 +3960,7 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
  
  CreatureAI* GetAI_boss_lady_vashj(Creature *_Creature)
  {
-@@ -867,9 +923,9 @@
+@@ -827,9 +836,9 @@
      return new mob_tainted_elementalAI (_Creature);
  }
  
@@ -4084,7 +3972,7 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
  }
  
  CreatureAI* GetAI_mob_shield_generator_channel(Creature *_Creature)
-@@ -896,8 +952,8 @@
+@@ -856,8 +865,8 @@
      m_scripts[nrscripts++] = newscript;
  
      newscript = new Script;
@@ -4097,7 +3985,7 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
      newscript = new Script;
 Index: scripts/zone/deadmines/deadmines.cpp
 ===================================================================
---- scripts/zone/deadmines/deadmines.cpp	(revision 697)
+--- scripts/zone/deadmines/deadmines.cpp	(revision 715)
 +++ scripts/zone/deadmines/deadmines.cpp	(working copy)
 @@ -22,3 +22,223 @@
  EndScriptData */
@@ -4344,17 +4232,17 @@ Index: scripts/zone/deadmines/def_deadmines.h
 +#endif
 Index: scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
 ===================================================================
---- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 697)
+--- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 715)
 +++ scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(working copy)
-@@ -176,6 +176,8 @@
-             m_creature->setFaction(14);
-             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+@@ -179,6 +179,8 @@
+                 m_creature->setFaction(14);
+                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 +                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN9);
 +                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNKNOWN2);
  
-             DoYell(SAY_FREED, LANG_UNIVERSAL, NULL);
-             DoPlaySoundToSet(m_creature, SOUND_FREED);
+                 DoScriptText(SAY_FREED, m_creature);
+ 
 Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_bladefist.cpp
 ===================================================================
 --- scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_bladefist.cpp	(revision 0)
@@ -4476,7 +4364,7 @@ Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_blade
 +}
 Index: scripts/zone/karazhan/boss_nightbane.cpp
 ===================================================================
---- scripts/zone/karazhan/boss_nightbane.cpp	(revision 697)
+--- scripts/zone/karazhan/boss_nightbane.cpp	(revision 715)
 +++ scripts/zone/karazhan/boss_nightbane.cpp	(working copy)
 @@ -22,12 +22,370 @@
  EndScriptData */
@@ -4857,1041 +4745,20 @@ Index: scripts/zone/karazhan/boss_nightbane.cpp
 +    newscript->GetAI = GetAI_boss_nightbane;
 +    m_scripts[nrscripts++] = newscript;
 +}
-Index: scripts/zone/netherstorm/netherstorm.cpp
-===================================================================
---- scripts/zone/netherstorm/netherstorm.cpp	(revision 697)
-+++ scripts/zone/netherstorm/netherstorm.cpp	(working copy)
-@@ -29,6 +29,12 @@
- EndContentData */
- 
- #include "precompiled.h"
-+#include "Player.h"
-+#include "WorldPacket.h"
-+#include "Cell.h"
-+#include "CellImpl.h"
-+#include "GridNotifiers.h"
-+#include "GridNotifiersImpl.h"
- 
- /*######
- ## npc_manaforge_control_console
-@@ -388,7 +394,366 @@
-     }
-     return true;
- }
-+/*
-+######
-+## Scripts for Quest 10198
-+######
-+*/
- 
-+// Entry of Arcanist Ardonis
-+#define ENTRY_ARCANIST_ARDONIS				19830
-+
-+// Entry of Commander Dawnforge
-+#define ENTRY_COMMANDER_DAWNFORGE			19831
-+
-+// Entry of Pathaleon the Curators Image
-+#define ENTRY_PATHALEONS_IMAGE				21504
-+#define POSITION_PATHALEONS_IMAGE_X			2325.851563
-+#define POSITION_PATHALEONS_IMAGE_Y			2799.534668
-+#define POSITION_PATHALEONS_IMAGE_Z			133.084229
-+#define POSITION_PATHALEONS_IMAGE_O			6.038996
-+
-+// The Speech of Dawnforge, Ardonis & Pathaleon
-+#define SAY_COMMANDER_DAWNFORGE_1			"We need you to send reinforcements to Manaforge Duro, Ardonis. This is not a request, it's an order."
-+#define SAY_ARCANIST_ARDONIS_1				"You cannot be serious! We are severely understaffed and can barely keep this manaforge functional!"
-+#define SAY_COMMANDER_DAWNFORGE_2			"You will do as ordered. Manaforge Duro has come under heavy attack by mana creatures and the situation is out of control. Failure to comply will not be tolerated!"
-+#define SAY_PATHALEON_CULATOR_IMAGE_1		"Indeed, it is not a request."
-+#define SAY_COMMANDER_DAWNFORGE_3	        "My lord!"
-+#define SAY_PATHALEON_CULATOR_IMAGE_2		"Duro will be reinforced! Ultris was a complete disaster. I will NOT have that mistake repeated!"
-+#define SAY_PATHALEON_CULATOR_IMAGE_2_1		"We've had too many setbacks along the way: Hellfire Citadel, Fallen Sky Ridge, Firewing Point... Prince Kael'thas will tolerate no further delays. I will tolerate nothing other than complete success!"
-+#define SAY_PATHALEON_CULATOR_IMAGE_2_2		"I am returning to Tempest Keep. See to it that I do not have reason to return!"
-+#define SAY_COMMANDER_DAWNFORGE_4	        "Yes, my lord."
-+#define SAY_ARCANIST_ARDONIS_2		        "Yes, my lord."
-+#define SAY_COMMANDER_DAWNFORGE_5	        "See to it, Ardonis!"
-+
-+/*
-+######
-+## npc_commander_dawnforge
-+######
-+
-+UPDATE `creature_template` SET `ScriptName` = 'npc_commander_dawnforge' WHERE `entry` = 19831;
-+*/
-+struct MANGOS_DLL_DECL npc_commander_dawnforgeAI : public ScriptedAI
-+{
-+
-+	// Event settings
-+	uint32 Phase;
-+    uint32 PhaseSubphase;
-+    uint32 Phase_Timer;
-+	bool isEvent;
-+	
-+	// Player define
-+	Player *plr;
-+
-+	// Creature define
-+	Creature* dawnforge;
-+	Creature* ardonis;
-+	Creature* pathaleon;
-+	float angle_dawnforge;
-+	float angle_ardonis;
-+	
-+	// Select any creature in a grid
-+	Creature* SelectCreatureInGrid(uint32 entry, float range)
-+    {
-+        Creature* pCreature = NULL;
-+
-+        // Time for some omg mind blowing code to search for creature
-+        CellPair pair(MaNGOS::ComputeCellPair(m_creature->GetPositionX(), m_creature->GetPositionY()));
-+        Cell cell(pair);
-+        cell.data.Part.reserved = ALL_DISTRICT;
-+        cell.SetNoCreate();
-+
-+        MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck creature_check(*m_creature, entry, true, range);
-+        MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreature, creature_check);
-+
-+        TypeContainerVisitor<MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck>, GridTypeMapContainer> creature_searcher(searcher);
-+
-+        CellLock<GridReadGuard> cell_lock(cell, pair);
-+        cell_lock->Visit(cell_lock, creature_searcher,*(m_creature->GetMap()));
-+
-+        return pCreature;
-+	}
-+	
-+	// Say Pathaleon - Workaround to prevent server to crash if Pathaleon doesnt exist any more
-+	void Say_Pathaleons_Image ( const char *text, const uint64 targetGUID = NULL )
-+	{
-+		if(pathaleon)
-+		{
-+			pathaleon->Say ( text, LANG_UNIVERSAL, targetGUID );
-+		}
-+		else Reset ();
-+	}
-+	
-+	// Emote Ardonis and Pathaleon
-+	void Turn_to_Pathaleons_Image ()
-+	{
-+		// Calculate the angle to Pathaleon
-+		angle_dawnforge = dawnforge->GetAngle ( POSITION_PATHALEONS_IMAGE_X, POSITION_PATHALEONS_IMAGE_Y );
-+		angle_ardonis = ardonis->GetAngle ( POSITION_PATHALEONS_IMAGE_X, POSITION_PATHALEONS_IMAGE_Y );
-+		
-+		// Turn Dawnforge
-+		dawnforge->SetOrientation( angle_dawnforge );
-+		dawnforge->SendUpdateToPlayer ( plr );
-+		// Turn Ardonis
-+		ardonis->SetOrientation( angle_ardonis );
-+		ardonis->SendUpdateToPlayer ( plr );
-+		
-+		// Set them on to kneel
-+		dawnforge->SetStandState ( 8 );
-+		ardonis->SetStandState ( 8 );
-+	}
-+		
-+	// Set them back to each other
-+	void Turn_to_eachother ()
-+	{
-+		angle_dawnforge = dawnforge->GetAngle ( ardonis->GetPositionX(), ardonis->GetPositionY() );
-+		angle_ardonis = ardonis->GetAngle ( dawnforge->GetPositionX(), dawnforge->GetPositionY() );
-+
-+		// Turn them to pathaleon and Update to Player
-+		dawnforge->SetOrientation( angle_dawnforge );
-+		dawnforge->SendUpdateToPlayer ( plr );
-+		ardonis->SetOrientation( angle_ardonis );
-+		ardonis->SendUpdateToPlayer ( plr );
-+		
-+		// Set them on to kneel
-+		dawnforge->SetStandState ( 0 );
-+		ardonis->SetStandState ( 0 );
-+	}
-+
-+	// Reset the complete script
-+	void Reset()
-+    {
-+		// Reset Phase, Timer, and Mob ID
-+		PhaseSubphase = 0;
-+		Phase_Timer = 4000;
-+		Phase = 1;
-+		isEvent = false;
-+
-+		// Reset Dawnforge
-+		dawnforge = SelectCreatureInGrid(ENTRY_COMMANDER_DAWNFORGE, 10);
-+		if (dawnforge) dawnforge->SetStandState ( 0 );
-+		
-+		// Reset Ardonis
-+		ardonis = SelectCreatureInGrid(ENTRY_ARCANIST_ARDONIS, 10);
-+		if (ardonis) ardonis->SetStandState ( 0 );
-+	}
-+
-+	npc_commander_dawnforgeAI(Creature *c) : ScriptedAI(c)
-+    {
-+		Reset ();
-+	}
-+
-+	void Aggro(Unit *who) { Reset (); }
-+	
-+	void MoveInLineOfSight(Unit *who)
-+    {
-+		// Check Player
-+		if ( who && who->GetTypeId() != TYPEID_PLAYER ) return;
-+		
-+		// Set plr
-+		plr = ((Player*)who);
-+
-+		// Check QuestStatus
-+		if ( plr->GetQuestStatus(10198) != QUEST_STATUS_INCOMPLETE ) return;
-+
-+		// Check Dist
-+		float attackRadius = m_creature->GetAttackDistance(who);
-+		if ( !m_creature->IsWithinDistInMap(who, attackRadius) )
-+		{
-+			Reset (); // Reset Event, MiLoS is called every time player moves.
-+			return;
-+		}
-+		
-+		// Select Dawnforge
-+		dawnforge = SelectCreatureInGrid(ENTRY_COMMANDER_DAWNFORGE, 10);
-+		if (!dawnforge) return;
-+		
-+		// Select Ardonis
-+		ardonis = SelectCreatureInGrid(ENTRY_ARCANIST_ARDONIS, 10);
-+		if (!ardonis) return;
-+
-+		// Set Dawnforge & Ardonis to look to eachother
-+		Turn_to_eachother ();
-+
-+		// Start Event
-+		isEvent = true;
-+	}
-+
-+	void UpdateAI(const uint32 diff)
-+    {
-+		// Can Event Start?
-+		if ( !isEvent ) return;
-+				
-+		// Phase timing
-+		if(Phase_Timer >= diff)
-+		{
-+			Phase_Timer -= diff;
-+			return;
-+		}
-+
-+		//Phase 1 Dawnforge say
-+		switch (Phase)
-+		{
-+		case 1:
-+			dawnforge->Say(SAY_COMMANDER_DAWNFORGE_1, LANG_UNIVERSAL, ardonis->GetGUID() );
-+			Phase++;
-+			Phase_Timer = 16000;
-+			break;
-+		//Phase 2 Ardonis say
-+		case 2:
-+			ardonis->Say(SAY_ARCANIST_ARDONIS_1, LANG_UNIVERSAL, dawnforge->GetGUID() );
-+			Phase++;
-+			Phase_Timer = 16000;
-+			break;
-+		//Phase 3 Dawnforge say
-+		case 3:
-+			dawnforge->Say(SAY_COMMANDER_DAWNFORGE_2, LANG_UNIVERSAL, ardonis->GetGUID() );
-+			Phase++;
-+			Phase_Timer = 10000;
-+			break;
-+		//Phase 4 Pathaleon spawns up to phase 9
-+		case 4:
-+			// SPAWN PATHALEON_CULATOR_IMAGE
-+			pathaleon = dawnforge->SummonCreature( ENTRY_PATHALEONS_IMAGE, POSITION_PATHALEONS_IMAGE_X, POSITION_PATHALEONS_IMAGE_Y, POSITION_PATHALEONS_IMAGE_Z, POSITION_PATHALEONS_IMAGE_O, (TempSummonType)3, 100000);
-+			Phase++;
-+			Phase_Timer = 16000;
-+			break;
-+		//Phase 5 Pathaleon say
-+		case 5:
-+			Say_Pathaleons_Image ( SAY_PATHALEON_CULATOR_IMAGE_1, ardonis->GetGUID() );
-+			Phase++;
-+			Phase_Timer = 10000;
-+			break;
-+		//Phase 6
-+		case 6:
-+			switch(PhaseSubphase)
-+			{
-+			//Subphase 1: Turn Dawnforge and Ardonis
-+			case 0:
-+				Turn_to_Pathaleons_Image ();
-+				PhaseSubphase++;
-+				Phase_Timer = 8000;
-+				break;
-+			//Subphase 2 Dawnforge say
-+			case 1:
-+				dawnforge->Say(SAY_COMMANDER_DAWNFORGE_3, LANG_UNIVERSAL, pathaleon->GetGUID() );
-+				PhaseSubphase = 0;
-+				Phase++;
-+				Phase_Timer = 8000;
-+				break;
-+			}
-+			break;
-+		//Phase 7 Pathaleons say 3 Sentence, every sentence need a subphase
-+		case 7:
-+			switch(PhaseSubphase)
-+			{
-+			//Subphase 1
-+			case 0:
-+				Say_Pathaleons_Image (SAY_PATHALEON_CULATOR_IMAGE_2);
-+				PhaseSubphase++;
-+				Phase_Timer = 16000;
-+				break;
-+			//Subphase 2
-+			case 1:
-+				Say_Pathaleons_Image (SAY_PATHALEON_CULATOR_IMAGE_2_1);
-+				PhaseSubphase++;
-+				Phase_Timer = 16000;
-+				break;
-+			//Subphase 3
-+			case 2:
-+				Say_Pathaleons_Image (SAY_PATHALEON_CULATOR_IMAGE_2_2);
-+				PhaseSubphase = 0;
-+				Phase++;
-+				Phase_Timer = 16000;
-+				break;
-+			}
-+			break;
-+		//Phase 8 Dawnforge says
-+		case 8:
-+			dawnforge->Say(SAY_COMMANDER_DAWNFORGE_4, LANG_UNIVERSAL, pathaleon->GetGUID() );
-+			Phase++;
-+			Phase_Timer = 4000;
-+			break;
-+		//Phase 9 Ardonis says & Pathaleons Despawn (Reset Dawnforge & Ardonis)
-+		case 9:
-+			switch (PhaseSubphase)
-+			{
-+			case 0:
-+				ardonis->Say(SAY_ARCANIST_ARDONIS_2, LANG_UNIVERSAL, pathaleon->GetGUID() );
-+				PhaseSubphase++;
-+				Phase_Timer = 13000;
-+				break;
-+			case 1:
-+				Turn_to_eachother ();
-+				PhaseSubphase = 0;
-+				Phase++;
-+				Phase_Timer = 3000;
-+			}
-+			break;
-+		//Phase 10 Dawnforge say
-+		case 10:
-+			dawnforge->Say(SAY_COMMANDER_DAWNFORGE_5, LANG_UNIVERSAL, ardonis->GetGUID() );
-+			Phase++;
-+			Phase_Timer = 4000;
-+			break;
-+		//Phase 10: Set Quest complete, Reset Event
-+		case 11:
-+			plr->AreaExploredOrEventHappens(10198);
-+			Reset();
-+			break;
-+		}
-+	}
-+};
-+CreatureAI* GetAI_npc_commander_dawnforge(Creature* _Creature)
-+{
-+    return new npc_commander_dawnforgeAI(_Creature);
-+}
-+
-+/*
-+######
-+## mob_arcane_annihilator (Maybe move this script to mobs_netherstorm.cpp)
-+######
-+
-+UPDATE `creature_template` SET `ScriptName` = 'mob_arcane_annihilator' WHERE `entry` = 18856;
-+*/
-+struct MANGOS_DLL_DECL mob_arcane_annihilatorAI : public ScriptedAI
-+{
-+	// define Player
-+	Player* plr;
-+	
-+	mob_arcane_annihilatorAI(Creature *c) : ScriptedAI(c) {	}
-+
-+	void Aggro(Unit *who) {}
-+
-+	void Reset () {}
-+
-+	void MoveInLineOfSight(Unit *who)
-+    {
-+		// Check if Player
-+		if ( who && who->GetTypeId() != TYPEID_PLAYER ) return;
-+		
-+		// Set plr
-+		plr = ((Player*)who);
-+
-+		// Check Dist
-+		float attackRadius = m_creature->GetAttackDistance(who);
-+		if ( !m_creature->IsWithinDistInMap(who, attackRadius) ) return;
-+		
-+		// Check Spell
-+		if ( !who->HasAura(34603, 1) ) return;
-+
-+		// Remove Aura
-+		who->RemoveAura ( 34603, 1, 0 );
-+
-+		// Start Combat
-+		DoStartAttackAndMovement ( who );
-+	}
-+};
-+CreatureAI* GetAI_mob_arcane_annihilator(Creature* _Creature)
-+{
-+    return new mob_arcane_annihilatorAI(_Creature);
-+}
-+
- /*######
- ##
- ######*/
-@@ -418,4 +783,14 @@
-     newscript->pGossipHello =   &GossipHello_npc_veronia;
-     newscript->pGossipSelect =  &GossipSelect_npc_veronia;
-     m_scripts[nrscripts++] = newscript;
-+
-+	newscript = new Script;
-+    newscript->Name = "npc_commander_dawnforge";
-+    newscript->GetAI = GetAI_npc_commander_dawnforge;
-+    m_scripts[nrscripts++] = newscript;
-+	
-+	newscript = new Script;
-+    newscript->Name = "mob_arcane_annihilator";
-+    newscript->GetAI = GetAI_mob_arcane_annihilator;
-+    m_scripts[nrscripts++] = newscript;
- }
-Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
-===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_alar.cpp	(revision 0)
-+++ scripts/zone/tempest_keep/the_eye/boss_alar.cpp	(revision 0)
-@@ -0,0 +1,617 @@
-+/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
-+* This program is free software; you can redistribute it and/or modify
-+* it under the terms of the GNU General Public License as published by
-+* the Free Software Foundation; either version 2 of the License, or
-+* (at your option) any later version.
-+*
-+* This program is distributed in the hope that it will be useful,
-+* but WITHOUT ANY WARRANTY; without even the implied warranty of
-+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+* GNU General Public License for more details.
-+*
-+* You should have received a copy of the GNU General Public License
-+* along with this program; if not, write to the Free Software
-+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+*/   
-+
-+/* ScriptData
-+SDName: boss_alar
-+SD%Complete: 95 (missing proper enrage spell and only partial support of Dive bomb in core)
-+SDComment:
-+SDCategory: Tempest Keep, The Eye
-+EndScriptData */
-+
-+#include "precompiled.h"
-+#include "def_the_eye.h"
-+#include "Player.h"
-+
-+#define SPELL_FLAME_BUFFET            34121 // Flame Buffet - every 1,5 secs in phase 1 if there is no victim in melee range and after Dive Bomb in phase 2 with same conditions
-+#define SPELL_FLAME_QUILLS            34229 // Randomly after changing position in phase after watching tonns of movies, set probability 20%
-+#define SPELL_REBIRTH                 34342 // Rebirth - beginning of second phase (after loose all health in phase 1)
-+#define SPELL_REBIRTH_2               35369 // Rebirth (another, without healing to full HP) - after Dive Bomb in phase 2
-+#define SPELL_MELT_ARMOR              35410 // Melt Armor - every 60 sec in phase 2
-+#define SPELL_CHARGE                  35412 // Charge - 30 sec cooldown
-+#define SPELL_DIVE_BOMB_VISUAL        35367 // Bosskillers says 30 sec cooldown, wowwiki says 30 sec colldown, DBM and BigWigs addons says ~47 sec
-+#define SPELL_DIVE_BOMB               35181 // after watching tonns of movies, set cooldown to 40+rand()%5.
-+#define SPELL_ENRAGE                  27680 // 10 minutes after phase 2 starts (id is wrong, but proper id is unknown)
-+
-+#define CREATURE_EMBER_OF_ALAR        19551 // Al'ar summons one Ember of Al'ar every position change in phase 1 and two after Dive Bomb. Also in phase 2 when Ember of Al'ar dies, boss loose 3% health.
-+#define SPELL_EMBER_BLAST             34133 // When Ember of Al'ar dies, it casts Ember Blast
-+
-+#define CREATURE_FLAME_PATCH_ALAR     20602 // Flame Patch - every 30 sec in phase 2
-+#define SPELL_FLAME_PATCH             35380 //
-+
-+float waypoint[6][3] = 
-+{
-+    {340.15, 58.65, 17.71},
-+    {388.09, 31.54, 20.18},
-+    {388.18, -32.85, 20.18},
-+    {340.29, -60.19, 17.72},
-+    {331, 0.01, 39},
-+    {331, 0.01, -2.39}
-+};
-+
-+struct MANGOS_DLL_DECL boss_alarAI : public ScriptedAI
-+{
-+    boss_alarAI(Creature *c) : ScriptedAI(c)
-+    {
-+        pInstance = ((ScriptedInstance*)c->GetInstanceData());
-+        DefaultSize = m_creature->GetFloatValue(OBJECT_FIELD_SCALE_X);
-+        DefaultModel = m_creature->GetUInt32Value(UNIT_FIELD_DISPLAYID);
-+        DefaultMoveSpeedRate = m_creature->GetSpeedRate(MOVE_RUN);
-+        Reset();
-+    }
-+    
-+    ScriptedInstance *pInstance;
-+    
-+    uint32 Platforms_Move_Timer;
-+    uint32 FlameBuffet_Timer;
-+    uint32 FlameQuillsDuration_Timer;
-+    uint32 DiveBomb_Timer;
-+    uint32 DiveBombCastDelay_Timer;
-+    uint32 CorpseDisappear_Timer;
-+    uint32 MeltArmor_Timer;
-+    uint32 Charge_Timer;
-+    uint32 FlamePatch_Timer;
-+    uint32 Enrage_Timer;
-+    uint32 ChargeDelay_Timer;
-+    int MovementInform_id;
-+
-+    float DefaultSize;
-+    float DefaultMoveSpeedRate;
-+    uint32 DefaultModel;
-+
-+    bool Moving;
-+    bool Charge;
-+    bool FlameQuills;
-+    bool Phase1;
-+    bool FakeDeath;
-+    bool Phase2_begin;
-+    bool FlameBuffetAfterDiveBomb;
-+    int8 cur_wp;
-+    float Charge_target_threat;
-+    Unit* Charge_target;
-+
-+    void Reset()
-+    {
-+        Platforms_Move_Timer = 30000+rand()%5000;
-+        FlameQuills = false;
-+        cur_wp = 0;
-+        FlameBuffet_Timer = 1500;
-+        CorpseDisappear_Timer = 9999999;
-+        Enrage_Timer = 600000;
-+        Moving = false;
-+        Phase1 = true;
-+        FakeDeath = false;
-+        Phase2_begin = false;
-+        FlameBuffetAfterDiveBomb = false;
-+        Charge_target = NULL;
-+        MovementInform_id = -1;
-+
-+        m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, DefaultSize);
-+        m_creature->SetUInt32Value(UNIT_FIELD_DISPLAYID, DefaultModel);
-+        m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
-+        m_creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
-+
-+        if(pInstance)
-+            pInstance->SetData(DATA_ALAREVENT, 0);
-+        
-+    }
-+    
-+    void Aggro (Unit *who)
-+    {
-+        StartEvent();
-+    }
-+
-+    void StartEvent()
-+    {
-+        if(pInstance)
-+            pInstance->SetData(DATA_ALAREVENT, 1);
-+        
-+        CreaturePointMove(0, waypoint[0][0], waypoint[0][1], waypoint[0][2]);
-+    }
-+ 
-+    void JustDied(Unit *victim)
-+    {
-+        if(pInstance)
-+            pInstance->SetData(DATA_ALAREVENT, 0);
-+    }
-+
-+    void MoveInLineOfSight(Unit *who)
-+    {
-+        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
-+        {
-+            if (m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
-+                return;
-+
-+            float attackRadius = m_creature->GetAttackDistance(who);
-+            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
-+            {
-+                if (Phase1)
-+                    DoStartAttackNoMovement(who);
-+                else
-+                    DoStartAttackAndMovement(who);
-+                
-+                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-+
-+                if (!InCombat)
-+                {
-+                    Aggro(who);
-+                    InCombat = true;
-+                }
-+            }
-+        }
-+    }
-+
-+    void AttackStart(Unit* who)
-+    {
-+        if (!who)
-+            return;
-+
-+        if (who->isTargetableForAttack())
-+        {
-+            //Begin attack
-+            if (Phase1)
-+                DoStartAttackNoMovement(who);
-+            else
-+                DoStartAttackAndMovement(who);
-+
-+            if (!InCombat)
-+            {
-+                Aggro(who);
-+                InCombat = true;
-+            }
-+        }
-+    }
-+
-+    void DamageTaken(Unit* pKiller, uint32 &damage)
-+    {
-+        if ((damage < m_creature->GetHealth()) || (!Phase1))
-+            return;
-+
-+        damage = 0;
-+        m_creature->InterruptNonMeleeSpells(false);
-+        m_creature->SetHealth(0);
-+        m_creature->StopMoving();
-+        m_creature->ClearComboPointHolders();
-+        m_creature->RemoveAllAurasOnDeath();
-+        m_creature->ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
-+        m_creature->ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
-+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-+        m_creature->ClearAllReactives();
-+        m_creature->SetUInt64Value(UNIT_FIELD_TARGET,0); 
-+        m_creature->GetMotionMaster()->Clear(); 
-+        m_creature->GetMotionMaster()->MoveIdle();
-+        m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, PLAYER_STATE_DEAD);
-+        FakeDeath = true;
-+        Moving = false;
-+        CorpseDisappear_Timer = 4000;
-+    }
-+
-+    void CreaturePointMove(uint32 id, float X, float Y, float Z)
-+    {
-+        Moving = true;
-+        m_creature->GetMotionMaster()->Clear();
-+        m_creature->AddUnitMovementFlag(MOVEMENTFLAG_FLYING2);
-+        m_creature->GetMotionMaster()->MovePoint(id, X, Y, Z);
-+    }
-+
-+    void MovementInform(uint32 type, uint32 id)
-+    {
-+        if (type == POINT_MOTION_TYPE)
-+            MovementInform_id = id;
-+        else
-+            MovementInform_id = -1;
-+    }
-+
-+    void UpdateAI(const uint32 diff)
-+    {
-+        if(!m_creature->SelectHostilTarget() || !m_creature->getVictim() )
-+            return;
-+
-+        if (MovementInform_id >= 0)
-+        {
-+            Moving = false;
-+            m_creature->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING2);
-+            switch (MovementInform_id)
-+            {
-+                case 0:
-+                case 1:
-+                case 2:
-+                case 3:
-+                    Platforms_Move_Timer = 30000+rand()%5000;
-+                    break;
-+                case 4:
-+                    DoCast(m_creature, SPELL_FLAME_QUILLS);
-+                    FlameQuillsDuration_Timer = 10000;
-+                    FlameQuills = true;
-+                    break;
-+                case 5:
-+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-+                    m_creature->SetVisibility(VISIBILITY_ON);
-+                    DoCast(m_creature, SPELL_REBIRTH);
-+                    Phase2_begin = true;
-+                    FakeDeath = false;
-+                    break;
-+                case 6:
-+                    m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, false);
-+                    m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, DefaultSize/4.0f);
-+                    DoCast(m_creature->getVictim(), SPELL_DIVE_BOMB_VISUAL);
-+                    DiveBombCastDelay_Timer = 4000;
-+                    break;
-+                case 7:
-+                    m_creature->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate);
-+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-+                    m_creature->SetUInt32Value(UNIT_FIELD_DISPLAYID, DefaultModel);
-+                    m_creature->SetVisibility(VISIBILITY_OFF);  // I know, that this sequence of commands looks stupid, but without it visual effect of Rebirth 
-+                    m_creature->SetVisibility(VISIBILITY_ON);   // after Dive Bomb looks not perfect (Al'ar appears, and than again disappears and cast Rebirth).
-+                    DoCast(m_creature, SPELL_REBIRTH_2);
-+                    DiveBombCastDelay_Timer = 9999999;
-+                    FlameBuffetAfterDiveBomb = true;
-+                    DiveBomb_Timer = 40000+rand()%5000;
-+                    FlameBuffet_Timer = 5000;
-+                    break;
-+            }
-+            m_creature->GetMotionMaster()->Clear();
-+            m_creature->GetMotionMaster()->MoveIdle();
-+            MovementInform_id = -1;
-+        }
-+
-+        if (Charge)
-+        {
-+            if (ChargeDelay_Timer < diff)
-+            {
-+                if (Charge_target)
-+                {
-+                    m_creature->getThreatManager().modifyThreatPercent(Charge_target, -100);
-+                    m_creature->getThreatManager().addThreat(Charge_target, Charge_target_threat);
-+                }
-+                Charge = false;
-+                m_creature->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate);
-+            }else ChargeDelay_Timer -= diff;
-+            return;
-+        }
-+        
-+        if (!Phase1)
-+            if (Enrage_Timer < diff)
-+            {
-+                DoCast(m_creature, SPELL_ENRAGE);
-+                Enrage_Timer = 600000;
-+            }else Enrage_Timer -= diff;
-+
-+
-+        if (Moving)
-+            return;
-+
-+        if (CorpseDisappear_Timer < diff)
-+        {
-+            m_creature->SetVisibility(VISIBILITY_OFF);
-+            m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-+            m_creature->SetHealth(m_creature->GetMaxHealth());
-+            CreaturePointMove(5, waypoint[5][0], waypoint[5][1], waypoint[5][2]);
-+            CorpseDisappear_Timer = 9999999;
-+        }else CorpseDisappear_Timer -= diff;
-+
-+        if (FakeDeath)
-+            return;
-+
-+        if (Phase2_begin)
-+        {
-+            m_creature->GetMotionMaster()->Clear();
-+            m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-+            MeltArmor_Timer = 60000;
-+            Charge_Timer = 7000;
-+            DiveBomb_Timer = 40000+rand()%5000;
-+            DiveBombCastDelay_Timer = 9999999;
-+            FlameBuffet_Timer = 9999999;
-+            FlamePatch_Timer = 30000;
-+            Phase2_begin = false;
-+            Phase1 = false;
-+            if(pInstance)
-+                pInstance->SetData(DATA_ALAREVENT, 2);
-+        }
-+
-+        if (Phase1)
-+        {
-+            if (FlameQuills) {
-+                if (FlameQuillsDuration_Timer < diff)
-+                {
-+                    switch(rand()%2)
-+                    {
-+                    case 0:
-+                        cur_wp = 0;
-+                        break;
-+                    case 1:
-+                        cur_wp = 3;
-+                        break;
-+                    }
-+                    CreaturePointMove(cur_wp, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2]);
-+                    FlameQuills = false;
-+                }else FlameQuillsDuration_Timer -= diff;
-+                return;
-+            }
-+            if (Platforms_Move_Timer < diff)
-+            {
-+                Creature* Summoned = NULL;
-+                Summoned = m_creature->SummonCreature(CREATURE_EMBER_OF_ALAR, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-+                if (Summoned)
-+                {
-+                    Unit* target = NULL;
-+                    target = SelectUnit(SELECT_TARGET_RANDOM, 0);
-+                    if (target)
-+                        Summoned->AI()->AttackStart(target);
-+                }
-+                if (rand()%100 <= 20)
-+                {
-+                    cur_wp = 4;
-+                    FlameQuills = true;
-+                } else
-+                {
-+                    cur_wp++;
-+                    if (cur_wp == 4)
-+                        cur_wp = 0;
-+                }
-+                CreaturePointMove(cur_wp, waypoint[cur_wp][0], waypoint[cur_wp][1], waypoint[cur_wp][2]);
-+            }else Platforms_Move_Timer -= diff;
-+
-+            if (FlameBuffet_Timer < diff)
-+            {
-+                std::list<HostilReference*>& m_threatlist = m_creature->getThreatManager().getThreatList();
-+                if(!m_threatlist.empty())
-+                {
-+                    std::list<HostilReference*>::iterator i = m_threatlist.begin();
-+                    bool InMeleeRange = false;
-+                    for(i = m_threatlist.begin(); i != m_threatlist.end(); ++i)
-+                    {
-+                        Unit* pUnit = NULL;
-+                        pUnit = Unit::GetUnit((*m_creature), (*i)->getUnitGuid());
-+                        if (pUnit)
-+                            if (m_creature->IsWithinDistInMap(pUnit, 5))
-+                            {                        
-+                                InMeleeRange = true;
-+                                m_creature->getThreatManager().addThreat(pUnit, 2.0f);
-+                                break;
-+                            }else
-+                                m_creature->getThreatManager().modifyThreatPercent(pUnit, -100);
-+                    }
-+                    if (!InMeleeRange)
-+                        DoCast(m_creature, SPELL_FLAME_BUFFET);
-+                }
-+                FlameBuffet_Timer = 1500;
-+            }else FlameBuffet_Timer -= diff;
-+        } else
-+        {
-+            if (FlameBuffetAfterDiveBomb)
-+            {
-+                if (FlameBuffet_Timer < diff)
-+                {
-+                    if (m_creature->IsWithinDistInMap(m_creature->getVictim(), 5))
-+                    {                        
-+                        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-+                        FlameBuffetAfterDiveBomb = false;
-+                        FlameBuffet_Timer = 9999999;
-+                    } else
-+                    {
-+                        DoCast(m_creature, SPELL_FLAME_BUFFET);
-+                        FlameBuffet_Timer = 1500;
-+                    }
-+                } else FlameBuffet_Timer -= diff;
-+            } else
-+            {
-+                if (MeltArmor_Timer < diff)
-+                {
-+                    DoCast(m_creature->getVictim(), SPELL_MELT_ARMOR);
-+                    MeltArmor_Timer = 60000;
-+                }else MeltArmor_Timer -= diff;
-+
-+                if (Charge_Timer < diff)
-+                {
-+                    Charge_target = SelectUnit(SELECT_TARGET_RANDOM, 1);
-+                    if (Charge_target)
-+                    {
-+                        m_creature->SetInFront(Charge_target);
-+                        Charge_target_threat = m_creature->getThreatManager().getThreat(Charge_target);
-+                        m_creature->getThreatManager().addThreat(Charge_target, 100000000.0f);
-+                        m_creature->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate*5.0f);
-+                        DoCast(Charge_target, SPELL_CHARGE);
-+                        ChargeDelay_Timer = 2000;
-+                        Charge = true;
-+                    }
-+                    Charge_Timer = 30000;
-+                }else Charge_Timer -= diff;
-+            }
-+
-+            if (DiveBomb_Timer < diff)
-+            {
-+                CreaturePointMove(6, waypoint[4][0], waypoint[4][1], waypoint[4][2]);
-+                DiveBomb_Timer = 40000+rand()%5000;
-+            }else DiveBomb_Timer -= diff;
-+
-+            if (DiveBombCastDelay_Timer < diff)
-+            {
-+                m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
-+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-+                m_creature->SetUInt32Value(UNIT_FIELD_DISPLAYID, 11686);
-+                Unit* target = NULL;
-+                target = SelectUnit(SELECT_TARGET_RANDOM, 0);
-+                DoCast(target, SPELL_DIVE_BOMB);
-+                m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, DefaultSize);
-+                m_creature->RemoveAurasDueToSpell(SPELL_DIVE_BOMB_VISUAL);
-+                m_creature->SetSpeed(MOVE_RUN, DefaultMoveSpeedRate*2.0f);
-+                if (target)
-+                    CreaturePointMove(7, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
-+                Creature* Summoned = NULL;
-+                for (int8 i=1; i<=2; i++)
-+                    if (target)
-+                    {
-+                        Summoned = m_creature->SummonCreature(CREATURE_EMBER_OF_ALAR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-+                        if (Summoned)
-+                        {
-+                            Unit* target1 = NULL;
-+                            target1 = SelectUnit(SELECT_TARGET_RANDOM, 0);
-+                            if (target1)
-+                                Summoned->AI()->AttackStart(target1);
-+                        }
-+                    }
-+                DiveBombCastDelay_Timer = 9999999;
-+            }else DiveBombCastDelay_Timer -= diff;
-+
-+            if (FlamePatch_Timer < diff)
-+            {
-+                Unit* target = NULL;
-+                target = SelectUnit(SELECT_TARGET_RANDOM, 0);
-+                if (target)
-+                {
-+                    Creature* Summoned = NULL;
-+                    Summoned = m_creature->SummonCreature(CREATURE_FLAME_PATCH_ALAR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 120000);
-+                    if (Summoned)
-+                    {
-+                        Summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-+                        Summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-+                        Summoned->SetFloatValue(OBJECT_FIELD_SCALE_X, Summoned->GetFloatValue(OBJECT_FIELD_SCALE_X)*2.9f);
-+                        Summoned->SetUInt32Value(UNIT_FIELD_DISPLAYID, 11686);
-+                        Summoned->setFaction(m_creature->getFaction());
-+                        Summoned->SetLevel(m_creature->getLevel());
-+                        Summoned->CastSpell(Summoned, SPELL_FLAME_PATCH, false);
-+                    }
-+                }
-+                FlamePatch_Timer = 30000;
-+            }else FlamePatch_Timer -= diff;
-+
-+        }
-+
-+        DoMeleeAttackIfReady();
-+    }
-+};
-+
-+CreatureAI* GetAI_boss_alar(Creature *_Creature)
-+{
-+    return new boss_alarAI (_Creature);
-+}
-+
-+struct MANGOS_DLL_DECL mob_ember_of_alarAI : public ScriptedAI
-+{
-+    mob_ember_of_alarAI(Creature *c) : ScriptedAI(c)
-+    {
-+        pInstance = ((ScriptedInstance*)c->GetInstanceData());
-+        Reset();
-+    }
-+
-+    ScriptedInstance *pInstance;
-+
-+    bool Die;
-+
-+    void Reset()
-+    {
-+        Die = false;
-+    }
-+
-+    void Aggro (Unit *who)
-+    {
-+    }
-+
-+    void DamageTaken(Unit* pKiller, uint32 &damage)
-+    {
-+        if (damage < m_creature->GetHealth())
-+            return;
-+
-+        damage = 0;
-+        DoCast(m_creature, SPELL_EMBER_BLAST);
-+        if(pInstance)
-+            if (pInstance->GetData(DATA_ALAREVENT) == 2)
-+            {
-+                Unit* Alar = NULL;
-+                Alar = Unit::GetUnit((*m_creature), pInstance->GetData64(DATA_ALAR));
-+                if (Alar)
-+                {
-+                    int AlarHealth = Alar->GetHealth() - Alar->GetMaxHealth()*0.03;
-+                    if (AlarHealth > 0)
-+                        Alar->SetHealth(AlarHealth);
-+                    else
-+                        Alar->SetHealth(1);
-+                }
-+            }
-+        Die = true;
-+    }
-+
-+    void UpdateAI(const uint32 diff)
-+    {
-+        if (Die) {
-+            m_creature->SetHealth(0);
-+            m_creature->setDeathState(JUST_DIED);
-+        }
-+
-+        DoMeleeAttackIfReady();
-+    }
-+
-+};
-+
-+CreatureAI* GetAI_mob_ember_of_alar(Creature *_Creature)
-+{
-+    return new mob_ember_of_alarAI (_Creature);
-+}
-+
-+struct MANGOS_DLL_DECL mob_flame_patch_alarAI : public ScriptedAI
-+{
-+    mob_flame_patch_alarAI(Creature *c) : ScriptedAI(c) {}
-+
-+    void Reset() {}
-+
-+    void Aggro (Unit *who) {}
-+
-+    void AttackStart(Unit* who) {}
-+
-+    void MoveInLineOfSight(Unit* who) {}
-+
-+    void UpdateAI(const uint32 diff) {}
-+
-+};
-+
-+CreatureAI* GetAI_mob_flame_patch_alar(Creature *_Creature)
-+{
-+    return new mob_flame_patch_alarAI (_Creature);
-+}
-+
-+void AddSC_boss_alar()
-+{
-+    Script *newscript;
-+
-+    newscript = new Script;
-+    newscript->Name="boss_alar";
-+    newscript->GetAI = GetAI_boss_alar;
-+    m_scripts[nrscripts++] = newscript;
-+
-+    newscript = new Script;
-+    newscript->Name="mob_ember_of_alar";
-+    newscript->GetAI = GetAI_mob_ember_of_alar;
-+    m_scripts[nrscripts++] = newscript;
-+
-+    newscript = new Script;
-+    newscript->Name="mob_flame_patch_alar";
-+    newscript->GetAI = GetAI_mob_flame_patch_alar;
-+    m_scripts[nrscripts++] = newscript;
-+}
 Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 697)
+--- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 715)
 +++ scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(working copy)
-@@ -144,7 +144,7 @@
-             {
+@@ -121,7 +121,7 @@
                  target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
-                                                             //15 yard radius minimum
--                if(target && target->GetDistance2d(m_creature) > 15)
-+                if(target && target->GetDistance2d(m_creature) > 18)
+ 
+                 //15 yard radius minimum
+-                if (target && target->GetDistance2d(m_creature) > 15)
++                if (target && target->GetDistance2d(m_creature) > 18)
                      target_list.push_back(target);
+ 
                  target = NULL;
-             }
-@@ -152,12 +152,7 @@
+@@ -131,12 +131,7 @@
                  target = *(target_list.begin()+rand()%target_list.size());
  
              if (target)
@@ -5905,77 +4772,6 @@ Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
  
              ArcaneOrb_Timer = 3000;
          }else ArcaneOrb_Timer -= diff;
-Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
-===================================================================
---- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 697)
-+++ scripts/zone/tempest_keep/the_eye/def_the_eye.h	(working copy)
-@@ -17,4 +17,5 @@
- #define DATA_SOLARIANEVENT                  10
- #define DATA_THALADREDTHEDARKENER           11
- #define DATA_VOIDREAVEREVENT                12
-+#define DATA_ALAR 13
- #endif
-Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
-===================================================================
---- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 697)
-+++ scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(working copy)
-@@ -43,8 +43,10 @@
-     uint64 MasterEngineerTelonicus;
-     uint64 Kaelthas;
-     uint64 Astromancer;
-+    uint64 Alar;
- 
-     uint8 KaelthasEventPhase;
-+    uint8 AlarEventPhase;
- 
-     bool Encounters[ENCOUNTERS];
- 
-@@ -56,8 +58,10 @@
-         MasterEngineerTelonicus = 0;
-         Kaelthas = 0;
-         Astromancer = 0;
-+        Alar = 0;
- 
-         KaelthasEventPhase = 0;
-+        AlarEventPhase = 0;
- 
-         for(uint8 i = 0; i < ENCOUNTERS; i++)
-             Encounters[i] = false;
-@@ -81,6 +85,7 @@
-             case 20060: LordSanguinar = creature->GetGUID(); break;
-             case 19622: Kaelthas = creature->GetGUID(); break;
-             case 18805: Astromancer = creature->GetGUID(); break;
-+            case 19514: Alar = creature->GetGUID(); break;
-         }
-     }
- 
-@@ -105,6 +110,9 @@
- 
-             case DATA_ASTROMANCER:
-                 return Astromancer;
-+
-+            case DATA_ALAR:
-+                return Alar;
-         }
- 
-         return 0;
-@@ -115,6 +123,7 @@
-         switch(type)
-         {
-             case DATA_ALAREVENT:
-+                AlarEventPhase = data;
-                 Encounters[0] = (data) ? true : false;
-                 break;
- 
-@@ -143,7 +152,7 @@
-         switch(type)
-         {
-             case DATA_ALAREVENT:
--                return Encounters[0];
-+                return AlarEventPhase;
- 
-             case DATA_SOLARIANEVENT:
-                 return Encounters[1];
 Index: scripts/zone/zulaman/boss_akilzon.cpp
 ===================================================================
 --- scripts/zone/zulaman/boss_akilzon.cpp	(revision 0)
@@ -7851,14 +6647,8 @@ Index: scripts/zone/zulaman/boss_hexlord.cpp
 +}
 Index: scripts/zone/zulaman/boss_janalai.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_janalai.cpp	(revision 697)
+--- scripts/zone/zulaman/boss_janalai.cpp	(revision 715)
 +++ scripts/zone/zulaman/boss_janalai.cpp	(working copy)
-@@ -1,4 +1,4 @@
--/* Copyright (C) 2006,2007 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
-+/* Copyright(C) 2006,2007 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-  * the Free Software Foundation; either version 2 of the License, or
 @@ -29,14 +29,14 @@
  #define SPELL_FLAME_BREATH          43140
  #define SPELL_FIRE_WALL             43113
@@ -8982,7 +7772,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  }
 Index: scripts/zone/zulaman/boss_nalorakk.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 697)
+--- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 715)
 +++ scripts/zone/zulaman/boss_nalorakk.cpp	(working copy)
 @@ -22,6 +22,7 @@
  EndScriptData */
@@ -9335,7 +8125,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 ===================================================================
 --- scripts/zone/zulaman/boss_zuljin.cpp	(revision 0)
 +++ scripts/zone/zulaman/boss_zuljin.cpp	(revision 0)
-@@ -0,0 +1,683 @@
+@@ -0,0 +1,677 @@
 +/* Copyright (C) 2006,2007,2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
 +* This program is free software; you can redistribute it and/or modify
 +* it under the terms of the GNU General Public License as published by
@@ -9614,13 +8404,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +            if(Phase == 2)
 +                m_creature->Attack(who, false);
 +            else
-+                DoStartAttackAndMovement(who);
-+
-+            if (!InCombat)
-+            {
-+                Aggro(who);
-+                InCombat = true;
-+            }
++                AttackStart(who);
 +        }
 +    }
 +
@@ -10021,7 +8805,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +}
 Index: scripts/zone/zulaman/def_zulaman.h
 ===================================================================
---- scripts/zone/zulaman/def_zulaman.h	(revision 697)
+--- scripts/zone/zulaman/def_zulaman.h	(revision 715)
 +++ scripts/zone/zulaman/def_zulaman.h	(working copy)
 @@ -5,13 +5,14 @@
  #ifndef DEF_ZULAMAN_H
@@ -10048,7 +8832,7 @@ Index: scripts/zone/zulaman/def_zulaman.h
  #endif
 Index: scripts/zone/zulaman/instance_zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/instance_zulaman.cpp	(revision 697)
+--- scripts/zone/zulaman/instance_zulaman.cpp	(revision 715)
 +++ scripts/zone/zulaman/instance_zulaman.cpp	(working copy)
 @@ -24,26 +24,58 @@
  #include "precompiled.h"
@@ -10355,7 +9139,7 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
  InstanceData* GetInstanceData_instance_zulaman(Map* map)
 Index: scripts/zone/zulaman/zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/zulaman.cpp	(revision 697)
+--- scripts/zone/zulaman/zulaman.cpp	(revision 715)
 +++ scripts/zone/zulaman/zulaman.cpp	(working copy)
 @@ -97,6 +97,74 @@
      return new npc_forest_frogAI (_Creature);
@@ -10446,7 +9230,7 @@ Index: scripts/zone/zulaman/zulaman.cpp
  }
 Index: VC71/71ScriptDev2.vcproj
 ===================================================================
---- VC71/71ScriptDev2.vcproj	(revision 697)
+--- VC71/71ScriptDev2.vcproj	(revision 715)
 +++ VC71/71ScriptDev2.vcproj	(working copy)
 @@ -263,6 +263,10 @@
  					<File
@@ -10459,20 +9243,9 @@ Index: VC71/71ScriptDev2.vcproj
  				</Filter>
  				<Filter
  					Name="Deadwind Pass">
-@@ -1172,6 +1176,10 @@
- 					<Filter
- 						Name="The Eye">
- 						<File
-+							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_alar.cpp"
-+							>
-+						</File>
-+						<File
- 							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_astromancer.cpp">
- 						</File>
- 						<File
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 697)
+--- VC80/80ScriptDev2.vcproj	(revision 715)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="Windows-1252"?>
@@ -10566,18 +9339,7 @@ Index: VC80/80ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
  							>
  						</File>
-@@ -1767,6 +1815,10 @@
- 							>
- 						</File>
- 						<File
-+							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_alar.cpp"
-+							>
-+						</File>
-+						<File
- 							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_kaelthas.cpp"
- 							>
- 						</File>
-@@ -2088,14 +2140,30 @@
+@@ -2100,14 +2148,30 @@
  					Name="Zul&apos;Aman"
  					>
  					<File
@@ -10610,7 +9372,7 @@ Index: VC80/80ScriptDev2.vcproj
  					</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 697)
+--- VC90/90ScriptDev2.vcproj	(revision 715)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -407,7 +407,23 @@
  			<Filter
@@ -10700,18 +9462,7 @@ Index: VC90/90ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
  							>
  						</File>
-@@ -1766,6 +1818,10 @@
- 							>
- 						</File>
- 						<File
-+							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_alar.cpp"
-+							>
-+						</File>
-+						<File
- 							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_kaelthas.cpp"
- 							>
- 						</File>
-@@ -2087,14 +2143,30 @@
+@@ -2099,14 +2151,30 @@
  					Name="Zul&apos;Aman"
  					>
  					<File
