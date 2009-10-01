@@ -109,7 +109,7 @@ Index: scripts/custom/teleguy.cpp
 +player->ADD_GOSSIP_ITEM( 5, "Ragefire Chasm. 10 Silver"			 , GOSSIP_SENDER_MAIN, 1248);
 +player->ADD_GOSSIP_ITEM( 5, "The Wailing Caverns. 10 Silver"     , GOSSIP_SENDER_MAIN, 1249);
 +player->ADD_GOSSIP_ITEM( 5, "The Stockade. 10 Silver"			 , GOSSIP_SENDER_MAIN, 1253);
-+player->ADD_GOSSIP_ITEM( 5, "Deadmines.	10 Silver"               , GOSSIP_SENDER_MAIN, 1250);
++player->ADD_GOSSIP_ITEM( 5, "Deadmines. 10 Silver"               , GOSSIP_SENDER_MAIN, 1250);
 +player->ADD_GOSSIP_ITEM( 5, "Shadowfang Keep. 10 Silver"         , GOSSIP_SENDER_MAIN, 1251);
 +player->ADD_GOSSIP_ITEM( 5, "Blackfathom Deeps. 10 Silver"       , GOSSIP_SENDER_MAIN, 1252);
 +player->ADD_GOSSIP_ITEM( 5, "Razorfen Kraul. 20 Silver"          , GOSSIP_SENDER_MAIN, 1254);

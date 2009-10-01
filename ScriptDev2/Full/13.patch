@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 732)
+--- Makefile.am	(revision 735)
 +++ Makefile.am	(working copy)
 @@ -51,10 +51,20 @@
  scripts/custom/custom_example.cpp \
@@ -47,8 +47,8 @@ Index: Makefile.am
  scripts/zone/tempest_keep/the_eye/def_the_eye.h \
  scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp \
  scripts/zone/tempest_keep/the_eye/the_eye.cpp \
-@@ -363,8 +376,12 @@
- scripts/zone/western_plaguelands/western_plaguelands.cpp \
+@@ -364,8 +377,12 @@
+ scripts/zone/westfall/westfall.cpp \
  scripts/zone/winterspring/winterspring.cpp \
  scripts/zone/zangarmarsh/zangarmarsh.cpp \
 +scripts/zone/zulaman/boss_akilzon.cpp \
@@ -62,7 +62,7 @@ Index: Makefile.am
  scripts/zone/zulaman/zulaman.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 732)
+--- ScriptMgr.cpp	(revision 735)
 +++ ScriptMgr.cpp	(working copy)
 @@ -77,12 +77,22 @@
  extern void AddSC_custom_example();
@@ -120,7 +120,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_instance_the_eye();
  extern void AddSC_the_eye();
  
-@@ -561,9 +576,14 @@
+@@ -563,9 +578,14 @@
  extern void AddSC_boss_renataki();
  extern void AddSC_boss_wushoolay();
  extern void AddSC_instance_zulgurub();
@@ -135,7 +135,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_instance_zulaman();
  extern void AddSC_zulaman();
  
-@@ -1255,12 +1275,22 @@
+@@ -1257,12 +1277,22 @@
      AddSC_custom_example();
      AddSC_custom_gossip_codebox();
      AddSC_test();
@@ -158,7 +158,7 @@ Index: ScriptMgr.cpp
  
      // -- Honor --
  
-@@ -1424,6 +1454,8 @@
+@@ -1426,6 +1456,8 @@
      //Darkshore
      //Darnassus
      //Deadmines
@@ -167,7 +167,7 @@ Index: ScriptMgr.cpp
      //Deadwind pass
      //Desolace
      //Dire Maul
-@@ -1473,6 +1505,7 @@
+@@ -1475,6 +1507,7 @@
      //--Shattered Halls
      AddSC_boss_grand_warlock_nethekurse();
      AddSC_boss_warbringer_omrogg();
@@ -175,7 +175,7 @@ Index: ScriptMgr.cpp
      AddSC_instance_shattered_halls();
  
      //--Ramparts
-@@ -1498,6 +1531,7 @@
+@@ -1500,6 +1533,7 @@
      AddSC_boss_shade_of_aran();
      AddSC_boss_malchezaar();
      AddSC_boss_terestian_illhoof();
@@ -183,7 +183,7 @@ Index: ScriptMgr.cpp
      AddSC_netherspite_infernal();
      AddSC_boss_moroes();
      AddSC_bosses_opera();
-@@ -1671,6 +1705,7 @@
+@@ -1673,6 +1707,7 @@
      AddSC_boss_kaelthas();
      AddSC_boss_void_reaver();
      AddSC_boss_high_astromancer_solarian();
@@ -191,7 +191,7 @@ Index: ScriptMgr.cpp
      AddSC_instance_the_eye();
      AddSC_the_eye();
  
-@@ -1741,8 +1776,12 @@
+@@ -1745,8 +1780,12 @@
      AddSC_instance_zulgurub();
  
      //Zul'Aman
@@ -283,7 +283,7 @@ Index: scripts/custom/teleguy.cpp
 +player->ADD_GOSSIP_ITEM( 5, "Ragefire Chasm. 10 Silver"			 , GOSSIP_SENDER_MAIN, 1248);
 +player->ADD_GOSSIP_ITEM( 5, "The Wailing Caverns. 10 Silver"     , GOSSIP_SENDER_MAIN, 1249);
 +player->ADD_GOSSIP_ITEM( 5, "The Stockade. 10 Silver"			 , GOSSIP_SENDER_MAIN, 1253);
-+player->ADD_GOSSIP_ITEM( 5, "Deadmines.	10 Silver"               , GOSSIP_SENDER_MAIN, 1250);
++player->ADD_GOSSIP_ITEM( 5, "Deadmines. 10 Silver"               , GOSSIP_SENDER_MAIN, 1250);
 +player->ADD_GOSSIP_ITEM( 5, "Shadowfang Keep. 10 Silver"         , GOSSIP_SENDER_MAIN, 1251);
 +player->ADD_GOSSIP_ITEM( 5, "Blackfathom Deeps. 10 Silver"       , GOSSIP_SENDER_MAIN, 1252);
 +player->ADD_GOSSIP_ITEM( 5, "Razorfen Kraul. 20 Silver"          , GOSSIP_SENDER_MAIN, 1254);
@@ -1706,7 +1706,7 @@ Index: scripts/guard/g_marcus_jonathan.cpp
 +}
 Index: scripts/guard/guard_ai.cpp
 ===================================================================
---- scripts/guard/guard_ai.cpp	(revision 732)
+--- scripts/guard/guard_ai.cpp	(revision 735)
 +++ scripts/guard/guard_ai.cpp	(working copy)
 @@ -1,26 +1,12 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -2251,7 +2251,7 @@ Index: scripts/guard/guard_ai.cpp
      else
 Index: scripts/guard/guard_ai.h
 ===================================================================
---- scripts/guard/guard_ai.h	(revision 732)
+--- scripts/guard/guard_ai.h	(revision 735)
 +++ scripts/guard/guard_ai.h	(working copy)
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -3855,7 +3855,7 @@ Index: scripts/guard/thrall.cpp
 +}
 Index: scripts/item/item_scripts.cpp
 ===================================================================
---- scripts/item/item_scripts.cpp	(revision 732)
+--- scripts/item/item_scripts.cpp	(revision 735)
 +++ scripts/item/item_scripts.cpp	(working copy)
 @@ -393,6 +393,25 @@
  }
@@ -3897,7 +3897,7 @@ Index: scripts/item/item_scripts.cpp
      m_scripts[nrscripts++] = newscript;
 Index: scripts/zone/black_temple/boss_supremus.cpp
 ===================================================================
---- scripts/zone/black_temple/boss_supremus.cpp	(revision 732)
+--- scripts/zone/black_temple/boss_supremus.cpp	(revision 735)
 +++ scripts/zone/black_temple/boss_supremus.cpp	(working copy)
 @@ -122,7 +122,7 @@
          CheckTimer = 1000;
@@ -3927,7 +3927,7 @@ Index: scripts/zone/black_temple/boss_supremus.cpp
                  }
 Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
 ===================================================================
---- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 732)
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 735)
 +++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
 @@ -66,7 +66,7 @@
  #define TAINTED_ELEMENTAL           22009
@@ -4009,7 +4009,7 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
      newscript = new Script;
 Index: scripts/zone/deadmines/deadmines.cpp
 ===================================================================
---- scripts/zone/deadmines/deadmines.cpp	(revision 732)
+--- scripts/zone/deadmines/deadmines.cpp	(revision 735)
 +++ scripts/zone/deadmines/deadmines.cpp	(working copy)
 @@ -22,3 +22,223 @@
  EndScriptData */
@@ -4256,7 +4256,7 @@ Index: scripts/zone/deadmines/def_deadmines.h
 +#endif
 Index: scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
 ===================================================================
---- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 732)
+--- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 735)
 +++ scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(working copy)
 @@ -179,6 +179,8 @@
                  m_creature->setFaction(14);
@@ -4388,7 +4388,7 @@ Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_blade
 +}
 Index: scripts/zone/karazhan/boss_nightbane.cpp
 ===================================================================
---- scripts/zone/karazhan/boss_nightbane.cpp	(revision 732)
+--- scripts/zone/karazhan/boss_nightbane.cpp	(revision 735)
 +++ scripts/zone/karazhan/boss_nightbane.cpp	(working copy)
 @@ -22,12 +22,370 @@
  EndScriptData */
@@ -5366,7 +5366,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +}
 Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 732)
+--- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 735)
 +++ scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(working copy)
 @@ -121,7 +121,7 @@
                  target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
@@ -5393,7 +5393,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
          }else ArcaneOrb_Timer -= diff;
 Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 732)
+--- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 735)
 +++ scripts/zone/tempest_keep/the_eye/def_the_eye.h	(working copy)
 @@ -17,4 +17,5 @@
  #define DATA_SOLARIANEVENT                  10
@@ -5403,7 +5403,7 @@ Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
  #endif
 Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 732)
+--- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 735)
 +++ scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(working copy)
 @@ -43,8 +43,10 @@
      uint64 MasterEngineerTelonicus;
@@ -7340,7 +7340,7 @@ Index: scripts/zone/zulaman/boss_hexlord.cpp
 +}
 Index: scripts/zone/zulaman/boss_janalai.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_janalai.cpp	(revision 732)
+--- scripts/zone/zulaman/boss_janalai.cpp	(revision 735)
 +++ scripts/zone/zulaman/boss_janalai.cpp	(working copy)
 @@ -16,7 +16,7 @@
  
@@ -8423,7 +8423,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  }
 Index: scripts/zone/zulaman/boss_nalorakk.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 732)
+--- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 735)
 +++ scripts/zone/zulaman/boss_nalorakk.cpp	(working copy)
 @@ -22,6 +22,7 @@
  EndScriptData */
@@ -9434,7 +9434,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +}
 Index: scripts/zone/zulaman/def_zulaman.h
 ===================================================================
---- scripts/zone/zulaman/def_zulaman.h	(revision 732)
+--- scripts/zone/zulaman/def_zulaman.h	(revision 735)
 +++ scripts/zone/zulaman/def_zulaman.h	(working copy)
 @@ -5,26 +5,14 @@
  #ifndef DEF_ZULAMAN_H
@@ -9474,7 +9474,7 @@ Index: scripts/zone/zulaman/def_zulaman.h
  #endif
 Index: scripts/zone/zulaman/instance_zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/instance_zulaman.cpp	(revision 732)
+--- scripts/zone/zulaman/instance_zulaman.cpp	(revision 735)
 +++ scripts/zone/zulaman/instance_zulaman.cpp	(working copy)
 @@ -16,7 +16,7 @@
  
@@ -9828,7 +9828,7 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
  
 Index: scripts/zone/zulaman/zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/zulaman.cpp	(revision 732)
+--- scripts/zone/zulaman/zulaman.cpp	(revision 735)
 +++ scripts/zone/zulaman/zulaman.cpp	(working copy)
 @@ -97,6 +97,74 @@
      return new npc_forest_frogAI (_Creature);
@@ -9919,7 +9919,7 @@ Index: scripts/zone/zulaman/zulaman.cpp
  }
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 732)
+--- VC80/80ScriptDev2.vcproj	(revision 735)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="Windows-1252"?>
@@ -10002,7 +10002,7 @@ Index: VC80/80ScriptDev2.vcproj
  				</Filter>
  				<Filter
  					Name="Deadwind Pass"
-@@ -1615,6 +1659,10 @@
+@@ -1619,6 +1663,10 @@
  							>
  						</File>
  						<File
@@ -10013,7 +10013,7 @@ Index: VC80/80ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
  							>
  						</File>
-@@ -1767,6 +1815,10 @@
+@@ -1771,6 +1819,10 @@
  							>
  						</File>
  						<File
@@ -10024,7 +10024,7 @@ Index: VC80/80ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_kaelthas.cpp"
  							>
  						</File>
-@@ -2100,14 +2152,30 @@
+@@ -2104,14 +2156,30 @@
  					Name="Zul&apos;Aman"
  					>
  					<File
@@ -10057,7 +10057,7 @@ Index: VC80/80ScriptDev2.vcproj
  					</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 732)
+--- VC90/90ScriptDev2.vcproj	(revision 735)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -408,6 +408,18 @@
  				Name="guard"
@@ -10131,7 +10131,7 @@ Index: VC90/90ScriptDev2.vcproj
  				</Filter>
  				<Filter
  					Name="Deadwind Pass"
-@@ -1614,6 +1658,10 @@
+@@ -1618,6 +1662,10 @@
  							>
  						</File>
  						<File
@@ -10142,7 +10142,7 @@ Index: VC90/90ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
  							>
  						</File>
-@@ -1766,6 +1814,10 @@
+@@ -1770,6 +1818,10 @@
  							>
  						</File>
  						<File
@@ -10153,7 +10153,7 @@ Index: VC90/90ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_kaelthas.cpp"
  							>
  						</File>
-@@ -2099,14 +2151,30 @@
+@@ -2103,14 +2155,30 @@
  					Name="Zul&apos;Aman"
  					>
  					<File

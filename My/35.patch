@@ -20836,7 +20836,7 @@ index 7673622..3dbdb52 100644
  
      // far teleport case
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 4a247da..8a3a5e3 100644
+index 4a247da..e5778fb 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -41,6 +41,7 @@
@@ -21834,6 +21834,15 @@ index 4a247da..8a3a5e3 100644
  SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool CanReflect)
  {
      // Return evade for units in evade mode
+@@ -2799,7 +3373,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
+ 
+     // All positive spells can`t miss
+     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
+-    if (IsPositiveSpell(spell->Id))
++    if (IsPositiveSpell(spell->Id)&&(!IsHostileTo(pVictim)))
+         return SPELL_MISS_NONE;
+ 
+     // Check for immune (use charges)
 @@ -2809,62 +3383,24 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
      // Try victim reflect spell
      if (CanReflect)
