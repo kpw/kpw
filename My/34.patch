@@ -8576,10 +8576,10 @@ index 0507ef5..42055ea 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 2bceb2d..8f76d60 100644
+index 1f2bcdd..fb443d5 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
-@@ -168,6 +168,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -169,6 +169,7 @@ ChatCommand * ChatHandler::getCommandTable()
          { "Mod32Value",     SEC_ADMINISTRATOR,  false, &ChatHandler::HandleMod32Value,                 "", NULL },
          { "anim",           SEC_GAMEMASTER,     false, &ChatHandler::HandleAnimCommand,                "", NULL },
          { "lootrecipient",  SEC_GAMEMASTER,     false, &ChatHandler::HandleGetLootRecipient,           "", NULL },
@@ -8587,7 +8587,7 @@ index 2bceb2d..8f76d60 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
  
-@@ -482,6 +483,8 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -484,6 +485,8 @@ ChatCommand * ChatHandler::getCommandTable()
          { "gps",            SEC_MODERATOR,      false, &ChatHandler::HandleGPSCommand,                 "", NULL },
          { "guid",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGUIDCommand,                "", NULL },
          { "help",           SEC_PLAYER,         true,  &ChatHandler::HandleHelpCommand,                "", NULL },
@@ -8596,7 +8596,7 @@ index 2bceb2d..8f76d60 100644
          { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", NULL },
          { "cooldown",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleCooldownCommand,            "", NULL },
          { "unlearn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnLearnCommand,             "", NULL },
-@@ -531,6 +534,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -533,6 +536,7 @@ ChatCommand * ChatHandler::getCommandTable()
          { "sendmessage",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
          { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
          { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
@@ -8605,7 +8605,7 @@ index 2bceb2d..8f76d60 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 4ddf2d9..bc0a679 100644
+index 1967d0e..95a29eb 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
 @@ -149,6 +149,8 @@ class ChatHandler
@@ -8617,7 +8617,7 @@ index 4ddf2d9..bc0a679 100644
  
          bool HandleModifyKnownTitlesCommand(const char* args);
          bool HandleModifyHPCommand(const char* args);
-@@ -411,6 +413,7 @@ class ChatHandler
+@@ -413,6 +415,7 @@ class ChatHandler
          bool HandleSendMessageCommand(const char * args);
          bool HandleRepairitemsCommand(const char* args);
          bool HandleWaterwalkCommand(const char* args);
@@ -8625,7 +8625,7 @@ index 4ddf2d9..bc0a679 100644
  
          //! Development Commands
          bool HandleSetValue(const char* args);
-@@ -423,6 +426,7 @@ class ChatHandler
+@@ -425,6 +428,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
          bool HandleGetLootRecipient(const char * args);
@@ -10087,7 +10087,7 @@ index 0000000..7460b92
 +#define sChatLog MaNGOS::Singleton<ChatLog>::Instance()
 +#endif
 diff --git a/src/game/Creature.cpp b/src/game/Creature.cpp
-index 0700077..76867ef 100644
+index ce5d9f7..f30d0c9 100644
 --- a/src/game/Creature.cpp
 +++ b/src/game/Creature.cpp
 @@ -42,6 +42,7 @@
@@ -10120,7 +10120,7 @@ index 0700077..76867ef 100644
              if( player->isDead() )
                  CastSpell(this,17251,true,NULL,NULL,player->GetGUID());
 diff --git a/src/game/Creature.h b/src/game/Creature.h
-index f8b9a96..cd9cab1 100644
+index eae23ff..6996a10 100644
 --- a/src/game/Creature.h
 +++ b/src/game/Creature.h
 @@ -53,7 +53,8 @@ enum Gossip_Option
@@ -10364,7 +10364,7 @@ index 5672f14..b07146d 100644
      }
  }
 diff --git a/src/game/Language.h b/src/game/Language.h
-index 974b94e..48744a6 100644
+index 7dcee62..2dcff1d 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
 @@ -21,6 +21,8 @@
@@ -10376,7 +10376,7 @@ index 974b94e..48744a6 100644
      // for chat commands
      LANG_SELECT_CHAR_OR_CREATURE        = 1,
      LANG_SELECT_CREATURE                = 2,
-@@ -629,6 +631,63 @@ enum MangosStrings
+@@ -631,6 +633,63 @@ enum MangosStrings
      LANG_ARENA_FIFTEEN_SECONDS          = 703,
      LANG_ARENA_BEGUN                    = 704,
  
@@ -10440,7 +10440,7 @@ index 974b94e..48744a6 100644
      LANG_WAIT_BEFORE_SPEAKING           = 705,
      LANG_NOT_EQUIPPED_ITEM              = 706,
      LANG_PLAYER_DND                     = 707,
-@@ -639,11 +698,65 @@ enum MangosStrings
+@@ -641,11 +700,65 @@ enum MangosStrings
      LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
      LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
  
@@ -10566,7 +10566,7 @@ index f5e4234..c557125 100644
          SendSysMessage(LANG_BAD_VALUE);
          SetSentErrorMessage(true);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 87f092a..d3e2153 100644
+index ad5e935..92f7624 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -10707,8 +10707,8 @@ index 87f092a..d3e2153 100644
      return true;
  }
  
-@@ -6155,3 +6248,9 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
-     PSendSysMessage(LANG_SENDMESSAGE,name.c_str(),msg_str);
+@@ -6215,3 +6308,9 @@ bool ChatHandler::HandleModifyGenderCommand(const char *args)
+         ChatHandler(player).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full,GetName());
      return true;
  }
 +
@@ -12430,7 +12430,7 @@ index 0000000..c5dbeb8
 +#endif /*OUTDOOR_PVP_H_*/
 diff --git a/src/game/OutdoorPvPEP.cpp b/src/game/OutdoorPvPEP.cpp
 new file mode 100644
-index 0000000..dd6ae0f
+index 0000000..3d6ab9a
 --- /dev/null
 +++ b/src/game/OutdoorPvPEP.cpp
 @@ -0,0 +1,878 @@
@@ -16281,7 +16281,7 @@ index 0000000..802f163
 +#endif
 diff --git a/src/game/OutdoorPvPZM.cpp b/src/game/OutdoorPvPZM.cpp
 new file mode 100644
-index 0000000..83b22cc
+index 0000000..76dabfd
 --- /dev/null
 +++ b/src/game/OutdoorPvPZM.cpp
 @@ -0,0 +1,476 @@
@@ -18206,7 +18206,7 @@ index 0334332..d5c6e06 100644
          {
              if( pQuest->IsRepeatable() )
 diff --git a/src/game/SharedDefines.h b/src/game/SharedDefines.h
-index 34e3eb1..fdc2154 100644
+index 817ae81..241bd48 100644
 --- a/src/game/SharedDefines.h
 +++ b/src/game/SharedDefines.h
 @@ -798,14 +798,16 @@ enum Targets
@@ -18247,7 +18247,7 @@ index 34e3eb1..fdc2154 100644
  };
  
 diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
-index 544432d..748f480 100644
+index 982d5b0..312968e 100644
 --- a/src/game/Spell.cpp
 +++ b/src/game/Spell.cpp
 @@ -305,6 +305,8 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
@@ -18764,7 +18764,7 @@ index 544432d..748f480 100644
  
      {
          if(uint8 castResult = CheckPower())
-@@ -3840,6 +4107,26 @@ uint8 Spell::CanCast(bool strict)
+@@ -3830,6 +4097,26 @@ uint8 Spell::CanCast(bool strict)
  
                  break;
              }
@@ -18791,7 +18791,7 @@ index 544432d..748f480 100644
              case SPELL_EFFECT_SUMMON_PET:
              {
                  if(m_caster->GetPetGUID())                  //let warlock do a replacement summon
-@@ -3888,19 +4175,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3878,19 +4165,6 @@ uint8 Spell::CanCast(bool strict)
              case SPELL_EFFECT_LEAP:
              case SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER:
              {
@@ -18811,7 +18811,7 @@ index 544432d..748f480 100644
                  // not allow use this effect at battleground until battleground start
                  if(m_caster->GetTypeId()==TYPEID_PLAYER)
                      if(BattleGround const *bg = ((Player*)m_caster)->GetBattleGround())
-@@ -4047,22 +4321,23 @@ int16 Spell::PetCanCast(Unit* target)
+@@ -4037,22 +4311,23 @@ int16 Spell::PetCanCast(Unit* target)
              if(!_target->isAlive())
                  return SPELL_FAILED_BAD_TARGETS;
  
@@ -18845,7 +18845,7 @@ index 544432d..748f480 100644
                  }
              }
          }
-@@ -4082,9 +4357,16 @@ uint8 Spell::CheckCasterAuras() const
+@@ -4072,9 +4347,16 @@ uint8 Spell::CheckCasterAuras() const
  {
      // Flag drop spells totally immuned to caster auras
      // FIXME: find more nice check for all totally immuned spells
@@ -20063,7 +20063,7 @@ index 295981a..5d897ef 100644
          void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
          void SetAuraFlag(uint32 slot, bool add);
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index e711143..44d6607 100644
+index 5077d87..8ecec29 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -48,6 +48,7 @@
@@ -20267,7 +20267,7 @@ index e711143..44d6607 100644
          lockId = gameObjTarget->GetLockId();
          guid = gameObjTarget->GetGUID();
      }
-@@ -4329,35 +4265,9 @@ void Spell::EffectWeaponDmg(uint32 i)
+@@ -4309,35 +4245,9 @@ void Spell::EffectWeaponDmg(uint32 i)
      // prevent negative damage
      uint32 eff_damage = uint32(bonus > 0 ? bonus : 0);
  
@@ -20306,7 +20306,7 @@ index e711143..44d6607 100644
  
      // Hemorrhage
      if(m_spellInfo->SpellFamilyName==SPELLFAMILY_ROGUE && (m_spellInfo->SpellFamilyFlags & 0x2000000))
-@@ -4421,10 +4331,7 @@ void Spell::EffectHealMaxHealth(uint32 /*i*/)
+@@ -4401,10 +4311,7 @@ void Spell::EffectHealMaxHealth(uint32 /*i*/)
  
      uint32 heal = m_caster->GetMaxHealth();
  
@@ -20318,7 +20318,7 @@ index e711143..44d6607 100644
  }
  
  void Spell::EffectInterruptCast(uint32 /*i*/)
-@@ -5436,25 +5343,59 @@ void Spell::EffectMomentMove(uint32 i)
+@@ -5416,25 +5323,59 @@ void Spell::EffectMomentMove(uint32 i)
          uint32 mapid = m_caster->GetMapId();
          float dis = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
  
@@ -20836,7 +20836,7 @@ index 7673622..3dbdb52 100644
  
      // far teleport case
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index aaf107d..d324700 100644
+index 4a247da..8a3a5e3 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -41,6 +41,7 @@
@@ -23827,7 +23827,7 @@ index aaf107d..d324700 100644
  SpellSchoolMask Unit::GetMeleeDamageSchoolMask() const
  {
 diff --git a/src/game/Unit.h b/src/game/Unit.h
-index 99d6b61..afb10f0 100644
+index ee5b94b..3c1812f 100644
 --- a/src/game/Unit.h
 +++ b/src/game/Unit.h
 @@ -74,7 +74,7 @@ enum SpellAuraInterruptFlags
@@ -23954,7 +23954,7 @@ index 99d6b61..afb10f0 100644
          void SendSpellNonMeleeDamageLog(Unit *target,uint32 SpellID,uint32 Damage, SpellSchoolMask damageSchoolMask,uint32 AbsorbedDamage, uint32 Resist,bool PhysicalDamage, uint32 Blocked, bool CriticalHit = false);
          void SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo);
  
-@@ -1004,6 +1057,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
+@@ -1006,6 +1059,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
          void RemoveAurasWithDispelType( DispelType type );
  
          void RemoveAllAuras();
@@ -23962,7 +23962,7 @@ index 99d6b61..afb10f0 100644
          void RemoveAllAurasOnDeath();
          void DelayAura(uint32 spellId, uint32 effindex, int32 delaytime);
  
-@@ -1175,7 +1229,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
+@@ -1177,7 +1231,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
          int32 SpellBaseHealingBonusForVictim(SpellSchoolMask schoolMask, Unit *pVictim);
          uint32 SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint32 damage, DamageEffectType damagetype);
          uint32 SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount, DamageEffectType damagetype, Unit *pVictim);
@@ -23972,7 +23972,7 @@ index 99d6b61..afb10f0 100644
          uint32 SpellCriticalBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim);
  
          void SetLastManaUse(uint32 spellCastTime) { m_lastManaUse = spellCastTime; }
-@@ -1313,11 +1368,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
+@@ -1315,11 +1370,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
          void SendAttackStop(Unit* victim);                  // only from AttackStop(Unit*)
          void SendAttackStart(Unit* pVictim);                // only from Unit::AttackStart(Unit*)
  
@@ -24294,7 +24294,7 @@ index 83754be..a1ce726 100644
 +    return true;
 +}
 diff --git a/src/mangosd/mangosd.conf.dist.in b/src/mangosd/mangosd.conf.dist.in
-index d43f220..9a92ef2 100644
+index 4c69f2d..46a1dbe 100644
 --- a/src/mangosd/mangosd.conf.dist.in
 +++ b/src/mangosd/mangosd.conf.dist.in
 @@ -294,6 +294,78 @@ GmLogTimestamp = 0
