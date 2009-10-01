@@ -5144,7 +5144,7 @@ index 8ebae23..b4d8402 100644
 @@ -130,22 +130,28 @@ void WorldSession::HandleMoveWorldportAckOpcode()
          _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
  
-     // battleground state preper
+     // battleground state prepare
 -    if(_player->InBattleGround())
 +    // only add to bg group and object, if the player was invited (else he entered through command)
 +    if(_player->InBattleGround() && _player->IsInvitedForBattleGroundInstance(_player->GetBattleGroundId()))

@@ -2712,7 +2712,7 @@ index 6732fc5..f0052bf 100644
                  ((Player*)caster)->SendCooldownEvent(GetSpellProto());
          }
      }
--    else if(sameaura)                                       // decrease count for spell, only for same aura effect, or this spell auras in remove proccess.
+-    else if(sameaura)                                       // decrease count for spell, only for same aura effect, or this spell auras in remove process.
 -        UpdateSlotCounterAndDuration(false);
  }
  
@@ -3437,7 +3437,7 @@ index b64f538..4bf308e 100644
 -    if(!HasAuraType(auraType))
 -        return;
 -
--    // The chance to dispell an aura depends on the damage taken with respect to the casters level.
+-    // The chance to dispel an aura depends on the damage taken with respect to the casters level.
 -    uint32 max_dmg = getLevel() > 8 ? 25 * getLevel() - 150 : 50;
 -    float chance = float(damage) / max_dmg * 100.0f;
 -    if (roll_chance_f(chance))
@@ -3452,7 +3452,7 @@ index b64f538..4bf308e 100644
      }
  
 -    pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_FEAR, damage);
--    // root type spells do not dispell the root effect
+-    // root type spells do not dispel the root effect
 -    if(!spellProto || spellProto->Mechanic != MECHANIC_ROOT)
 -        pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, damage);
 -
@@ -3534,10 +3534,10 @@ index b64f538..4bf308e 100644
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
--        multipler *= (100.0f + (*i)->GetModifier()->m_amount)/100.0f;
-+        multipler *= (100.0f + (*i)->GetModifier()->m_amount * (*i)->m_stackAmount)/100.0f;
+-        multiplier *= (100.0f + (*i)->GetModifier()->m_amount)/100.0f;
++        multiplier *= (100.0f + (*i)->GetModifier()->m_amount * (*i)->m_stackAmount)/100.0f;
  
-     return multipler;
+     return multiplier;
  }
 @@ -3474,8 +3466,11 @@ int32 Unit::GetMaxPositiveAuraModifier(AuraType auratype) const
  
@@ -3580,10 +3580,10 @@ index b64f538..4bf308e 100644
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue & misc_mask)
--            multipler *= (100.0f + mod->m_amount)/100.0f;
-+            multipler *= (100.0f + mod->m_amount * (*i)->m_stackAmount)/100.0f;
+-            multiplier *= (100.0f + mod->m_amount)/100.0f;
++            multiplier *= (100.0f + mod->m_amount * (*i)->m_stackAmount)/100.0f;
      }
-     return multipler;
+     return multiplier;
  }
 @@ -3528,8 +3526,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscMask(AuraType auratype, uint32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -3622,10 +3622,10 @@ index b64f538..4bf308e 100644
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue == misc_value)
--            multipler *= (100.0f + mod->m_amount)/100.0f;
-+            multipler *= (100.0f + mod->m_amount * (*i)->m_stackAmount)/100.0f;
+-            multiplier *= (100.0f + mod->m_amount)/100.0f;
++            multiplier *= (100.0f + mod->m_amount * (*i)->m_stackAmount)/100.0f;
      }
-     return multipler;
+     return multiplier;
  }
 @@ -3586,8 +3586,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)

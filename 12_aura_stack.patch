@@ -195,7 +195,7 @@ index 2f29cfc..f9a1124 100644
                  ((Player*)caster)->SendCooldownEvent(GetSpellProto());
          }
      }
--    else if(sameaura)                                       // decrease count for spell, only for same aura effect, or this spell auras in remove proccess.
+-    else if(sameaura)                                       // decrease count for spell, only for same aura effect, or this spell auras in remove process.
 -        UpdateSlotCounterAndDuration(false);
  }
  
@@ -970,10 +970,10 @@ index 339a590..04eabf8 100644
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
--        multipler *= (100.0f + (*i)->GetModifier()->m_amount)/100.0f;
-+        multipler *= (100.0f + (*i)->GetModifier()->m_amount * (*i)->m_stackAmount)/100.0f;
+-        multiplier *= (100.0f + (*i)->GetModifier()->m_amount)/100.0f;
++        multiplier *= (100.0f + (*i)->GetModifier()->m_amount * (*i)->m_stackAmount)/100.0f;
  
-     return multipler;
+     return multiplier;
  }
 @@ -3470,8 +3470,11 @@ int32 Unit::GetMaxPositiveAuraModifier(AuraType auratype) const
  
@@ -1016,10 +1016,10 @@ index 339a590..04eabf8 100644
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue & misc_mask)
--            multipler *= (100.0f + mod->m_amount)/100.0f;
-+            multipler *= (100.0f + mod->m_amount * (*i)->m_stackAmount)/100.0f;
+-            multiplier *= (100.0f + mod->m_amount)/100.0f;
++            multiplier *= (100.0f + mod->m_amount * (*i)->m_stackAmount)/100.0f;
      }
-     return multipler;
+     return multiplier;
  }
 @@ -3524,8 +3530,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscMask(AuraType auratype, uint32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -1058,10 +1058,10 @@ index 339a590..04eabf8 100644
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue == misc_value)
--            multipler *= (100.0f + mod->m_amount)/100.0f;
-+            multipler *= (100.0f + mod->m_amount * (*i)->m_stackAmount)/100.0f;
+-            multiplier *= (100.0f + mod->m_amount)/100.0f;
++            multiplier *= (100.0f + mod->m_amount * (*i)->m_stackAmount)/100.0f;
      }
-     return multipler;
+     return multiplier;
  }
 @@ -3582,8 +3590,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)

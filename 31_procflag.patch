@@ -1819,7 +1819,7 @@ index 57b0c91..52a28f6 100644
 -    }
 -
 -    // TODO need use this code for spell hit result calculation
--    // now code commented for compotability
+-    // now code commented for computability
      switch (spell->DmgClass)
      {
          case SPELL_DAMAGE_CLASS_RANGED:
@@ -3420,14 +3420,14 @@ index 5d598fb..2a0a0da 100644
          void SendAttackStart(Unit* pVictim);                // only from Unit::AttackStart(Unit*)
  
 -        void ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag, AuraTypeSet const& procAuraTypes, WeaponAttackType attType, SpellEntry const * procSpell, uint32 damage, SpellSchoolMask damageSchoolMask );
--        bool HandleDummyAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggredByAura, SpellEntry const * procSpell, uint32 procFlag,uint32 cooldown);
--        bool HandleProcTriggerSpell(Unit *pVictim,uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell, uint32 procFlags,WeaponAttackType attType,uint32 cooldown);
--        bool HandleHasteAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggredByAura, SpellEntry const * procSpell, uint32 procFlag,uint32 cooldown);
--        bool HandleOverrideClassScriptAuraProc(Unit *pVictim, int32 scriptId, uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell,uint32 cooldown);
-+        bool HandleDummyAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggredByAura, SpellEntry const * procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
-+        bool HandleHasteAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggredByAura, SpellEntry const * procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
-+        bool HandleProcTriggerSpell(Unit *pVictim,uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown);
-+        bool HandleOverrideClassScriptAuraProc(Unit *pVictim, int32 scriptId, uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell, uint32 cooldown);
+-        bool HandleDummyAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggeredByAura, SpellEntry const * procSpell, uint32 procFlag,uint32 cooldown);
+-        bool HandleProcTriggerSpell(Unit *pVictim,uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlags,WeaponAttackType attType,uint32 cooldown);
+-        bool HandleHasteAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggeredByAura, SpellEntry const * procSpell, uint32 procFlag,uint32 cooldown);
+-        bool HandleOverrideClassScriptAuraProc(Unit *pVictim, int32 scriptId, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell,uint32 cooldown);
++        bool HandleDummyAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggeredByAura, SpellEntry const * procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
++        bool HandleHasteAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggeredByAura, SpellEntry const * procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
++        bool HandleProcTriggerSpell(Unit *pVictim,uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown);
++        bool HandleOverrideClassScriptAuraProc(Unit *pVictim, int32 scriptId, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 cooldown);
 +
  
          uint32 m_state;                                     // Even derived shouldn't modify

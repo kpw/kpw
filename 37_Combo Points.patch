@@ -1,19 +1,23 @@
 diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
-index 7faf701..eea6ae4 100644
+index e2aed2c..d59b37b 100644
 --- a/src/game/Spell.cpp
 +++ b/src/game/Spell.cpp
-@@ -2528,7 +2528,14 @@ void Spell::finish(bool ok)
+@@ -2528,7 +2528,18 @@ void Spell::finish(bool ok)
  
      // Clear combo at finish state
      if(m_caster->GetTypeId() == TYPEID_PLAYER && NeedsComboPoints(m_spellInfo))
 -        ((Player*)m_caster)->ClearComboPoints();
 +    {
++        // Not drop combopoints if any miss exist
++        bool needDrop = true;
 +        for(std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin();ihit != m_UniqueTargetInfo.end();++ihit)
-+            if (ihit->missCondition == SPELL_MISS_NONE)
++            if (ihit->missCondition != SPELL_MISS_NONE)
 +            {
-+                ((Player*)m_caster)->ClearComboPoints();
++                needDrop = false;
 +                break;
 +            }
++        if (needDrop)
++            ((Player*)m_caster)->ClearComboPoints();
 +    }
  
      // call triggered spell only at successful cast (after clear combo points -> for add some if need)
