@@ -1,0 +1,54 @@
+Index: boss_void_reaver.cpp
+===================================================================
+--- boss_void_reaver.cpp	(revision 18)
++++ boss_void_reaver.cpp	(working copy)
+@@ -61,10 +61,10 @@
+ 
+     void EnterEvadeMode()
+     {       
+-        Pounding_Timer = 12000;
+-        ArcaneOrb_Timer = 3000;
++        Pounding_Timer = 20000;
++        ArcaneOrb_Timer = 8000;
+         KnockAway_Timer = 30000;
+-        Berserk_Timer = 600000;
++        Berserk_Timer = 900000;
+         InCombat = false;
+ 
+         m_creature->RemoveAllAuras();
+@@ -165,7 +165,7 @@
+         if(Pounding_Timer < diff)
+         {
+             DoCast(m_creature->getVictim(),SPELL_POUNDING);
+-            Pounding_Timer = 12000;
++            Pounding_Timer = 20000;
+         }else Pounding_Timer -= diff;
+ 
+         // Arcane Orb
+@@ -192,7 +192,7 @@
+                     m_creature->CastSpell(Spawn, SPELL_ARCANE_ORB_TRIGGER, true);
+             }
+ 
+-            ArcaneOrb_Timer = 3000;
++            ArcaneOrb_Timer = 8000;
+         }else ArcaneOrb_Timer -= diff;
+ 
+         // Single Target knock back, reduces aggro
+@@ -203,7 +203,7 @@
+             //Drop 25% aggro
+             m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(),-25);
+ 
+-            KnockAway_Timer = 30000;
++            KnockAway_Timer = 45000;
+         }else KnockAway_Timer -= diff;
+ 
+         //Berserk
+@@ -213,7 +213,7 @@
+                 m_creature->InterruptSpell(CURRENT_GENERIC_SPELL);
+ 
+             DoCast(m_creature,SPELL_BERSERK);
+-            Berserk_Timer = 600000;
++            Berserk_Timer = 900000;
+         }else Berserk_Timer -= diff;
+ 
+         DoMeleeAttackIfReady();

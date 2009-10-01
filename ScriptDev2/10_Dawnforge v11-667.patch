@@ -1,0 +1,399 @@
+Index: scripts/zone/netherstorm/netherstorm.cpp
+===================================================================
+--- scripts/zone/netherstorm/netherstorm.cpp	(revision 667)
++++ scripts/zone/netherstorm/netherstorm.cpp	(working copy)
+@@ -29,6 +29,12 @@
+ EndContentData */
+ 
+ #include "precompiled.h"
++#include "Player.h"
++#include "WorldPacket.h"
++#include "Cell.h"
++#include "CellImpl.h"
++#include "GridNotifiers.h"
++#include "GridNotifiersImpl.h"
+ 
+ /*######
+ ## npc_manaforge_control_console
+@@ -390,7 +396,366 @@
+     }
+     return true;
+ }
++/*
++######
++## Scripts for Quest 10198
++######
++*/
+ 
++// Entry of Arcanist Ardonis
++#define ENTRY_ARCANIST_ARDONIS				19830
++
++// Entry of Commander Dawnforge
++#define ENTRY_COMMANDER_DAWNFORGE			19831
++
++// Entry of Pathaleon the Curators Image
++#define ENTRY_PATHALEONS_IMAGE				21504
++#define POSITION_PATHALEONS_IMAGE_X			2325.851563
++#define POSITION_PATHALEONS_IMAGE_Y			2799.534668
++#define POSITION_PATHALEONS_IMAGE_Z			133.084229
++#define POSITION_PATHALEONS_IMAGE_O			6.038996
++
++// The Speech of Dawnforge, Ardonis & Pathaleon
++#define SAY_COMMANDER_DAWNFORGE_1			"We need you to send reinforcements to Manaforge Duro, Ardonis. This is not a request, it's an order."
++#define SAY_ARCANIST_ARDONIS_1				"You cannot be serious! We are severely understaffed and can barely keep this manaforge functional!"
++#define SAY_COMMANDER_DAWNFORGE_2			"You will do as ordered. Manaforge Duro has come under heavy attack by mana creatures and the situation is out of control. Failure to comply will not be tolerated!"
++#define SAY_PATHALEON_CULATOR_IMAGE_1		"Indeed, it is not a request."
++#define SAY_COMMANDER_DAWNFORGE_3	        "My lord!"
++#define SAY_PATHALEON_CULATOR_IMAGE_2		"Duro will be reinforced! Ultris was a complete disaster. I will NOT have that mistake repeated!"
++#define SAY_PATHALEON_CULATOR_IMAGE_2_1		"We've had too many setbacks along the way: Hellfire Citadel, Fallen Sky Ridge, Firewing Point... Prince Kael'thas will tolerate no further delays. I will tolerate nothing other than complete success!"
++#define SAY_PATHALEON_CULATOR_IMAGE_2_2		"I am returning to Tempest Keep. See to it that I do not have reason to return!"
++#define SAY_COMMANDER_DAWNFORGE_4	        "Yes, my lord."
++#define SAY_ARCANIST_ARDONIS_2		        "Yes, my lord."
++#define SAY_COMMANDER_DAWNFORGE_5	        "See to it, Ardonis!"
++
++/*
++######
++## npc_commander_dawnforge
++######
++
++UPDATE `creature_template` SET `ScriptName` = 'npc_commander_dawnforge' WHERE `entry` = 19831;
++*/
++struct MANGOS_DLL_DECL npc_commander_dawnforgeAI : public ScriptedAI
++{
++
++	// Event settings
++	uint32 Phase;
++    uint32 PhaseSubphase;
++    uint32 Phase_Timer;
++	bool isEvent;
++	
++	// Player define
++	Player *plr;
++
++	// Creature define
++	Creature* dawnforge;
++	Creature* ardonis;
++	Creature* pathaleon;
++	float angle_dawnforge;
++	float angle_ardonis;
++	
++	// Select any creature in a grid
++	Creature* SelectCreatureInGrid(uint32 entry, float range)
++    {
++        Creature* pCreature = NULL;
++
++        // Time for some omg mind blowing code to search for creature
++        CellPair pair(MaNGOS::ComputeCellPair(m_creature->GetPositionX(), m_creature->GetPositionY()));
++        Cell cell(pair);
++        cell.data.Part.reserved = ALL_DISTRICT;
++        cell.SetNoCreate();
++
++        MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck creature_check(*m_creature, entry, true, range);
++        MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreature, creature_check);
++
++        TypeContainerVisitor<MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck>, GridTypeMapContainer> creature_searcher(searcher);
++
++        CellLock<GridReadGuard> cell_lock(cell, pair);
++        cell_lock->Visit(cell_lock, creature_searcher,*(m_creature->GetMap()));
++
++        return pCreature;
++	}
++	
++	// Say Pathaleon - Workaround to prevent server to crash if Pathaleon doesnt exist any more
++	void Say_Pathaleons_Image ( const char *text, const uint64 targetGUID = NULL )
++	{
++		if(pathaleon)
++		{
++			pathaleon->Say ( text, LANG_UNIVERSAL, targetGUID );
++		}
++		else Reset ();
++	}
++	
++	// Emote Ardonis and Pathaleon
++	void Turn_to_Pathaleons_Image ()
++	{
++		// Calculate the angle to Pathaleon
++		angle_dawnforge = dawnforge->GetAngle ( POSITION_PATHALEONS_IMAGE_X, POSITION_PATHALEONS_IMAGE_Y );
++		angle_ardonis = ardonis->GetAngle ( POSITION_PATHALEONS_IMAGE_X, POSITION_PATHALEONS_IMAGE_Y );
++		
++		// Turn Dawnforge
++		dawnforge->SetOrientation( angle_dawnforge );
++		dawnforge->SendUpdateToPlayer ( plr );
++		// Turn Ardonis
++		ardonis->SetOrientation( angle_ardonis );
++		ardonis->SendUpdateToPlayer ( plr );
++		
++		// Set them on to kneel
++		dawnforge->SetStandState ( 8 );
++		ardonis->SetStandState ( 8 );
++	}
++		
++	// Set them back to each other
++	void Turn_to_eachother ()
++	{
++		angle_dawnforge = dawnforge->GetAngle ( ardonis->GetPositionX(), ardonis->GetPositionY() );
++		angle_ardonis = ardonis->GetAngle ( dawnforge->GetPositionX(), dawnforge->GetPositionY() );
++
++		// Turn them to pathaleon and Update to Player
++		dawnforge->SetOrientation( angle_dawnforge );
++		dawnforge->SendUpdateToPlayer ( plr );
++		ardonis->SetOrientation( angle_ardonis );
++		ardonis->SendUpdateToPlayer ( plr );
++		
++		// Set them on to kneel
++		dawnforge->SetStandState ( 0 );
++		ardonis->SetStandState ( 0 );
++	}
++
++	// Reset the complete script
++	void Reset()
++    {
++		// Reset Phase, Timer, and Mob ID
++		PhaseSubphase = 0;
++		Phase_Timer = 4000;
++		Phase = 1;
++		isEvent = false;
++
++		// Reset Dawnforge
++		dawnforge = SelectCreatureInGrid(ENTRY_COMMANDER_DAWNFORGE, 10);
++		if (dawnforge) dawnforge->SetStandState ( 0 );
++		
++		// Reset Ardonis
++		ardonis = SelectCreatureInGrid(ENTRY_ARCANIST_ARDONIS, 10);
++		if (ardonis) ardonis->SetStandState ( 0 );
++	}
++
++	npc_commander_dawnforgeAI(Creature *c) : ScriptedAI(c)
++    {
++		Reset ();
++	}
++
++	void Aggro(Unit *who) { Reset (); }
++	
++	void MoveInLineOfSight(Unit *who)
++    {
++		// Check Player
++		if ( who && who->GetTypeId() != TYPEID_PLAYER ) return;
++		
++		// Set plr
++		plr = ((Player*)who);
++
++		// Check QuestStatus
++		if ( plr->GetQuestStatus(10198) != QUEST_STATUS_INCOMPLETE ) return;
++
++		// Check Dist
++		float attackRadius = m_creature->GetAttackDistance(who);
++		if ( !m_creature->IsWithinDistInMap(who, attackRadius) )
++		{
++			Reset (); // Reset Event, MiLoS is called every time player moves.
++			return;
++		}
++		
++		// Select Dawnforge
++		dawnforge = SelectCreatureInGrid(ENTRY_COMMANDER_DAWNFORGE, 10);
++		if (!dawnforge) return;
++		
++		// Select Ardonis
++		ardonis = SelectCreatureInGrid(ENTRY_ARCANIST_ARDONIS, 10);
++		if (!ardonis) return;
++
++		// Set Dawnforge & Ardonis to look to eachother
++		Turn_to_eachother ();
++
++		// Start Event
++		isEvent = true;
++	}
++
++	void UpdateAI(const uint32 diff)
++    {
++		// Can Event Start?
++		if ( !isEvent ) return;
++				
++		// Phase timing
++		if(Phase_Timer >= diff)
++		{
++			Phase_Timer -= diff;
++			return;
++		}
++
++		//Phase 1 Dawnforge say
++		switch (Phase)
++		{
++		case 1:
++			dawnforge->Say(SAY_COMMANDER_DAWNFORGE_1, LANG_UNIVERSAL, ardonis->GetGUID() );
++			Phase++;
++			Phase_Timer = 16000;
++			break;
++		//Phase 2 Ardonis say
++		case 2:
++			ardonis->Say(SAY_ARCANIST_ARDONIS_1, LANG_UNIVERSAL, dawnforge->GetGUID() );
++			Phase++;
++			Phase_Timer = 16000;
++			break;
++		//Phase 3 Dawnforge say
++		case 3:
++			dawnforge->Say(SAY_COMMANDER_DAWNFORGE_2, LANG_UNIVERSAL, ardonis->GetGUID() );
++			Phase++;
++			Phase_Timer = 10000;
++			break;
++		//Phase 4 Pathaleon spawns up to phase 9
++		case 4:
++			// SPAWN PATHALEON_CULATOR_IMAGE
++			pathaleon = dawnforge->SummonCreature( ENTRY_PATHALEONS_IMAGE, POSITION_PATHALEONS_IMAGE_X, POSITION_PATHALEONS_IMAGE_Y, POSITION_PATHALEONS_IMAGE_Z, POSITION_PATHALEONS_IMAGE_O, (TempSummonType)3, 100000);
++			Phase++;
++			Phase_Timer = 16000;
++			break;
++		//Phase 5 Pathaleon say
++		case 5:
++			Say_Pathaleons_Image ( SAY_PATHALEON_CULATOR_IMAGE_1, ardonis->GetGUID() );
++			Phase++;
++			Phase_Timer = 10000;
++			break;
++		//Phase 6
++		case 6:
++			switch(PhaseSubphase)
++			{
++			//Subphase 1: Turn Dawnforge and Ardonis
++			case 0:
++				Turn_to_Pathaleons_Image ();
++				PhaseSubphase++;
++				Phase_Timer = 8000;
++				break;
++			//Subphase 2 Dawnforge say
++			case 1:
++				dawnforge->Say(SAY_COMMANDER_DAWNFORGE_3, LANG_UNIVERSAL, pathaleon->GetGUID() );
++				PhaseSubphase = 0;
++				Phase++;
++				Phase_Timer = 8000;
++				break;
++			}
++			break;
++		//Phase 7 Pathaleons say 3 Sentence, every sentence need a subphase
++		case 7:
++			switch(PhaseSubphase)
++			{
++			//Subphase 1
++			case 0:
++				Say_Pathaleons_Image (SAY_PATHALEON_CULATOR_IMAGE_2);
++				PhaseSubphase++;
++				Phase_Timer = 16000;
++				break;
++			//Subphase 2
++			case 1:
++				Say_Pathaleons_Image (SAY_PATHALEON_CULATOR_IMAGE_2_1);
++				PhaseSubphase++;
++				Phase_Timer = 16000;
++				break;
++			//Subphase 3
++			case 2:
++				Say_Pathaleons_Image (SAY_PATHALEON_CULATOR_IMAGE_2_2);
++				PhaseSubphase = 0;
++				Phase++;
++				Phase_Timer = 16000;
++				break;
++			}
++			break;
++		//Phase 8 Dawnforge says
++		case 8:
++			dawnforge->Say(SAY_COMMANDER_DAWNFORGE_4, LANG_UNIVERSAL, pathaleon->GetGUID() );
++			Phase++;
++			Phase_Timer = 4000;
++			break;
++		//Phase 9 Ardonis says & Pathaleons Despawn (Reset Dawnforge & Ardonis)
++		case 9:
++			switch (PhaseSubphase)
++			{
++			case 0:
++				ardonis->Say(SAY_ARCANIST_ARDONIS_2, LANG_UNIVERSAL, pathaleon->GetGUID() );
++				PhaseSubphase++;
++				Phase_Timer = 13000;
++				break;
++			case 1:
++				Turn_to_eachother ();
++				PhaseSubphase = 0;
++				Phase++;
++				Phase_Timer = 3000;
++			}
++			break;
++		//Phase 10 Dawnforge say
++		case 10:
++			dawnforge->Say(SAY_COMMANDER_DAWNFORGE_5, LANG_UNIVERSAL, ardonis->GetGUID() );
++			Phase++;
++			Phase_Timer = 4000;
++			break;
++		//Phase 10: Set Quest complete, Reset Event
++		case 11:
++			plr->AreaExploredOrEventHappens(10198);
++			Reset();
++			break;
++		}
++	}
++};
++CreatureAI* GetAI_npc_commander_dawnforge(Creature* _Creature)
++{
++    return new npc_commander_dawnforgeAI(_Creature);
++}
++
++/*
++######
++## mob_arcane_annihilator (Maybe move this script to mobs_netherstorm.cpp)
++######
++
++UPDATE `creature_template` SET `ScriptName` = 'mob_arcane_annihilator' WHERE `entry` = 18856;
++*/
++struct MANGOS_DLL_DECL mob_arcane_annihilatorAI : public ScriptedAI
++{
++	// define Player
++	Player* plr;
++	
++	mob_arcane_annihilatorAI(Creature *c) : ScriptedAI(c) {	}
++
++	void Aggro(Unit *who) {}
++
++	void Reset () {}
++
++	void MoveInLineOfSight(Unit *who)
++    {
++		// Check if Player
++		if ( who && who->GetTypeId() != TYPEID_PLAYER ) return;
++		
++		// Set plr
++		plr = ((Player*)who);
++
++		// Check Dist
++		float attackRadius = m_creature->GetAttackDistance(who);
++		if ( !m_creature->IsWithinDistInMap(who, attackRadius) ) return;
++		
++		// Check Spell
++		if ( !who->HasAura(34603, 1) ) return;
++
++		// Remove Aura
++		who->RemoveAura ( 34603, 1, 0 );
++
++		// Start Combat
++		DoStartAttackAndMovement ( who );
++	}
++};
++CreatureAI* GetAI_mob_arcane_annihilator(Creature* _Creature)
++{
++    return new mob_arcane_annihilatorAI(_Creature);
++}
++
+ /*######
+ ##
+ ######*/
+@@ -420,4 +785,14 @@
+     newscript->pGossipHello =   &GossipHello_npc_veronia;
+     newscript->pGossipSelect =  &GossipSelect_npc_veronia;
+     m_scripts[nrscripts++] = newscript;
++
++	newscript = new Script;
++    newscript->Name = "npc_commander_dawnforge";
++    newscript->GetAI = GetAI_npc_commander_dawnforge;
++    m_scripts[nrscripts++] = newscript;
++	
++	newscript = new Script;
++    newscript->Name = "mob_arcane_annihilator";
++    newscript->GetAI = GetAI_mob_arcane_annihilator;
++    m_scripts[nrscripts++] = newscript;
+ }

@@ -1,0 +1,1048 @@
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/mangos.sql
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/mangos.sql	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/mangos.sql	(revision 6740)
+@@ -208,7 +208,8 @@
+ ('event start',2,'Syntax: .event start #event_id\r\nStart event #event_id. Set start time for event to current moment (change not saved in DB).'),
+ ('event stop',2,'Syntax: .event stop #event_id\r\nStop event #event_id. Set start time for event to time in past that make current moment is event stop time (change not saved in DB).'),
+ ('explorecheat',3,'Syntax: .explorecheat #flag\r\n\r\nReveal  or hide all maps for the selected player. If no player is selected, hide or reveal maps to you.\r\n\r\nUse a #flag of value 1 to reveal, use a #flag value of 0 to hide all maps.'),
+-('gm',1,'Syntax: .gm on/off\r\n\r\nEnable or Disable GM MODE'),
++('gm',1,'Syntax: .gm [on/off]\r\n\r\nEnable or Disable in game GM MODE or show current state of on/off not provided.'),
++('gm chat',1,'Syntax: .gm chat [on/off]\r\n\r\nEnable or disable chat GM MODE (show gm badge in messages) or show current state of on/off not provided.'),
+ ('gm fly',3,'Syntax: .gm fly on/off\r\nEnable/disable gm fly mode.'),
+ ('gm list',0,'Syntax: .gm list\r\n\r\nDisplay a list of available Game Masters.'),
+ ('gm visible',1,'Syntax: .gm visible on/off\r\n\r\nOutput current visibility state or make GM visible(on) and invisible(off) for other players.'),
+@@ -2330,6 +2331,10 @@
+ (329,'  %s (GUID %u)',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+ (330,'No players found!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+ (331,'Extended item cost %u not exist',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(332,'GM mode is ON',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(333,'GM mode is OFF',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(334,'GM Chat Badge is ON',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(335,'GM Chat Badge is OFF',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+ (400,'|cffff0000[System Message]:|rScripts reloaded',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+ (401,'You change security level of %s to %i.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+ (402,'%s changed your security level to %i.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+@@ -2568,7 +2573,21 @@
+ (709,'Do not Disturb',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+ (710,'Away from Keyboard',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+ (711,'Queue status for %s (Lvl: %u to %u)\nQueued alliances: %u (Need at least %u more)\nQueued hordes: %u (Need at least %u more)',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+-(712,'|cffff0000[BG Queue Announcer]:|r %s -- [%u-%u] A: %u (Need: %u), H: %u (Needs %u)|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
++(712,'|cffff0000[BG Queue Announcer]:|r %s -- [%u-%u] A: %u (Need: %u), H: %u (Needs %u)|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(713,'You must be level %u to join an arena team!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(714,'%s is not high enough level to join your team',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(715,'You don\'t meet Battleground level requirements',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(716,'Your arena team is full, %s cannot join it.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(800,'Invalid name',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(801,'You do not have enough gold',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(802,'You do not have enough free slots',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(803,'Your partner does not have enough free bag slots',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(804,'You do not have permission to perform that function',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(805,'Unknown language',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(806,'You don\'t know that language',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(807,'Please provide character name',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(808,'Player %s not found or offline',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(809,'Account for character %s not found',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+ /*!40000 ALTER TABLE `mangos_string` ENABLE KEYS */;
+ UNLOCK TABLES;
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_characters_characters.sql
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_characters_characters.sql	(revision 0)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_characters_characters.sql	(revision 6740)
+@@ -0,0 +1,2 @@
++ALTER TABLE characters
++  CHANGE COLUMN gmstate gmstate int(11) unsigned NOT NULL default '0';
+
+Property changes on: C:\Documents and Settings\Администратор\Рабочий стол\EmulatorX\Source\sql\updates\6740_characters_characters.sql
+___________________________________________________________________
+Name: svn:eol-style
+   + native
+
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_mangos_command.sql
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_mangos_command.sql	(revision 0)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_mangos_command.sql	(revision 6740)
+@@ -0,0 +1,4 @@
++DELETE FROM command WHERE name IN ('gm','gm chat');
++INSERT INTO `command` VALUES
++('gm',1,'Syntax: .gm [on/off]\r\n\r\nEnable or Disable in game GM MODE or show current state of on/off not provided.'),
++('gm chat',1,'Syntax: .gm chat [on/off]\r\n\r\nEnable or disable chat GM MODE (show gm badge in messages) or show current state of on/off not provided.');
+
+Property changes on: C:\Documents and Settings\Администратор\Рабочий стол\EmulatorX\Source\sql\updates\6740_mangos_command.sql
+___________________________________________________________________
+Name: svn:eol-style
+   + native
+
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/Makefile.am
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/Makefile.am	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/Makefile.am	(revision 6740)
+@@ -206,6 +206,9 @@
+ 	6715_mangos_spell_affect.sql \
+ 	6728_mangos_quest_template.sql \
+ 	6730_mangos_mangos_string.sql \
++	6740_characters_characters.sql \
++	6740_mangos_command.sql \
++	6740_mangos_mangos_string.sql \
+ 	README
+ 
+ ## Additional files to include when running 'make dist'
+@@ -393,4 +396,7 @@
+ 	6715_mangos_spell_affect.sql \
+ 	6728_mangos_quest_template.sql \
+ 	6730_mangos_mangos_string.sql \
++	6740_characters_characters.sql \
++	6740_mangos_command.sql \
++	6740_mangos_mangos_string.sql \
+ 	README
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_mangos_mangos_string.sql
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_mangos_mangos_string.sql	(revision 0)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6740_mangos_mangos_string.sql	(revision 6740)
+@@ -0,0 +1,27 @@
++DELETE FROM mangos_string WHERE entry IN (332,333,334,335);
++INSERT INTO mangos_string VALUES
++(332,'GM mode is ON',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(333,'GM mode is OFF',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(334,'GM Chat Badge is ON',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(335,'GM Chat Badge is OFF',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
++
++DELETE FROM mangos_string WHERE entry IN (713);
++INSERT INTO mangos_string VALUES
++(713,'You must be level %u to join an arena team!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(714,'%s is not high enough level to join your team',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(715,'You don\'t meet Battleground level requirements',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(716,'Your arena team is full, %s cannot join it.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
++
++
++DELETE FROM mangos_string WHERE entry IN (800);
++INSERT INTO mangos_string VALUES
++(800,'Invalid name',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(801,'You do not have enough gold',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(802,'You do not have enough free slots',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(803,'Your partner does not have enough free bag slots',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(804,'You do not have permission to perform that function',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(805,'Unknown language',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(806,'You don\'t know that language',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(807,'Please provide character name',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(808,'Player %s not found or offline',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
++(809,'Account for character %s not found',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+
+Property changes on: C:\Documents and Settings\Администратор\Рабочий стол\EmulatorX\Source\sql\updates\6740_mangos_mangos_string.sql
+___________________________________________________________________
+Name: svn:eol-style
+   + native
+
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/characters.sql
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/characters.sql	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/characters.sql	(revision 6740)
+@@ -175,7 +175,7 @@
+   `trans_z` float NOT NULL default '0',
+   `trans_o` float NOT NULL default '0',
+   `transguid` bigint(20) unsigned NOT NULL default '0',
+-  `gmstate` tinyint(3) unsigned NOT NULL default '0',
++  `gmstate` int(11) unsigned NOT NULL default '0',
+   `stable_slots` tinyint(1) unsigned NOT NULL default '0',
+   `at_login` int(11) unsigned NOT NULL default '0',
+   `zone` int(11) unsigned NOT NULL default '0',
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/mangosd/mangosd.conf.dist.in
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/mangosd/mangosd.conf.dist.in	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/mangosd/mangosd.conf.dist.in	(revision 6740)
+@@ -750,10 +750,29 @@
+ ###################################################################################################################
+ # GAME MASTER SETTINGS
+ #
++#    GM.LoginState
++#        GM mode at login
++#        Default: 2 (last save state)
++#                 0 (disable)
++#                 1 (enable)
++#
++#    GM.AcceptTickets
++#        Is GM accepting tickets from player by default or not.
++#        Default: 2 (last save state)
++#                 0 (disable)
++#                 1 (enable)
++#
++#    GM.Chat
++#        GM chat mode at login
++#        Default: 2 (last save state)
++#                 0 (disable)
++#                 1 (enable)
++#
+ #    GM.WhisperingTo
+ #        Is GM accepting whispers from player by default or not.
+-#        Default: 0 (false)
+-#                 1 (true)
++#        Default: 2 (last save state)
++#                 0 (disable)
++#                 1 (enable)
+ #
+ #    GM.InGMList
+ #        Is GM showed in GM list (if visible) in non-GM state (.gmoff)
+@@ -765,12 +784,6 @@
+ #        Default: 0 (false)
+ #                 1 (true)
+ #
+-#    GM.LoginState
+-#        GM mode at login
+-#        Default: 2 (last save state)
+-#                 0 (disable)
+-#                 1 (enable)
+-#
+ #    GM.LogTrade
+ #        Include GM trade and trade slot enchanting operations in GM log if it enable
+ #        Default: 1 (include)
+@@ -778,10 +791,12 @@
+ #
+ ###################################################################################################################
+ 
+-GM.WhisperingTo = 0
++GM.LoginState     = 2
++GM.AcceptTickets  = 2
++GM.ChatLoginState = 2
++GM.WhisperingTo   = 2
+ GM.InGMList = 0
+ GM.InWhoList = 0
+-GM.LoginState = 2
+ GM.LogTrade = 1
+ 
+ ###################################################################################################################
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.h	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.h	(revision 6740)
+@@ -69,7 +69,7 @@
+         int ParseCommands(const char* text);
+ 
+     protected:
+-        bool hasStringAbbr(const char* s1, const char* s2);
++        bool hasStringAbbr(const char* name, const char* part);
+         void SendGlobalSysMessage(const char *str);
+ 
+         bool ExecuteCommandInTable(ChatCommand *table, const char* text, std::string fullcommand);
+@@ -94,6 +94,7 @@
+         bool HandleAnnounceCommand(const char* args);
+         bool HandleNotifyCommand(const char* args);
+         bool HandleGMmodeCommand(const char* args);
++        bool HandleGMChatCommand(const char* args);
+         bool HandleVisibleCommand(const char* args);
+         bool HandleGPSCommand(const char* args);
+         bool HandleTaxiCheatCommand(const char* args);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetHandler.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetHandler.cpp	(revision 6740)
+@@ -30,6 +30,7 @@
+ #include "CreatureAI.h"
+ #include "Util.h"
+ #include "Pet.h"
++#include "Language.h"
+ 
+ void WorldSession::HandlePetAction( WorldPacket & recv_data )
+ {
+@@ -395,7 +396,7 @@
+ 
+     if((!ObjectMgr::IsValidPetName(name)) || (objmgr.IsReservedName(name)))
+     {
+-        SendNotification("Invalid name");
++        SendNotification(LANG_PET_INVALID_NAME);
+         return;
+     }
+     pet->SetName(name);
+@@ -415,7 +416,7 @@
+         Utf8toWStr(name,wname);
+         if(!ObjectMgr::CheckDeclinedNames(GetMainPartOfName(wname,0),declinedname))
+         {
+-            SendNotification("Invalid name");
++            SendNotification(LANG_PET_INVALID_NAME);
+             return;
+         }
+     }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level1.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level1.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level1.cpp	(revision 6740)
+@@ -147,9 +147,11 @@
+ {
+     if(!*args)
+     {
+-        SendSysMessage(LANG_USE_BOL);
+-        SetSentErrorMessage(true);
+-        return false;
++        if(m_session->GetPlayer()->isGameMaster())
++            m_session->SendNotification(LANG_GM_ON);
++        else
++            m_session->SendNotification(LANG_GM_OFF);
++        return true;
+     }
+ 
+     std::string argstr = (char*)args;
+@@ -157,7 +159,7 @@
+     if (argstr == "on")
+     {
+         m_session->GetPlayer()->SetGameMaster(true);
+-        m_session->SendNotification("GM mode is ON");
++        m_session->SendNotification(LANG_GM_ON);
+         #ifdef _DEBUG_VMAPS
+         VMAP::IVMapManager *vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
+         vMapManager->processCommand("stoplog");
+@@ -168,7 +170,7 @@
+     if (argstr == "off")
+     {
+         m_session->GetPlayer()->SetGameMaster(false);
+-        m_session->SendNotification("GM mode is OFF");
++        m_session->SendNotification(LANG_GM_OFF);
+         #ifdef _DEBUG_VMAPS
+         VMAP::IVMapManager *vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
+         vMapManager->processCommand("startlog");
+@@ -181,6 +183,40 @@
+     return false;
+ }
+ 
++// Enables or disables hiding of the staff badge
++bool ChatHandler::HandleGMChatCommand(const char* args)
++{
++    if(!*args)
++    {
++        if(m_session->GetPlayer()->isGMChat())
++            m_session->SendNotification(LANG_GM_CHAT_ON);
++        else
++            m_session->SendNotification(LANG_GM_CHAT_OFF);
++        return true;
++    }
++
++    std::string argstr = (char*)args;
++
++    if (argstr == "on")
++    {
++        m_session->GetPlayer()->SetGMChat(true);
++        m_session->SendNotification(LANG_GM_CHAT_ON);
++        return true;
++    }
++
++    if (argstr == "off")
++    {
++        m_session->GetPlayer()->SetGMChat(false);
++        m_session->SendNotification(LANG_GM_CHAT_OFF);
++        return true;
++    }
++
++    SendSysMessage(LANG_USE_BOL);
++    SetSentErrorMessage(true);
++    return false;
++}
++
++
+ //Enable\Dissable Invisible mode
+ bool ChatHandler::HandleVisibleCommand(const char* args)
+ {
+@@ -195,13 +231,13 @@
+     if (argstr == "on")
+     {
+         m_session->GetPlayer()->SetGMVisible(true);
+-        m_session->SendNotification(GetMangosString(LANG_INVISIBLE_VISIBLE));
++        m_session->SendNotification(LANG_INVISIBLE_VISIBLE);
+         return true;
+     }
+ 
+     if (argstr == "off")
+     {
+-        m_session->SendNotification(GetMangosString(LANG_INVISIBLE_INVISIBLE));
++        m_session->SendNotification(LANG_INVISIBLE_INVISIBLE);
+         m_session->GetPlayer()->SetGMVisible(false);
+         return true;
+     }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetitionsHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetitionsHandler.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetitionsHandler.cpp	(revision 6740)
+@@ -111,7 +111,7 @@
+         // TODO: find correct opcode
+         if(_player->getLevel() < sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL))
+         {
+-            SendNotification(GetMangosString(LANG_ARENA_ONE_TOOLOW), 70);
++            SendNotification(LANG_ARENA_ONE_TOOLOW, 70);
+             return;
+         }
+ 
+@@ -530,7 +530,7 @@
+     if(type != 9 && _player->getLevel() < sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL))
+     {
+         // player is too low level to join an arena team
+-        SendNotification("You must be level %u to join an arena team!",sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL));
++        SendNotification(LANG_YOUR_ARENA_LEVEL_REQ_ERROR,sWorld.getConfig(CONFIG_MAX_PLAYER_LEVEL));
+         return;
+     }
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.cpp	(revision 6740)
+@@ -352,6 +352,7 @@
+ 
+     static ChatCommand gmCommandTable[] =
+     {
++        { "chat",           SEC_MODERATOR,      &ChatHandler::HandleGMChatCommand,              "", NULL },
+         { "list",           SEC_PLAYER,         &ChatHandler::HandleGMListCommand,              "", NULL },
+         { "visible",        SEC_MODERATOR,      &ChatHandler::HandleVisibleCommand,             "", NULL },
+         { "fly",            SEC_ADMINISTRATOR,  &ChatHandler::HandleFlyModeCommand,             "", NULL },
+@@ -505,18 +506,29 @@
+     return m_session->GetMangosString(entry);
+ }
+ 
+-bool ChatHandler::hasStringAbbr(const char* s1, const char* s2)
++bool ChatHandler::hasStringAbbr(const char* name, const char* part)
+ {
+-    for(;;)
++    // non "" command
++    if( *name )
+     {
+-        if( !*s2 )
+-            return true;
+-        else if( !*s1 )
++        // "" part from non-"" command
++        if( !*part )
+             return false;
+-        else if( tolower( *s1 ) != tolower( *s2 ) )
+-            return false;
+-        ++s1; ++s2;
++
++        for(;;)
++        {
++            if( !*part )
++                return true;
++            else if( !*name )
++                return false;
++            else if( tolower( *name ) != tolower( *part ) )
++                return false;
++            ++name; ++part;
++        }
+     }
++    // allow with any for ""
++
++    return true;
+ }
+ 
+ void ChatHandler::SendSysMessage(const char *str)
+@@ -592,13 +604,9 @@
+ 
+     while (*text == ' ') ++text;
+ 
+-    if(!cmd.length())
+-        return false;
+-
+     for(uint32 i = 0; table[i].Name != NULL; i++)
+     {
+-        // allow pass "" command name in table
+-        if(strlen(table[i].Name) && !hasStringAbbr(table[i].Name, cmd.c_str()))
++        if( !hasStringAbbr(table[i].Name, cmd.c_str()) )
+             continue;
+ 
+         // select subcommand from child commands list
+@@ -686,8 +694,7 @@
+         if(m_session->GetSecurity() < table[i].SecurityLevel)
+             continue;
+ 
+-        if(strlen(table[i].Name) && !hasStringAbbr(table[i].Name, subcmd))
+-            continue;
++        if( !hasStringAbbr(table[i].Name, subcmd) )
+ 
+         (list += "\n    ") += table[i].Name;
+     }
+@@ -715,7 +722,7 @@
+             if(m_session->GetSecurity() < table[i].SecurityLevel)
+                 continue;
+ 
+-            if(strlen(table[i].Name) && !hasStringAbbr(table[i].Name, cmd))
++            if( !hasStringAbbr(table[i].Name, cmd) )
+                 continue;
+ 
+             // have subcommand
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ArenaTeamHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ArenaTeamHandler.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ArenaTeamHandler.cpp	(revision 6740)
+@@ -25,6 +25,7 @@
+ #include "ArenaTeam.h"
+ #include "World.h"
+ #include "SocialMgr.h"
++#include "Language.h"
+ 
+ void WorldSession::HandleInspectArenaStatsOpcode(WorldPacket & recv_data)
+ {
+@@ -117,7 +118,7 @@
+     {
+         //SendArenaTeamCommandResult(ARENA_TEAM_INVITE_SS,"",Invitedname,ARENA_TEAM_PLAYER_NOT_FOUND_S);
+                                                             // can't find related opcode
+-        SendNotification("%s is not high enough level to join your team", player->GetName());
++        SendNotification(LANG_HIS_ARENA_LEVEL_REQ_ERROR, player->GetName());
+         return;
+     }
+ 
+@@ -154,7 +155,7 @@
+     {
+         // should send an "arena team is full" or the likes message, I just don't know the proper values so... ERR_INTERNAL
+ //        SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", "", ERR_ARENA_TEAM_INTERNAL);
+-        SendNotification("Your arena team is full, %s cannot join it.", player->GetName());
++        SendNotification(LANG_YOUR_ARENA_TEAM_FULL, player->GetName());
+         return;
+     }
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.h	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.h	(revision 6740)
+@@ -496,6 +496,7 @@
+     PLAYER_EXTRA_ACCEPT_WHISPERS    = 0x0004,
+     PLAYER_EXTRA_TAXICHEAT          = 0x0008,
+     PLAYER_EXTRA_GM_INVISIBLE       = 0x0010,
++    PLAYER_EXTRA_GM_CHAT            = 0x0020,               // Show GM badge in chat messages
+ 
+     // other states
+     PLAYER_EXTRA_PVP_DEATH          = 0x0100                // store PvP death status until corpse creating.
+@@ -954,6 +955,8 @@
+         void SetAcceptWhispers(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
+         bool isGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
+         void SetGameMaster(bool on);
++        bool isGMChat() const { return GetSession()->GetSecurity() >= SEC_MODERATOR && (m_ExtraFlags & PLAYER_EXTRA_GM_CHAT); }
++        void SetGMChat(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_GM_CHAT; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_CHAT; }
+         bool isTaxiCheater() const { return m_ExtraFlags & PLAYER_EXTRA_TAXICHEAT; }
+         void SetTaxiCheater(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_TAXICHEAT; else m_ExtraFlags &= ~PLAYER_EXTRA_TAXICHEAT; }
+         bool isGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/TradeHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/TradeHandler.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/TradeHandler.cpp	(revision 6740)
+@@ -26,6 +26,7 @@
+ #include "Player.h"
+ #include "Item.h"
+ #include "SocialMgr.h"
++#include "Language.h"
+ 
+ enum TradeStatus
+ {
+@@ -255,7 +256,7 @@
+     // not accept case incorrect money amount
+     if( _player->tradeGold > _player->GetMoney() )
+     {
+-        SendNotification( "You do not have enough gold" );
++        SendNotification(LANG_NOT_ENOUGH_GOLD);
+         _player->pTrader->GetSession()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+         _player->acceptTrade = false;
+         return;
+@@ -264,7 +265,7 @@
+     // not accept case incorrect money amount
+     if( _player->pTrader->tradeGold > _player->pTrader->GetMoney() )
+     {
+-        _player->pTrader->GetSession( )->SendNotification( "You do not have enough gold" );
++        _player->pTrader->GetSession( )->SendNotification(LANG_NOT_ENOUGH_GOLD);
+         SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+         _player->pTrader->acceptTrade = false;
+         return;
+@@ -338,16 +339,16 @@
+         // in case of missing space report error
+         if(!myCanCompleteTrade)
+         {
+-            SendNotification("You do not have enough free slots");
+-            GetPlayer( )->pTrader->GetSession( )->SendNotification("Your partner does not have enough free bag slots");
++            SendNotification(LANG_NOT_FREE_TRADE_SLOTS);
++            GetPlayer( )->pTrader->GetSession( )->SendNotification(LANG_NOT_PARTNER_FREE_TRADE_SLOTS);
+             SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+             _player->pTrader->GetSession()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+             return;
+         }
+         else if (!hisCanCompleteTrade)
+         {
+-            SendNotification("Your partner does not have enough free bag slots");
+-            GetPlayer()->pTrader->GetSession()->SendNotification("You do not have enough free slots");
++            SendNotification(LANG_NOT_PARTNER_FREE_TRADE_SLOTS);
++            GetPlayer()->pTrader->GetSession()->SendNotification(LANG_NOT_FREE_TRADE_SLOTS);
+             SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+             _player->pTrader->GetSession()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+             return;
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/MiscHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/MiscHandler.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/MiscHandler.cpp	(revision 6740)
+@@ -1422,7 +1422,7 @@
+     if (GetSecurity() >= SEC_ADMINISTRATOR)
+         GetPlayer()->TeleportTo(mapid,PositionX,PositionY,PositionZ,Orientation);
+     else
+-        SendNotification("You do not have permission to perform that function");
++        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+     sLog.outDebug("Received worldport command from player %s", GetPlayer()->GetName());
+ }
+ 
+@@ -1431,63 +1431,57 @@
+     CHECK_PACKET_SIZE(recv_data, 1);
+ 
+     sLog.outDebug("Received opcode CMSG_WHOIS");
+-    std::string charname, acc, email, lastip, msg;
++    std::string charname;
+     recv_data >> charname;
+ 
+     if (GetSecurity() < SEC_ADMINISTRATOR)
+     {
+-        SendNotification("You do not have permission to perform that function");
++        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+         return;
+     }
+ 
+     if(charname.empty())
+     {
+-        SendNotification("Please provide character name");
++        SendNotification(LANG_NEED_CHARACTER_NAME);
+         return;
+     }
+ 
+-    uint32 accid;
+-    Field *fields;
+-
+     Player *plr = objmgr.GetPlayer(charname.c_str());
+ 
+-    if(plr)
+-        accid = plr->GetSession()->GetAccountId();
+-    else
++    if(!plr)
+     {
+-        SendNotification("Player %s not found or offline", charname.c_str());
++        SendNotification(LANG_PLAYER_NOT_EXIST_OR_OFFLINE, charname.c_str());
+         return;
+     }
+ 
+-    if(!accid)
++    uint32 accid = plr->GetSession()->GetAccountId();
++
++    QueryResult *result = loginDatabase.PQuery("SELECT username,email,last_ip FROM account WHERE id=%u", accid);
++    if(!result)
+     {
+-        SendNotification("Account for character %s not found", charname.c_str());
++        SendNotification(LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, charname.c_str());
+         return;
+     }
+ 
+-    QueryResult *result = loginDatabase.PQuery("SELECT username,email,last_ip FROM account WHERE id=%u", accid);
+-    if(result)
+-    {
+-        fields = result->Fetch();
+-        acc = fields[0].GetCppString();
+-        if(acc.empty())
+-            acc = "Unknown";
+-        email = fields[1].GetCppString();
+-        if(email.empty())
+-            email = "Unknown";
+-        lastip = fields[2].GetCppString();
+-        if(lastip.empty())
+-            lastip = "Unknown";
+-        msg = charname + "'s " + "account is " + acc + ", e-mail: " + email + ", last ip: " + lastip;
++    Field *fields = result->Fetch();
++    std::string acc = fields[0].GetCppString();
++    if(acc.empty())
++        acc = "Unknown";
++    std::string email = fields[1].GetCppString();
++    if(email.empty())
++        email = "Unknown";
++    std::string lastip = fields[2].GetCppString();
++    if(lastip.empty())
++        lastip = "Unknown";
+ 
+-        WorldPacket data(SMSG_WHOIS, msg.size()+1);
+-        data << msg;
+-        _player->GetSession()->SendPacket(&data);
+-    }
+-    else
+-        SendNotification("Account for character %s not found", charname.c_str());
++    std::string msg = charname + "'s " + "account is " + acc + ", e-mail: " + email + ", last ip: " + lastip;
+ 
++    WorldPacket data(SMSG_WHOIS, msg.size()+1);
++    data << msg;
++    _player->GetSession()->SendPacket(&data);
++
+     delete result;
++
+     sLog.outDebug("Received whois command from player %s for character %s", GetPlayer()->GetName(), charname.c_str());
+ }
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.h	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.h	(revision 6740)
+@@ -108,10 +108,12 @@
+     CONFIG_CAST_UNSTUCK,
+     CONFIG_MAX_PRIMARY_TRADE_SKILL,
+     CONFIG_MIN_PETITION_SIGNS,
++    CONFIG_GM_LOGIN_STATE,
++    CONFIG_GM_ACCEPT_TICKETS,
++    CONFIG_GM_CHAT,
+     CONFIG_GM_WISPERING_TO,
+     CONFIG_GM_IN_GM_LIST,
+     CONFIG_GM_IN_WHO_LIST,
+-    CONFIG_GM_LOGIN_STATE,
+     CONFIG_GM_LOG_TRADE,
+     CONFIG_GROUP_VISIBILITY,
+     CONFIG_MAIL_DELIVERY_DELAY,
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.h	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.h	(revision 6740)
+@@ -79,6 +79,7 @@
+ 
+         void SendPacket(WorldPacket const* packet);
+         void SendNotification(const char *format,...) ATTR_PRINTF(2,3);
++        void SendNotification(int32 string_id,...);
+         void SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type);
+         void SendPartyResult(PartyOperation operation, std::string member, PartyResult res);
+         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.cpp	(revision 6740)
+@@ -601,12 +601,15 @@
+         m_configs[CONFIG_MIN_PETITION_SIGNS] = 9;
+     }
+ 
+-    m_configs[CONFIG_GM_WISPERING_TO] = sConfig.GetBoolDefault("GM.WhisperingTo",false);
+-    m_configs[CONFIG_GM_IN_GM_LIST]  = sConfig.GetBoolDefault("GM.InGMList",false);
+-    m_configs[CONFIG_GM_IN_WHO_LIST]  = sConfig.GetBoolDefault("GM.InWhoList",false);
+-    m_configs[CONFIG_GM_LOGIN_STATE]  = sConfig.GetIntDefault("GM.LoginState",2);
+-    m_configs[CONFIG_GM_LOG_TRADE] = sConfig.GetBoolDefault("GM.LogTrade", false);
++    m_configs[CONFIG_GM_LOGIN_STATE]       = sConfig.GetIntDefault("GM.LoginState",2);
++    m_configs[CONFIG_GM_ACCEPT_TICKETS]    = sConfig.GetIntDefault("GM.AcceptTickets",2);
++    m_configs[CONFIG_GM_CHAT]              = sConfig.GetIntDefault("GM.Chat",2);
++    m_configs[CONFIG_GM_WISPERING_TO]      = sConfig.GetIntDefault("GM.WhisperingTo",2);
+ 
++    m_configs[CONFIG_GM_IN_GM_LIST]        = sConfig.GetBoolDefault("GM.InGMList",false);
++    m_configs[CONFIG_GM_IN_WHO_LIST]       = sConfig.GetBoolDefault("GM.InWhoList",false);
++    m_configs[CONFIG_GM_LOG_TRADE]         = sConfig.GetBoolDefault("GM.LogTrade", false);
++
+     m_configs[CONFIG_GROUP_VISIBILITY] = sConfig.GetIntDefault("Visibility.GroupMode",0);
+ 
+     m_configs[CONFIG_MAIL_DELIVERY_DELAY] = sConfig.GetIntDefault("MailDeliveryDelay",HOUR);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/BattleGroundHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/BattleGroundHandler.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/BattleGroundHandler.cpp	(revision 6740)
+@@ -29,6 +29,7 @@
+ #include "BattleGroundMgr.h"
+ #include "BattleGroundWS.h"
+ #include "BattleGround.h"
++#include "Language.h"
+ 
+ void WorldSession::HandleBattleGroundHelloOpcode( WorldPacket & recv_data )
+ {
+@@ -53,7 +54,7 @@
+     if(!_player->GetBGAccessByLevel(bgTypeId))
+     {
+                                                             // temp, must be gossip message...
+-        SendNotification("You don't meet Battleground level requirements");
++        SendNotification(LANG_YOUR_BG_LEVEL_REQ_ERROR);
+         return;
+     }
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/CharacterHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/CharacterHandler.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/CharacterHandler.cpp	(revision 6740)
+@@ -36,6 +36,7 @@
+ #include "PlayerDump.h"
+ #include "SocialMgr.h"
+ #include "Util.h"
++#include "Language.h"
+ 
+ class LoginQueryHolder : public SqlQueryHolder
+ {
+@@ -718,13 +719,13 @@
+     if(pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_SPELLS))
+     {
+         pCurrChar->resetSpells();
+-        SendNotification("Spells has been reset.");
++        SendNotification(LANG_RESET_SPELLS);
+     }
+ 
+     if(pCurrChar->HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
+     {
+         pCurrChar->resetTalents(true);
+-        SendNotification("Talents has been reset.");
++        SendNotification(LANG_RESET_TALENTS);
+     }
+ 
+     // show time before shutdown if shutdown planned.
+@@ -732,7 +733,7 @@
+         sWorld.ShutdownMsg(true,pCurrChar);
+ 
+     if(pCurrChar->isGameMaster())
+-        SendNotification("GM mode is ON");
++        SendNotification(LANG_GM_ON);
+ 
+     std::string IP_str = _socket ? _socket->GetRemoteAddress().c_str() : "-";
+     sLog.outChar("Account: %d (IP: %s) Login Character:[%s] (guid:%u)",GetAccountId(),IP_str.c_str(),pCurrChar->GetName() ,pCurrChar->GetGUID());
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.cpp	(revision 6740)
+@@ -429,6 +429,24 @@
+     }
+ }
+ 
++void WorldSession::SendNotification(int32 string_id,...)
++{
++    char const* format = GetMangosString(string_id);
++    if(format)
++    {
++        va_list ap;
++        char szStr [1024];
++        szStr[0] = '\0';
++        va_start(ap, format);
++        vsnprintf( szStr, 1024, format, ap );
++        va_end(ap);
++
++        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr)+1));
++        data << szStr;
++        SendPacket(&data);
++    }
++}
++
+ const char * WorldSession::GetMangosString( int32 entry )
+ {
+     return objmgr.GetMangosString(entry,GetSessionDbLocaleIndex());
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.cpp	(revision 6740)
+@@ -265,8 +265,8 @@
+     if(GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+         SetAcceptTicket(true);
+ 
+-    // players always and GM if set in config accept whispers by default
+-    if(GetSession()->GetSecurity() == SEC_PLAYER || sWorld.getConfig(CONFIG_GM_WISPERING_TO))
++    // players always accept 
++    if(GetSession()->GetSecurity() == SEC_PLAYER)
+         SetAcceptWhispers(true);
+ 
+     m_curSelection = 0;
+@@ -1415,7 +1415,7 @@
+     // 0x4 - gm
+     // 0x2 - dnd
+     // 0x1 - afk
+-    if(isGameMaster())
++    if(isGMChat())
+         return 4;
+     else if(isDND())
+         return 3;
+@@ -13766,18 +13766,47 @@
+     {
+         switch(sWorld.getConfig(CONFIG_GM_LOGIN_STATE))
+         {
+-            case 0:                                         // disable
+-                break;
+-            case 1:                                         // enable
+-                SetGameMaster(true);
+-                break;
++            default:
++            case 0:                      break;             // disable
++            case 1: SetGameMaster(true); break;             // enable
+             case 2:                                         // save state
+-                if(gmstate)
++                if(gmstate & PLAYER_EXTRA_GM_ON)
+                     SetGameMaster(true);
+                 break;
++        }
++
++        switch(sWorld.getConfig(CONFIG_GM_ACCEPT_TICKETS))
++        {
+             default:
++            case 0:                        break;           // disable
++            case 1: SetAcceptTicket(true); break;           // enable
++            case 2:                                         // save state
++            if(gmstate & PLAYER_EXTRA_GM_ACCEPT_TICKETS)
++                SetAcceptTicket(true);
++            break;
++        }
++
++        switch(sWorld.getConfig(CONFIG_GM_CHAT))
++        {
++            default:
++            case 0:                  break;                 // disable
++            case 1: SetGMChat(true); break;                 // enable
++            case 2:                                         // save state
++                if(gmstate & PLAYER_EXTRA_GM_CHAT)
++                    SetGMChat(true);
+                 break;
+         }
++
++        switch(sWorld.getConfig(CONFIG_GM_WISPERING_TO))
++        {
++            default:
++            case 0:                          break;         // disable
++            case 1: SetAcceptWhispers(true); break;         // enable
++            case 2:                                         // save state
++                if(gmstate & PLAYER_EXTRA_ACCEPT_WHISPERS)
++                    SetAcceptWhispers(true);
++                break;
++        }
+     }
+ 
+     _LoadDeclinedNames(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES));
+@@ -14843,7 +14872,7 @@
+         ss << "0";
+ 
+     ss << ", ";
+-    ss << (isGameMaster()? 1 : 0);
++    ss << m_ExtraFlags;
+ 
+     ss << ", ";
+     ss << uint32(m_stableSlots);                            // to prevent save uint8 as char
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ChatHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ChatHandler.cpp	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ChatHandler.cpp	(revision 6740)
+@@ -58,7 +58,7 @@
+     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
+     if(!langDesc)
+     {
+-        SendNotification("Unknown language");
++        SendNotification(LANG_UNKNOWN_LANGUAGE);
+         return;
+     }
+     if(langDesc->skill_id != 0 && !_player->HasSkill(langDesc->skill_id))
+@@ -76,7 +76,7 @@
+         }
+         if(!foundAura)
+         {
+-            SendNotification("You don't know that language");
++            SendNotification(LANG_NOT_LEARNED_LANGUAGE);
+             return;
+         }
+     }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Language.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Language.h	(revision 6739)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Language.h	(revision 6740)
+@@ -75,7 +75,7 @@
+     LANG_LEVEL_MINREQUIRED              = 49,
+     LANG_LEVEL_MINREQUIRED_AND_ITEM     = 50,
+     LANG_NPC_TAINER_HELLO               = 51,
+-    // Room for more level 0
++    // Room for more level 0              52-99 not used
+ 
+     // level 1 chat
+     LANG_GLOBAL_NOTIFY                  = 100,
+@@ -159,7 +159,7 @@
+ 
+     LANG_MAIL_SENT                      = 169,
+     LANG_SOUND_NOT_EXIST                = 170,
+-    // Room for more level 1
++    // Room for more level 1              171-199 not used
+ 
+     // level 2 chat
+     LANG_NO_SELECTION                   = 200,
+@@ -304,9 +304,12 @@
+     LANG_LOOKUP_PLAYER_CHARACTER        = 329,
+     LANG_NO_PLAYERS_FOUND               = 330,
+     LANG_EXTENDED_COST_NOT_EXIST        = 331,
++    LANG_GM_ON                          = 332,
++    LANG_GM_OFF                         = 333,
++    LANG_GM_CHAT_ON                     = 334,
++    LANG_GM_CHAT_OFF                    = 335,
++    // Room for more level 2              336-399 not used
+ 
+-    // Room for more level 2
+-
+     // level 3 chat
+     LANG_SCRIPTS_RELOADED               = 400,
+     LANG_YOU_CHANGE_SECURITY            = 401,
+@@ -610,60 +613,31 @@
+ 
+     LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
+     LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
+-};
+-#endif
+ 
+-/*  NOT USED VALUES
+-// alliance ranks
+-#define LANG_ALI_PRIVATE                 "Private "
+-#define LANG_ALI_CORPORAL                "Corporal "
+-#define LANG_ALI_SERGEANT                "Sergeant "
+-#define LANG_ALI_MASTER_SERGEANT         "Master Sergeant "
+-#define LANG_ALI_SERGEANT_MAJOR          "Sergeant Major "
+-#define LANG_ALI_KNIGHT                  "Knight "
+-#define LANG_ALI_KNIGHT_LIEUTENANT       "Knight-Lieutenant "
+-#define LANG_ALI_KNIGHT_CAPTAIN          "Knight-Captain "
+-#define LANG_ALI_KNIGHT_CHAMPION         "Knight-Champion "
+-#define LANG_ALI_LIEUTENANT_COMMANDER    "Lieutenant Commander "
+-#define LANG_ALI_COMMANDER               "Commander "
+-#define LANG_ALI_MARSHAL                 "Marshal "
+-#define LANG_ALI_FIELD_MARSHAL           "Field Marshal "
+-#define LANG_ALI_GRAND_MARSHAL           "Grand Marshal "
+-#define LANG_ALI_GAME_MASTER             "Game Master "
++    LANG_YOUR_ARENA_LEVEL_REQ_ERROR     = 713,
++    LANG_HIS_ARENA_LEVEL_REQ_ERROR      = 714,
++    LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
++    LANG_YOUR_ARENA_TEAM_FULL           = 716,
++    // Room for BG/ARENA                  717-799 not used
+ 
+-// horde ranks
+-#define LANG_HRD_SCOUT                   "Scout "
+-#define LANG_HRD_GRUNT                   "Grunt "
+-#define LANG_HRD_SERGEANT                "Sergeant "
+-#define LANG_HRD_SENIOR_SERGEANT         "Senior Sergeant "
+-#define LANG_HRD_FIRST_SERGEANT          "First Sergeant "
+-#define LANG_HRD_STONE_GUARD             "Stone Guard "
+-#define LANG_HRD_BLOOD_GUARD             "Blood Guard "
+-#define LANG_HRD_LEGIONNARE              "Legionnaire "
+-#define LANG_HRD_CENTURION               "Centurion "
+-#define LANG_HRD_CHAMPION                "Champion "
+-#define LANG_HRD_LIEUTENANT_GENERAL      "Lieutenant General "
+-#define LANG_HRD_GENERAL                 "General "
+-#define LANG_HRD_WARLORD                 "Warlord "
+-#define LANG_HRD_HIGH_WARLORD            "High Warlord "
+-#define LANG_HRD_GAME_MASTER             "Game Master "
++    // in game strings
++    LANG_PET_INVALID_NAME               = 800,
++    LANG_NOT_ENOUGH_GOLD                = 801,
++    LANG_NOT_FREE_TRADE_SLOTS           = 802,
++    LANG_NOT_PARTNER_FREE_TRADE_SLOTS   = 803,
++    LANG_YOU_NOT_HAVE_PERMISSION        = 804,
++    LANG_UNKNOWN_LANGUAGE               = 805,
++    LANG_NOT_LEARNED_LANGUAGE           = 806,
++    LANG_NEED_CHARACTER_NAME            = 807,
++    LANG_PLAYER_NOT_EXIST_OR_OFFLINE    = 808,
++    LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND   = 809,
++    // Room for in-game strings           810-999 not used
+ 
+-#define LANG_NO_RANK                     "No rank "
+-#define LANG_RANK                        "%s (Rank %u)"
+-#define LANG_HONOR_TODAY                 "Today: [Honorable kills: |c0000ff00%u|r] [Dishonorable kills: |c00ff0000%u|r]"
+-#define LANG_HONOR_YESTERDAY             "Yesterday: [Kills: |c0000ff00%u|r] [Honor: %u]"
+-#define LANG_HONOR_THIS_WEEK             "This week: [Kills: |c0000ff00%u|r] [Honor: %u]"
+-#define LANG_HONOR_LAST_WEEK             "Last week: [Kills: |c0000ff00%u|r] [Honor: %u] [Standing: %u]"
+-#define LANG_HONOR_LIFE                  "Lifetime: [Honorable kills: |c0000ff00%u|r] [Dishonorable kills: |c00ff0000%u|r] [Highest rank %u: %s]"
++    // FREE IDS                           1000-9999
+ 
+-// level 2
+-#define LANG_ADD_OBJ                     "AddObject at Chat.cpp" //log
+-#define LANG_DEMORPHED                   "Demorphed %s"     //log
++    // Use for not-in-svn patches         10000-10999
++    // Use for custom patches             11000-11999
+ 
+-// level 3
+-#define LANG_SPAWNING_SPIRIT_HEAL        "Spawning spirit healers\n"
+-#define LANG_NO_SPIRIT_HEAL_DB           "No spirit healers in database, exiting."
+-
+-#define LANG_ADD_OBJ_LV3                 "AddObject at Level3.cpp line 1176"
+-
+-*/
++    // NOT RESERVED IDS                   12000-
++};
++#endif
+
+
+* Implement chat GM state (.gm chat on/off) independent from in-game GM state (.gm on/off). Chat gm state control show (or not) gm chat badge. Original patch provided by Shurian.
+* [6740_mangos_command.sql] For ".gm" and ".gm chat" show current state for related mode, fix bug with "" command processing if command have args.
+* [6740_characters_characters.sql] Support (default) value 2 (use saved state) for GM.WhisperingTo and new GM.AcceptTickets and GM.Chat config options to control allowed whispering to GM, show new tickets by game and gm chat mode state at GM login.
+* [6740_mangos_mangos_string.sql] Implement support and use mangos strings localization for all SendNotification calls.
+* For patch authors: for avoid or make less chance for conflicts at svn merge in using mangos string indexes in Language.h reserved special string id ranges for custom patches and not-yet-in-svn patches. Recommended use _random_ indexes from this ranges in patches.

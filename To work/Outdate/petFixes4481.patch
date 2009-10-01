@@ -1,0 +1,241 @@
+Index: src/game/GridNotifiersImpl.h
+===================================================================
+--- src/game/GridNotifiersImpl.h	(revision 4481)
++++ src/game/GridNotifiersImpl.h	(working copy)
+@@ -79,16 +79,39 @@
+ 
+ inline void CreatureCreatureRelocationWorker(Creature* c1, Creature* c2)
+ {
++    Pet* c1IsPet = dynamic_cast<Pet*>(c1);
++    Pet* c2IsPet = dynamic_cast<Pet*>(c2);
++
+     if(!c1->hasUnitState(UNIT_STAT_CHASE | UNIT_STAT_SEARCHING | UNIT_STAT_FLEEING))
+     {
+         if( c1->AI() && c1->AI()->IsVisible(c2) && !c1->IsInEvadeMode() )
+-            c1->AI()->MoveInLineOfSight(c2);
++        {
++            if (!c2IsPet)
++            {
++                c1->AI()->MoveInLineOfSight(c2);
++            }
++            else
++            {
++                if (c2IsPet->getPetType() != MINI_PET)
++                    c1->AI()->MoveInLineOfSight(c2);
++            }
++        }
+     }
+ 
+     if(!c2->hasUnitState(UNIT_STAT_CHASE | UNIT_STAT_SEARCHING | UNIT_STAT_FLEEING))
+     {
+         if( c2->AI() && c2->AI()->IsVisible(c1) && !c2->IsInEvadeMode() )
+-            c2->AI()->MoveInLineOfSight(c1);
++        {
++            if (!c1IsPet)
++            {
++                c2->AI()->MoveInLineOfSight(c1);
++            }
++            else
++            {
++                if (c1IsPet->getPetType() != MINI_PET)
++                    c2->AI()->MoveInLineOfSight(c1);
++            }
++        }
+     }
+ }
+ 
+Index: src/game/Pet.cpp
+===================================================================
+--- src/game/Pet.cpp	(revision 4481)
++++ src/game/Pet.cpp	(working copy)
+@@ -80,17 +80,15 @@
+     // pets always have a charminfo, even if they are not actually charmed
+     CharmInfo* charmInfo = InitCharmInfo(this);
+ 
+-    if(type == MINI_PET)                                    // always passive and follow
+-    {
++    if(type == MINI_PET)
+         charmInfo->SetReactState(REACT_PASSIVE);
+-        charmInfo->SetCommandState(COMMAND_FOLLOW);
+-    }
+-    else if(type == GUARDIAN_PET)                           // always aggressive and follow
+-    {
++    else if(type == GUARDIAN_PET)
+         charmInfo->SetReactState(REACT_AGGRESSIVE);
+-        charmInfo->SetCommandState(COMMAND_FOLLOW);
+-    }
++    else
++        charmInfo->SetReactState(REACT_DEFENSIVE);
+ 
++    charmInfo->SetCommandState(COMMAND_FOLLOW);
++
+     m_spells.clear();
+     m_Auras.clear();
+     m_CreatureSpellCooldowns.clear();
+Index: src/game/PetAI.cpp
+===================================================================
+--- src/game/PetAI.cpp	(revision 4481)
++++ src/game/PetAI.cpp	(working copy)
+@@ -226,11 +226,18 @@
+             {
+                 i_pet.addUnitState(UNIT_STAT_FOLLOW);
+                 i_pet.GetMotionMaster()->Clear();
+-                i_pet.GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
++                if (((Pet&)i_pet).getPetType() != MINI_PET)
++                    i_pet.GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
++                else
++                    i_pet.GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*owner,0.1,M_PI/2+M_PI*rand_norm()));
+             }
+         }
+     }
+ 
++    if (owner && !owner->isInCombat() && !i_pet.isInCombat())
++        for(int i = 0; i < MAX_MOVE_TYPE; ++i)
++            i_pet.SetSpeed(UnitMoveType(i),owner->GetSpeedRate(UnitMoveType(i)),true);
++
+     //Autocast
+     HM_NAMESPACE::hash_map<uint32, Unit*> targetMap;
+     targetMap.clear();
+Index: src/game/PetHandler.cpp
+===================================================================
+--- src/game/PetHandler.cpp	(revision 4481)
++++ src/game/PetHandler.cpp	(working copy)
+@@ -150,6 +150,7 @@
+             switch(spellid)
+             {
+                 case REACT_PASSIVE:                         //passive
++                    pet->AttackStop();
+                 case REACT_DEFENSIVE:                       //recovery
+                 case REACT_AGGRESSIVE:                      //activete
+                     charmInfo->SetReactState( ReactStates(spellid) );
+Index: src/game/Spell.cpp
+===================================================================
+--- src/game/Spell.cpp	(revision 4481)
++++ src/game/Spell.cpp	(working copy)
+@@ -2462,6 +2462,26 @@
+             return prevented_reason;
+     }
+ 
++    if (m_spellInfo->Id == 1515)
++    {
++        if (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetTypeId() == TYPEID_PLAYER)
++            return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
++
++        if (m_targets.getUnitTarget()->getLevel() > m_caster->getLevel())
++            return SPELL_FAILED_HIGHLEVEL;
++
++        CreatureInfo const *cinfo = ((Creature*)m_targets.getUnitTarget())->GetCreatureInfo();
++        CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
++        if( cinfo->type != CREATURE_TYPE_BEAST || !cFamily || !cFamily->tamable )
++            return SPELL_FAILED_BAD_TARGETS;
++
++        if(m_caster->GetPetGUID())
++            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
++
++        if(m_caster->GetCharmGUID())
++            return SPELL_FAILED_ALREADY_HAVE_CHARM;
++    }
++
+     for (int i = 0; i < 3; i++)
+     {
+         // for effects of spells that have only one target
+@@ -2493,27 +2513,6 @@
+                 }
+                 break;
+             }
+-            case SPELL_EFFECT_TAMECREATURE:
+-            {
+-                if (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetTypeId() == TYPEID_PLAYER)
+-                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+-
+-                if (m_targets.getUnitTarget()->getLevel() > m_caster->getLevel())
+-                    return SPELL_FAILED_HIGHLEVEL;
+-
+-                CreatureInfo const *cinfo = ((Creature*)m_targets.getUnitTarget())->GetCreatureInfo();
+-                CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
+-                if( cinfo->type != CREATURE_TYPE_BEAST || !cFamily || !cFamily->tamable )
+-                    return SPELL_FAILED_BAD_TARGETS;
+-
+-                if(m_caster->GetPetGUID())
+-                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+-
+-                if(m_caster->GetCharmGUID())
+-                    return SPELL_FAILED_ALREADY_HAVE_CHARM;
+-
+-                break;
+-            }
+             case SPELL_EFFECT_LEARN_SPELL:
+             {
+                 if(m_spellInfo->EffectImplicitTargetA[i] != TARGET_PET)
+@@ -2667,7 +2666,7 @@
+             case SPELL_EFFECT_SUMMON_PET:
+             case SPELL_EFFECT_SUMMON_POSSESSED:
+             case SPELL_EFFECT_SUMMON_PHANTASM:
+-            case SPELL_EFFECT_SUMMON_CRITTER:               //not store in pet field
++                //case SPELL_EFFECT_SUMMON_CRITTER:             //not store in pet field
+             case SPELL_EFFECT_SUMMON_DEMON:
+             {
+                 if(m_caster->GetPetGUID())
+Index: src/game/SpellAuras.cpp
+===================================================================
+--- src/game/SpellAuras.cpp	(revision 4481)
++++ src/game/SpellAuras.cpp	(working copy)
+@@ -2502,6 +2502,9 @@
+     m_target->ApplySpeedMod(MOVE_RUN, rate, true, apply );
+ 
+     sLog.outDebug("ChangeSpeedTo:%f", m_target->GetSpeed(MOVE_RUN));
++
++    if (m_target->getVictim())
++        (*(Creature*)m_target).GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*(Creature*)m_target->getVictim()));
+ }
+ 
+ void Aura::HandleAuraModIncreaseMountedSpeed(bool apply, bool Real)
+Index: src/game/SpellEffects.cpp
+===================================================================
+--- src/game/SpellEffects.cpp	(revision 4481)
++++ src/game/SpellEffects.cpp	(working copy)
+@@ -3537,7 +3537,7 @@
+             name = ((Creature*)m_caster)->GetCreatureInfo()->Name;
+         name.append(petTypeSuffix[critter->getPetType()]);
+         critter->SetName( name );
+-        //m_caster->SetPet(critter);
++        m_caster->SetPet(critter);
+ 
+         MapManager::Instance().GetMap(m_caster->GetMapId(), m_caster)->Add((Creature*)critter);
+     }
+Index: src/game/Unit.cpp
+===================================================================
+--- src/game/Unit.cpp	(revision 4481)
++++ src/game/Unit.cpp	(working copy)
+@@ -4764,15 +4764,19 @@
+ 
+ void Unit::SetPet(Pet* pet)
+ {
+-    SetUInt64Value(UNIT_FIELD_SUMMON,pet ? pet->GetGUID() : 0);
+-
+     if(pet)
+     {
++        if (pet->getPetType() != MINI_PET) SetUInt64Value(UNIT_FIELD_SUMMON,pet->GetGUID());
++
+         for(int i = 0; i < MAX_MOVE_TYPE; ++i)
+         {
+             pet->SetSpeed(UnitMoveType(i),m_speed_rate[i],true);
+         }
+     }
++    else
++    {
++        SetUInt64Value(UNIT_FIELD_SUMMON,0);
++    }
+ }
+ 
+ void Unit::SetCharm(Unit* charmed)
+@@ -5931,9 +5935,6 @@
+     if (mtype == MOVE_RUN) data << uint8(0);                // new 2.1.0
+     data << float(GetSpeed(mtype));
+     SendMessageToSet( &data, true );
+-
+-    if(Pet* pet = GetPet())
+-        pet->SetSpeed(mtype,m_speed_rate[mtype],forced);
+ }
+ 
+ void Unit::SetHover(bool on)

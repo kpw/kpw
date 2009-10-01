@@ -1,0 +1,2 @@
+update `creature_template` set `scriptname` = 'boss_warchief_kargath_bladefist' where `entry` = '16808';
+update `creature_template` set `scriptname` = 'boss_warchief_kargath_bladefist' where `entry` = '20597';

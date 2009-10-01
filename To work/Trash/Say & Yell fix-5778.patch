@@ -1,0 +1,54 @@
+Index: src/game/Level1.cpp
+===================================================================
+--- src/game/Level1.cpp	(revision 5778)
++++ src/game/Level1.cpp	(working copy)
+@@ -39,15 +39,20 @@
+     if(!*args) 
+         return false;
+ 
++    Player* player=getSelectedPlayer();
+     Creature* pCreature = getSelectedCreature();
+-    if(!pCreature)
++    if(player)
+     {
+-        SendSysMessage(LANG_SELECT_CREATURE);
++        player->Say(args, LANG_UNIVERSAL);
+         return true;
+     }
++    else if(pCreature)
++    {
++        pCreature->Say(args, LANG_UNIVERSAL, 0);
++        return true;
++    }
+ 
+-    pCreature->Say(args, LANG_UNIVERSAL, 0);
+-
++    SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+     return true;
+ }
+ 
+@@ -56,15 +61,20 @@
+     if(!*args) 
+         return false;
+ 
++    Player* player=getSelectedPlayer();
+     Creature* pCreature = getSelectedCreature();
+-    if(!pCreature)
++    if(player)
+     {
+-        SendSysMessage(LANG_SELECT_CREATURE);
++        player->Yell(args, LANG_UNIVERSAL);
+         return true;
+     }
++    else if(pCreature)
++    {
++        pCreature->Yell(args, LANG_UNIVERSAL, 0);
++        return true;
++    }
+ 
+-    pCreature->Yell(args, LANG_UNIVERSAL, 0);
+-
++    SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+     return true;
+ }
+ 

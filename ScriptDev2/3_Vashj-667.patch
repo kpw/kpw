@@ -1,0 +1,148 @@
+Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
+===================================================================
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 667)
++++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
+@@ -79,7 +79,7 @@
+ #define TAINTED_ELEMENTAL             22009
+ #define COILFANG_STRIDER              22056
+ #define COILFANG_ELITE                22055
+-#define FATHOM_SPOREBAT               22140
++#define TOXIC_SPORE_BAT               22140
+ 
+ float ElementPos[8][4] =
+ {
+@@ -368,7 +368,7 @@
+                 if(SummonSporebat_Timer < diff)
+                 {
+                     Creature *Sporebat = NULL;
+-                    Sporebat = m_creature->SummonCreature(FATHOM_SPOREBAT, SPOREBAT_X, SPOREBAT_Y, SPOREBAT_Z, SPOREBAT_O, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
++                    Sporebat = m_creature->SummonCreature(TOXIC_SPORE_BAT, SPOREBAT_X, SPOREBAT_Y, SPOREBAT_Z, SPOREBAT_O, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
+ 
+                     if(Sporebat)
+                     {
+@@ -529,19 +529,40 @@
+ {
+     mob_enchanted_elementalAI(Creature *c) : ScriptedAI(c)
+     {
+-        pInstance = ((ScriptedInstance*)c->GetInstanceData());
+-        Reset();
++        pInstance = (c->GetInstanceData()) ? ((ScriptedInstance*)c->GetInstanceData()) : NULL;
++        EnterEvadeMode();
+     }
+ 
+     ScriptedInstance *pInstance;
+ 
+     uint32 Check_Timer;
+     uint32 Movement_Timer;
+-
++    float angle;
++    float distance;
++    float newX;
++    float newY;
++    float newZ;
++    bool waipontReached;
+     void Reset()
+     {
+         Check_Timer = 5000;
+         Movement_Timer = 500;
++        waipontReached = false;
++        Unit *Vashj = NULL;
++        Vashj = Unit::GetUnit((*m_creature), pInstance->GetData64(DATA_LADYVASHJ));
++        if(Vashj)
++        {
++            angle = m_creature->GetAngle(Vashj);
++            distance = m_creature->GetDistance(Vashj);
++            newX = m_creature->GetPositionX() + cos(angle)*(distance - 60);
++            newY = m_creature->GetPositionY() + sin(angle)*(distance - 60);
++            newZ = Vashj->GetPositionZ() - 2;
++        }
++
++        //m_creature->RemoveAllAuras();
++        //m_creature->DeleteThreatList();
++        //m_creature->CombatStop();
++        //DoGoHome();
+     }
+ 
+     void Aggro(Unit *who) { return; }
+@@ -550,6 +571,24 @@
+ 
+     void UpdateAI(const uint32 diff)
+     {
++        if(!m_creature->isAlive())
++            return;
++        //Movement_Timer
++        if(Movement_Timer < diff)
++        {
++            Unit *Vashj = NULL;
++            Vashj = Unit::GetUnit((*m_creature), pInstance->GetData64(DATA_LADYVASHJ));
++            if(Vashj)
++            {
++                m_creature->GetMotionMaster()->Clear();
++                m_creature->GetMotionMaster()->MovePoint(0, newX, newY, newZ);
++                //m_creature->GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*Vashj));
++            }
++
++            //if first movement doesn't work, apply the same movement after 10 seconds
++            Movement_Timer = 5000;
++        }else Movement_Timer -= diff;
++
+         //Check_Timer
+         if(Check_Timer < diff)
+         {
+@@ -575,9 +614,17 @@
+                         //call Unsummon()
+                         m_creature->setDeathState(JUST_DIED);
+                     }
++                    else if (Vashj->IsWithinDistInMap(m_creature, 61)){
++                        if (!waipontReached){
++                            Movement_Timer = 500;
++                            newX = Vashj->GetPositionX();
++                            newY = Vashj->GetPositionY();
++                            newZ = newZ + 2;
++                            waipontReached = true;
++                        }
++                    }
+                 }
+             }
+-            else error_log("ERROR: Instance Data for Serpentshrine Caverns not set");
+             Check_Timer = 1000;
+         }else Check_Timer -= diff;
+     }
+@@ -652,11 +699,11 @@
+     }
+ };
+ 
+-//Fathom Sporebat
++//Toxic Spore Bat
+ //Toxic Spores: Used in Phase 3 by the Spore Bats, it creates a contaminated green patch of ground, dealing about 2775-3225 nature damage every second to anyone who stands in it.
+-struct MANGOS_DLL_DECL mob_fathom_sporebatAI : public ScriptedAI
++struct MANGOS_DLL_DECL mob_toxic_spore_batAI : public ScriptedAI
+ {
+-    mob_fathom_sporebatAI(Creature *c) : ScriptedAI(c)
++    mob_toxic_spore_batAI(Creature *c) : ScriptedAI(c)
+     {
+         pInstance = ((ScriptedInstance*)c->GetInstanceData());
+         Reset();
+@@ -885,9 +932,9 @@
+     return new mob_tainted_elementalAI (_Creature);
+ }
+ 
+-CreatureAI* GetAI_mob_fathom_sporebat(Creature *_Creature)
++CreatureAI* GetAI_mob_toxic_spore_bat(Creature *_Creature)
+ {
+-    return new mob_fathom_sporebatAI (_Creature);
++    return new mob_toxic_spore_batAI (_Creature);
+ }
+ 
+ CreatureAI* GetAI_mob_shield_generator_channel(Creature *_Creature)
+@@ -914,8 +961,8 @@
+     m_scripts[nrscripts++] = newscript;
+ 
+     newscript = new Script;
+-    newscript->Name="mob_fathom_sporebat";
+-    newscript->GetAI = GetAI_mob_fathom_sporebat;
++    newscript->Name="mob_toxic_spore_bat";
++    newscript->GetAI = GetAI_mob_toxic_spore_bat;
+     m_scripts[nrscripts++] = newscript;
+ 
+     newscript = new Script;

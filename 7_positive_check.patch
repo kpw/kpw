@@ -1,0 +1,16 @@
+diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
+index 544432d..23f6acb 100644
+--- a/src/game/Spell.cpp
++++ b/src/game/Spell.cpp
+@@ -968,10 +968,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
+                 return;
+             }
+ 
+-            // exclude Arcane Missiles Dummy Aura aura for now (attack on hit)
+-            // TODO: find way to not need this?
+-            if(!(m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
+-                m_spellInfo->SpellFamilyFlags & 0x800LL))
++            if(!IsPositiveSpell(m_spellInfo->Id))
+             {
+                 unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+ 

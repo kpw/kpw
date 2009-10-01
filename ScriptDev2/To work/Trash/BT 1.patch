@@ -1,0 +1,32 @@
+Index: boss_supremus.cpp
+===================================================================
+--- boss_supremus.cpp	(revision 562)
++++ boss_supremus.cpp	(working copy)
+@@ -115,7 +115,7 @@
+         CheckTimer = 1000;
+         SupremusGUID = 0;
+         FireballTimer = 500;
+-        GeyserTimer = 0;
++        GeyserTimer = 2000;
+     }
+ 
+     void Aggro(Unit *who) {}
+@@ -313,17 +313,8 @@
+ 
+                 if(target)
+                 {
+-                    Creature* Volcano = NULL;
+-                    Volcano = SummonCreature(CREATURE_VOLCANO, target);
+-
+-                    if(Volcano)
+-                    {
+-                        DoCast(target, SPELL_VOLCANIC_ERUPTION);
+-                        ((npc_volcanoAI*)Volcano->AI())->SetSupremusGUID(m_creature->GetGUID());
+-                    }
+-                    
++                    DoCast(target, SPELL_VOLCANIC_ERUPTION);
+                     DoTextEmote("roars and the ground begins to crack open!", NULL);
+-                    
+                     SummonVolcanoTimer = 10000;
+                 }
+             }else SummonVolcanoTimer -= diff;

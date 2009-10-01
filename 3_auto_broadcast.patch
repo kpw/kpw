@@ -1,0 +1,160 @@
+diff --git a/src/game/Language.h b/src/game/Language.h
+index 4d4c155..49fd9fb 100644
+--- a/src/game/Language.h
++++ b/src/game/Language.h
+@@ -21,6 +21,8 @@
+ 
+ enum MangosStrings
+ {
++	LANG_AUTO_BROADCAST                 = 1001,
++
+     // for chat commands
+     LANG_SELECT_CHAR_OR_CREATURE        = 1,
+     LANG_SELECT_CREATURE                = 2,
+diff --git a/src/game/World.cpp b/src/game/World.cpp
+index 2badcae..5a74605 100644
+--- a/src/game/World.cpp
++++ b/src/game/World.cpp
+@@ -56,6 +56,7 @@
+ #include "InstanceSaveMgr.h"
+ #include "WaypointManager.h"
+ #include "Util.h"
++#include "Language.h"
+ 
+ INSTANTIATE_SINGLETON_1( World );
+ 
+@@ -1150,6 +1151,9 @@ void World::SetInitialWorldSettings()
+ 
+     WorldDatabase.PExecute("INSERT INTO uptime (startstring, starttime, uptime) VALUES('%s', %ld, 0)", isoDate, m_startTime );
+ 
++	static uint32 abtimer = 0;
++	abtimer = sConfig.GetIntDefault("AutoBroadcast.Timer", 60000);
++	
+     m_timers[WUPDATE_OBJECTS].SetInterval(0);
+     m_timers[WUPDATE_SESSIONS].SetInterval(0);
+     m_timers[WUPDATE_WEATHERS].SetInterval(1000);
+@@ -1157,6 +1161,7 @@ void World::SetInitialWorldSettings()
+     m_timers[WUPDATE_UPTIME].SetInterval(m_configs[CONFIG_UPTIME_UPDATE]*MINUTE*1000);
+                                                             //Update "uptime" table based on configuration entry in minutes.
+     m_timers[WUPDATE_CORPSES].SetInterval(20*MINUTE*1000);  //erase corpses every 20 minutes
++	m_timers[WUPDATE_AUTOBROADCAST].SetInterval(abtimer);
+ 
+     //to set mailtimer to return mails every day between 4 and 5 am
+     //mailtimer is increased when updating auctions
+@@ -1394,6 +1399,17 @@ void World::Update(time_t diff)
+         m_timers[WUPDATE_EVENTS].Reset();
+     }
+ 
++	static uint32 autobroadcaston = 0;
++	autobroadcaston = sConfig.GetIntDefault("AutoBroadcast.On", 0);
++	if(autobroadcaston == 1)
++	{
++		if (m_timers[WUPDATE_AUTOBROADCAST].Passed())
++		{
++			m_timers[WUPDATE_AUTOBROADCAST].Reset();
++			SendRNDBroadcast();
++		}
++	}
++	
+     /// </ul>
+     ///- Move all creatures with "delayed move" and remove and delete all objects with "delayed remove"
+     MapManager::Instance().DoDelayedMovesAndRemoves();
+@@ -2471,6 +2487,45 @@ void World::ProcessCliCommands()
+     p_zprintf("mangos>");
+ }
+ 
++void World::SendRNDBroadcast()
++{
++	std::string msg;
++	QueryResult *result = WorldDatabase.PQuery("SELECT `text` FROM `autobroadcast` ORDER BY RAND() LIMIT 1");
++	
++	if(!result)
++		return;
++	
++	msg = result->Fetch()[0].GetString();
++	delete result;
++
++	static uint32 abcenter = 0;
++    abcenter = sConfig.GetIntDefault("AutoBroadcast.Center", 0);
++    if(abcenter == 0)
++    {
++		sWorld.SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
++
++		sLog.outString("AutoBroadcast: '%s'",msg.c_str());
++	}
++	if(abcenter == 1)
++	{
++		WorldPacket data(SMSG_NOTIFICATION, (msg.size()+1));
++		data << msg;
++		sWorld.SendGlobalMessage(&data);
++
++		sLog.outString("AutoBroadcast: '%s'",msg.c_str());
++	}
++	if(abcenter == 2)
++	{
++		sWorld.SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
++
++		WorldPacket data(SMSG_NOTIFICATION, (msg.size()+1));
++		data << msg;
++		sWorld.SendGlobalMessage(&data);
++
++		sLog.outString("AutoBroadcast: '%s'",msg.c_str());
++	}
++}
++
+ void World::InitResultQueue()
+ {
+     m_resultQueue = new SqlResultQueue;
+diff --git a/src/game/World.h b/src/game/World.h
+index f70ea7b..f8701c3 100644
+--- a/src/game/World.h
++++ b/src/game/World.h
+@@ -59,7 +59,8 @@ enum WorldTimers
+     WUPDATE_UPTIME      = 4,
+     WUPDATE_CORPSES     = 5,
+     WUPDATE_EVENTS      = 6,
+-    WUPDATE_COUNT       = 7
++    WUPDATE_AUTOBROADCAST = 7,
++	WUPDATE_COUNT 		= 8
+ };
+ 
+ /// Configuration elements
+@@ -340,6 +341,7 @@ class World
+ 
+         WorldSession* FindSession(uint32 id) const;
+         void AddSession(WorldSession *s);
++		void SendRNDBroadcast();
+         bool RemoveSession(uint32 id);
+         /// Get the number of current active sessions
+         void UpdateMaxSessionCounters();
+diff --git a/src/mangosd/mangosd.conf.dist.in b/src/mangosd/mangosd.conf.dist.in
+index 65ba1a8..2ee6a94 100644
+--- a/src/mangosd/mangosd.conf.dist.in
++++ b/src/mangosd/mangosd.conf.dist.in
+@@ -1080,3 +1080,26 @@ Ra.IP = 0.0.0.0
+ Ra.Port = 3443
+ Ra.MinLevel = 3
+ Ra.Secure = 1
++
++###################################################################################################################
++# AUTO BROADCAST
++#
++#    AutoBroadcast.On
++#        Enable auto broadcast
++#        Default: 0 - off
++#                 1 - on
++#
++#    AutoBroadcast.Center
++#        Display method
++#        Default: 0 - announce
++#                 1 - notify
++#                 2 - both
++#
++#    AutoBroadcast.Timer
++#        Timer for auto broadcast
++#
++###################################################################################################################
++
++AutoBroadcast.On = 0
++AutoBroadcast.Center = 0
++AutoBroadcast.Timer = 60000

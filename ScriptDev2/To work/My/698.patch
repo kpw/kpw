@@ -1,0 +1,1390 @@
+Index: C:/ScriptDev2/include/sc_creature.cpp
+===================================================================
+--- C:/ScriptDev2/include/sc_creature.cpp	(revision 697)
++++ C:/ScriptDev2/include/sc_creature.cpp	(revision 698)
+@@ -9,8 +9,8 @@
+ 
+ // Spell summary for ScriptedAI::SelectSpell
+ struct TSpellSummary {
+-    uint8 Targets;    // set of enum SelectTarget
+-    uint8 Effects;    // set of enum SelectEffect
++    uint8 Targets;                                          // set of enum SelectTarget
++    uint8 Effects;                                          // set of enum SelectEffect
+ } *SpellSummary;
+ 
+ bool ScriptedAI::IsVisible(Unit* who) const
+@@ -23,22 +23,16 @@
+ 
+ void ScriptedAI::MoveInLineOfSight(Unit *who)
+ {
+-    if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
++    if (!m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature))
+     {
+         if (!m_creature->canFly() && m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
+             return;
+ 
+         float attackRadius = m_creature->GetAttackDistance(who);
+-        if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
++        if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+         {
+-            DoStartAttackAndMovement(who);
+             who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-            if (!InCombat)
+-            {
+-                InCombat = true;
+-                Aggro(who);
+-            }
++            AttackStart(who);
+         }
+     }
+ }
+@@ -48,28 +42,31 @@
+     if (!who)
+         return;
+ 
+-    if (who->isTargetableForAttack())
++    if (m_creature->Attack(who, true))
+     {
+-        //Begin attack
+-        DoStartAttackAndMovement(who);
++        m_creature->AddThreat(who, 0.0f);
++        m_creature->SetInCombatWith(who);
++        who->SetInCombatWith(m_creature);
+ 
+         if (!InCombat)
+         {
+             InCombat = true;
+             Aggro(who);
+         }
++
++        DoStartMovement(who);
+     }
+ }
+ 
+ void ScriptedAI::UpdateAI(const uint32 diff)
+ {
+     //Check if we have a current target
+-    if( m_creature->isAlive() && m_creature->SelectHostilTarget() && m_creature->getVictim())
++    if (m_creature->isAlive() && m_creature->SelectHostilTarget() && m_creature->getVictim())
+     {
+-        if( m_creature->isAttackReady() )
++        if (m_creature->isAttackReady() )
+         {
+             //If we are within range melee the target
+-            if( m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
++            if (m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
+             {
+                 m_creature->AttackerStateUpdate(m_creature->getVictim());
+                 m_creature->resetAttackTimer();
+@@ -86,7 +83,7 @@
+     m_creature->CombatStop();
+     m_creature->LoadCreaturesAddon();
+ 
+-    if( m_creature->isAlive() )
++    if (m_creature->isAlive())
+         m_creature->GetMotionMaster()->MoveTargetedHome();
+ 
+     m_creature->SetLootRecipient(NULL);
+@@ -101,37 +98,31 @@
+     Reset();
+ }
+ 
+-void ScriptedAI::DoStartAttackAndMovement(Unit* victim, float distance, float angle)
++void ScriptedAI::DoStartMovement(Unit* victim, float distance, float angle)
+ {
+     if (!victim)
+         return;
+ 
+-    if ( m_creature->Attack(victim, true) )
+-    {
+-        m_creature->GetMotionMaster()->MoveChase(victim, distance, angle);
+-        m_creature->AddThreat(victim, 0.0f);
+-    }
++    m_creature->GetMotionMaster()->MoveChase(victim, distance, angle);
+ }
+ 
+-void ScriptedAI::DoStartAttackNoMovement(Unit* victim)
++void ScriptedAI::DoStartNoMovement(Unit* victim)
+ {
+     if (!victim)
+         return;
+ 
+-    if ( m_creature->Attack(victim, true) )
+-    {
+-        m_creature->AddThreat(victim, 0.0f);
+-    }
++    m_creature->GetMotionMaster()->MoveIdle();
++    m_creature->StopMoving();
+ }
+ 
+ 
+ void ScriptedAI::DoMeleeAttackIfReady()
+ {
+     //Make sure our attack is ready and we aren't currently casting before checking distance
+-    if( m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
++    if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+     {
+         //If we are within range melee the target
+-        if( m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
++        if (m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
+         {
+             m_creature->AttackerStateUpdate(m_creature->getVictim());
+             m_creature->resetAttackTimer();
+@@ -141,7 +132,7 @@
+ 
+ void ScriptedAI::DoStopAttack()
+ {
+-    if( m_creature->getVictim() != NULL )
++    if (m_creature->getVictim() != NULL)
+     {
+         m_creature->AttackStop();
+     }
+@@ -167,19 +158,19 @@
+ 
+ void ScriptedAI::DoSay(const char* text, uint32 language, Unit* target)
+ {
+-    if (target)m_creature->Say(text, language, target->GetGUID());
++    if (target) m_creature->Say(text, language, target->GetGUID());
+     else m_creature->Say(text, language, 0);
+ }
+ 
+ void ScriptedAI::DoYell(const char* text, uint32 language, Unit* target)
+ {
+-    if (target)m_creature->Yell(text, language, target->GetGUID());
++    if (target) m_creature->Yell(text, language, target->GetGUID());
+     else m_creature->Yell(text, language, 0);
+ }
+ 
+ void ScriptedAI::DoTextEmote(const char* text, Unit* target, bool IsBossEmote)
+ {
+-    if (target)m_creature->TextEmote(text, target->GetGUID(), IsBossEmote);
++    if (target) m_creature->TextEmote(text, target->GetGUID(), IsBossEmote);
+     else m_creature->TextEmote(text, 0, IsBossEmote);
+ }
+ 
+@@ -581,14 +572,8 @@
+         float attackRadius = m_creature->GetAttackDistance(who);
+         if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+         {
+-            DoStartAttackNoMovement(who);
+             who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-            if (!InCombat)
+-            {
+-                InCombat = true;
+-                Aggro(who);
+-            }
++            AttackStart(who);
+         }
+     }
+ }
+@@ -598,15 +583,18 @@
+     if (!who)
+         return;
+ 
+-    if (who->isTargetableForAttack())
++    if (m_creature->Attack(who, true))
+     {
+-        //Begin attack
+-        DoStartAttackNoMovement(who);
++        m_creature->AddThreat(who, 0.0f);
++        m_creature->SetInCombatWith(who);
++        who->SetInCombatWith(m_creature);
+ 
+         if (!InCombat)
+         {
+             InCombat = true;
+             Aggro(who);
+         }
++
++        DoStartNoMovement(who);
+     }
+ }
+Index: C:/ScriptDev2/include/sc_creature.h
+===================================================================
+--- C:/ScriptDev2/include/sc_creature.h	(revision 697)
++++ C:/ScriptDev2/include/sc_creature.h	(revision 698)
+@@ -119,11 +119,11 @@
+     //AI Helper Functions
+     //*************
+ 
+-    //Start attack of victim and go to him
+-    void DoStartAttackAndMovement(Unit* victim, float distance = 0, float angle = 0);
++    //Start movement toward victim
++    void DoStartMovement(Unit* victim, float distance = 0, float angle = 0);
+ 
+-    //Start attack on victim but do not move
+-    void DoStartAttackNoMovement(Unit* victim);
++    //Start no movement on victim
++    void DoStartNoMovement(Unit* victim);
+ 
+     //Do melee swing of current victim if in rnage and ready and not casting
+     void DoMeleeAttackIfReady();
+Index: C:/ScriptDev2/scripts/guard/guards.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/guard/guards.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/guard/guards.cpp	(revision 698)
+@@ -529,7 +529,7 @@
+                         DoCastSpell(who, spell);
+                     }
+                 }
+-                DoStartAttackAndMovement(who);
++                DoStartMovement(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/zulgurub/boss_thekal.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/zulgurub/boss_thekal.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/zulgurub/boss_thekal.cpp	(revision 698)
+@@ -205,8 +205,8 @@
+ 
+                     DoCast(target,SPELL_CHARGE);
+                     m_creature->SendMonsterMove(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, true,1);
+-                    DoStartAttackAndMovement(target);
+                     DoResetThreat();
++                    AttackStart(target);
+ 
+                     Charge_Timer = 15000 + rand()%7000;
+                 }else Charge_Timer -= diff;
+Index: C:/ScriptDev2/scripts/zone/zulgurub/boss_jeklik.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/zulgurub/boss_jeklik.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/zulgurub/boss_jeklik.cpp	(revision 698)
+@@ -109,7 +109,7 @@
+ 
+                         m_creature->Relocate(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0);
+                         m_creature->SendMonsterMove(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, true,1);
+-                        DoStartAttackAndMovement(target);
++                        AttackStart(target);
+                     }
+ 
+                     Charge_Timer = 15000 + rand()%15000;
+Index: C:/ScriptDev2/scripts/zone/zulgurub/boss_grilek.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/zulgurub/boss_grilek.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/zulgurub/boss_grilek.cpp	(revision 698)
+@@ -62,7 +62,7 @@
+             if(m_creature->getThreatManager().getThreat(m_creature->getVictim()))
+                 m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(),-50);
+             if (target)
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+ 
+             Avartar_Timer = 25000 + rand()%10000;
+         }else Avartar_Timer -= diff;
+Index: C:/ScriptDev2/scripts/zone/zulgurub/boss_renataki.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/zulgurub/boss_renataki.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/zulgurub/boss_renataki.cpp	(revision 698)
+@@ -121,7 +121,7 @@
+                 m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(),-50);
+ 
+             if (target)
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+ 
+             Aggro_Timer = 7000 + rand()%13000;
+         }else Aggro_Timer -= diff;
+Index: C:/ScriptDev2/scripts/zone/zulgurub/boss_arlokk.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/zulgurub/boss_arlokk.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/zulgurub/boss_arlokk.cpp	(revision 698)
+@@ -167,7 +167,7 @@
+                     m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 35)));
+                     m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 35)));
+                     m_creature->UpdateDamagePhysical(BASE_ATTACK);
+-                    DoStartAttackAndMovement(target);
++                    AttackStart(target);
+                     //The Panther Model
+                     m_creature->SetUInt32Value(UNIT_FIELD_DISPLAYID,15215);
+                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+Index: C:/ScriptDev2/scripts/zone/zulgurub/boss_mandokir.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/zulgurub/boss_mandokir.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/zulgurub/boss_mandokir.cpp	(revision 698)
+@@ -142,7 +142,7 @@
+                         {
+                             DoCast(pUnit,SPELL_CHARGE);
+                             m_creature->SendMonsterMove(pUnit->GetPositionX(), pUnit->GetPositionY(), pUnit->GetPositionZ(), 0, true,1);
+-                            DoStartAttackAndMovement(pUnit);
++                            AttackStart(pUnit);
+                         }
+                     }
+                 }
+Index: C:/ScriptDev2/scripts/zone/zulgurub/boss_marli.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/zulgurub/boss_marli.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/zulgurub/boss_marli.cpp	(revision 698)
+@@ -165,10 +165,12 @@
+                                 i=3;
+                     }
+                     if (target)
++                    {
+                         DoCast(target, SPELL_CHARGE);
+-                    //                    m_creature->Relocate(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0);
+-                    //                    m_creature->SendMonsterMove(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, true,1);
+-                    DoStartAttackAndMovement(target);
++                        //m_creature->Relocate(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0);
++                        //m_creature->SendMonsterMove(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, true,1);
++                        AttackStart(target);
++                    }
+ 
+                     Charge_Timer = 8000;
+                 }else Charge_Timer -= diff;
+Index: C:/ScriptDev2/scripts/zone/hellfire_citadel/hellfire_ramparts/boss_watchkeeper_gargolmar.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/hellfire_citadel/hellfire_ramparts/boss_watchkeeper_gargolmar.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/hellfire_citadel/hellfire_ramparts/boss_watchkeeper_gargolmar.cpp	(revision 698)
+@@ -103,14 +103,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if(m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+-                DoStartAttackAndMovement(who);
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+             else if (!HasTaunted && m_creature->IsWithinDistInMap(who, 60.0f))
+             {
+Index: C:/ScriptDev2/scripts/zone/hellfire_citadel/hellfire_ramparts/boss_omor_the_unscarred.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/hellfire_citadel/hellfire_ramparts/boss_omor_the_unscarred.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/hellfire_citadel/hellfire_ramparts/boss_omor_the_unscarred.cpp	(revision 698)
+@@ -54,9 +54,9 @@
+ #define SAY_WIPE                    "I am victorious!"
+ #define SOUND_WIPE                  10283
+ 
+-struct MANGOS_DLL_DECL boss_omor_the_unscarredAI : public ScriptedAI
++struct MANGOS_DLL_DECL boss_omor_the_unscarredAI : public Scripted_NoMovementAI
+ {
+-    boss_omor_the_unscarredAI(Creature *c) : ScriptedAI(c) {Reset();}
++    boss_omor_the_unscarredAI(Creature *c) : Scripted_NoMovementAI(c) {Reset();}
+ 
+     uint32 OrbitalStrike_Timer;
+     uint32 ShadowWhip_Timer;
+@@ -106,45 +106,6 @@
+         }
+     }
+ 
+-    void AttackStart(Unit* who)
+-    {
+-        if (!who)
+-            return;
+-
+-        if (who->isTargetableForAttack())
+-        {
+-            DoStartAttackNoMovement(who);
+-
+-            if (!InCombat)
+-            {
+-                InCombat = true;
+-                Aggro(who);
+-            }
+-        }
+-    }
+-
+-    void MoveInLineOfSight(Unit* who)
+-    {
+-        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
+-        {
+-            if (!m_creature->canFly() && m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
+-                return;
+-
+-            float attackRadius = m_creature->GetAttackDistance(who);
+-            if(m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+-            {
+-                DoStartAttackNoMovement(who);
+-                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
+-            }
+-        }
+-    }
+-
+     void KilledUnit(Unit* victim)
+     {
+         if (rand()%2)
+Index: C:/ScriptDev2/scripts/zone/hellfire_citadel/shattered_halls/boss_nethekurse.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/hellfire_citadel/shattered_halls/boss_nethekurse.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/hellfire_citadel/shattered_halls/boss_nethekurse.cpp	(revision 698)
+@@ -193,16 +193,20 @@
+         if ( IsIntroEvent || !IsMainEvent )
+             return;
+ 
+-        if( who->isTargetableForAttack() )
++        if (m_creature->Attack(who, true))
+         {
+-            if( Phase ) DoStartAttackNoMovement(who);
+-            else DoStartAttackAndMovement(who);
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
+ 
+-            if( !InCombat )
++            if (!InCombat)
+             {
+                 InCombat = true;
+                 Aggro(who);
+             }
++
++            if (Phase) DoStartNoMovement(who);
++            else DoStartMovement(who);
+         }
+     }
+ 
+@@ -230,16 +234,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                if( Phase ) DoStartAttackNoMovement(who);
+-                else DoStartAttackAndMovement(who);
+-
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if( !InCombat )
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/black_temple/boss_illidan.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/black_temple/boss_illidan.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/black_temple/boss_illidan.cpp	(revision 698)
+@@ -978,13 +978,25 @@
+ 
+     void AttackStart(Unit *who)
+     {
+-        if(!who || IsTalking || Phase == 2 || Phase == 4 || Phase == 6 || m_creature->HasAura(SPELL_KNEEL, 0))
++        if (!who || IsTalking || Phase == 2 || Phase == 4 || Phase == 6 || m_creature->HasAura(SPELL_KNEEL, 0))
+             return;
+ 
+-        if (who->isTargetableForAttack() && who!= m_creature)
++        if (who == m_creature)
++            return;
++
++        if (m_creature->Attack(who, true))
+         {
+-            //Begin melee attack if we are within range
+-            DoStartAttackAndMovement(who);
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
++
++            if (!InCombat)
++            {
++                InCombat = true;
++                Aggro(who);
++            }
++
++            DoStartMovement(who);
+         }
+     }
+ 
+@@ -1001,10 +1013,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                DoStartAttackAndMovement(who);
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/black_temple/boss_shade_of_akama.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/black_temple/boss_shade_of_akama.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/black_temple/boss_shade_of_akama.cpp	(revision 698)
+@@ -258,15 +258,29 @@
+ 
+     void AttackStart(Unit* who)
+     {
+-        if(!who || IsBanished) return;
++        if(!who || IsBanished || who == m_creature)
++            return;
+ 
+-        if(who->isTargetableForAttack() && who != m_creature)
+-            DoStartAttackAndMovement(who);
++        if (m_creature->Attack(who, true))
++        {
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
++
++            if (!InCombat)
++            {
++                InCombat = true;
++                Aggro(who);
++            }
++
++            DoStartMovement(who);
++        }
+     }
+ 
+     void MoveInLineOfSight(Unit* who)
+     {
+-        if(IsBanished) return;
++        if (IsBanished)
++            return;
+ 
+         ScriptedAI::MoveInLineOfSight(who);
+     }
+Index: C:/ScriptDev2/scripts/zone/black_temple/boss_reliquary_of_souls.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/black_temple/boss_reliquary_of_souls.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/black_temple/boss_reliquary_of_souls.cpp	(revision 698)
+@@ -796,16 +796,13 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= CREATURE_Z_ATTACK_RANGE && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                //Begin melee attack if we are within range
+-                DoStartAttackAndMovement(who);
+-
+                 if (!InCombat)
+                 {
+                     DoCast(who, AURA_OF_DESIRE);
+                 }
++
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+         }
+     }
+@@ -892,16 +889,13 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= CREATURE_Z_ATTACK_RANGE && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                //Begin melee attack if we are within range
+-                DoStartAttackAndMovement(who);
+-
+                 if (!InCombat)
+                 {
+                     DoCast(who, AURA_OF_ANGER);
+                 }
++
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/tempest_keep/the_eye/boss_kaelthas.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/tempest_keep/the_eye/boss_kaelthas.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/tempest_keep/the_eye/boss_kaelthas.cpp	(revision 698)
+@@ -210,14 +210,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if(m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                DoStartAttackAndMovement(who);
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+         }
+     }
+@@ -227,16 +221,19 @@
+         if (!who || FakeDeath || m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+             return;
+ 
+-        if (who->isTargetableForAttack())
++        if (m_creature->Attack(who, true))
+         {
+-            //Begin attack
+-            DoStartAttackAndMovement(who);
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
+ 
+             if (!InCombat)
+             {
+                 InCombat = true;
+                 Aggro(who);
+             }
++
++            DoStartMovement(who);
+         }
+     }
+ 
+@@ -435,7 +432,7 @@
+             target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+         }else
+         {
+@@ -506,10 +503,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (Phase >= 4 && m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                DoStartAttackAndMovement(who);
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+             else if(who->isAlive())
+             {
+@@ -774,7 +769,7 @@
+                     target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+                     if(target)
+                     {
+-                        DoStartAttackAndMovement(target);
++                        AttackStart(target);
+                     }
+                     Phase_Timer = 30000;
+                 }else Phase_Timer -= diff;
+@@ -931,7 +926,7 @@
+                         DoCast(m_creature, SPELL_EXPLODE);
+                         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                         Phase = 6;
+-                        DoStartAttackAndMovement(m_creature->getVictim());
++                        AttackStart(m_creature->getVictim());
+                         m_creature->GetMotionMaster()->Clear();
+                         m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+ 
+@@ -1037,7 +1032,7 @@
+                                 InGravityLapse = false;
+                                 GravityLapse_Timer = 60000;
+                                 GravityLapse_Phase = 0;
+-                                DoStartAttackAndMovement(m_creature->getVictim());
++                                AttackStart(m_creature->getVictim());
+                                 m_creature->GetMotionMaster()->Clear();
+                                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                                 DoResetThreat();
+@@ -1241,16 +1236,19 @@
+         if (!who || FakeDeath || m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+             return;
+ 
+-        if (who->isTargetableForAttack())
++        if (m_creature->Attack(who, true))
+         {
+-            //Begin attack
+-            DoStartAttackAndMovement(who, CAPERNIAN_DISTANCE, M_PI/2);
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
+ 
+             if (!InCombat)
+             {
+                 InCombat = true;
+                 Aggro(who);
+             }
++
++            DoStartMovement(who, CAPERNIAN_DISTANCE, M_PI/2);
+         }
+     }
+ 
+Index: C:/ScriptDev2/scripts/zone/tempest_keep/arcatraz/boss_harbinger_skyriss.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/tempest_keep/arcatraz/boss_harbinger_skyriss.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/tempest_keep/arcatraz/boss_harbinger_skyriss.cpp	(revision 698)
+@@ -125,14 +125,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                DoStartAttackAndMovement(who);
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+         }
+     }
+@@ -142,15 +136,19 @@
+         if( !Intro )
+             return;
+ 
+-        if( who->isTargetableForAttack() )
++        if (m_creature->Attack(who, true))
+         {
+-            DoStartAttackAndMovement(who);
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
+ 
+-            if( !InCombat )
++            if (!InCombat)
+             {
+                 InCombat = true;
+                 Aggro(who);
+             }
++
++            DoStartMovement(who);
+         }
+     }
+ 
+Index: C:/ScriptDev2/scripts/zone/tempest_keep/arcatraz/arcatraz.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/tempest_keep/arcatraz/arcatraz.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/tempest_keep/arcatraz/arcatraz.cpp	(revision 698)
+@@ -123,39 +123,22 @@
+         }
+     }
+ 
+-    void MoveInLineOfSight(Unit *who)
+-    {
+-        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
+-        {
+-            if (!m_creature->canFly() && m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
+-                return;
+-
+-            float attackRadius = m_creature->GetAttackDistance(who);
+-            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+-            {
+-                DoStartAttackNoMovement(who);
+-                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
+-            }
+-        }
+-    }
+-
+     void AttackStart(Unit* who)
+     {
+-        if (who->isTargetableForAttack())
++        if (m_creature->Attack(who, true))
+         {
+-            DoStartAttackNoMovement(who);
++            m_creature->AddThreat(who, 0.0f);
++            m_creature->SetInCombatWith(who);
++            who->SetInCombatWith(m_creature);
+ 
+             if (!InCombat)
+             {
+                 InCombat = true;
+                 Aggro(who);
+             }
++
++            //TODO: Make it so he moves when target out of range
++            DoStartNoMovement(who);
+         }
+     }
+ 
+Index: C:/ScriptDev2/scripts/zone/temple_of_ahnqiraj/boss_bug_trio.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/temple_of_ahnqiraj/boss_bug_trio.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/temple_of_ahnqiraj/boss_bug_trio.cpp	(revision 698)
+@@ -177,7 +177,7 @@
+             {
+                 DoCast(target, SPELL_CHARGE);
+                 m_creature->SendMonsterMove(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, true,1);
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+ 
+             Charge_Timer = 8000 + rand()%8000;
+Index: C:/ScriptDev2/scripts/zone/temple_of_ahnqiraj/boss_sartura.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/temple_of_ahnqiraj/boss_sartura.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/temple_of_ahnqiraj/boss_sartura.cpp	(revision 698)
+@@ -80,7 +80,7 @@
+                 Unit* target = NULL;
+                 target = SelectUnit(SELECT_TARGET_RANDOM,1);
+                 if (target)
+-                    DoStartAttackAndMovement(target);
++                    AttackStart(target);
+ 
+                 WhirlWindRandom_Timer = 3000 + rand()%4000;
+             }else WhirlWindRandom_Timer -= diff;
+@@ -219,7 +219,7 @@
+                 Unit* target = NULL;
+                 target = SelectUnit(SELECT_TARGET_RANDOM,1);
+                 if (target)
+-                    DoStartAttackAndMovement(target);
++                    AttackStart(target);
+ 
+                 AggroReset = true;
+                 AggroReset_Timer = 2000 + rand()%3000;
+Index: C:/ScriptDev2/scripts/zone/blackwing_lair/boss_vaelastrasz.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/blackwing_lair/boss_vaelastrasz.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/blackwing_lair/boss_vaelastrasz.cpp	(revision 698)
+@@ -119,42 +119,40 @@
+     {
+         //Speach
+         if (DoingSpeach)
+-            if (SpeachTimer < diff)
+         {
+-            switch (SpeachNum)
++            if (SpeachTimer < diff)
+             {
+-                case 0:
+-                    //16 seconds till next line
+-                    DoYell(SAY_LINE2,LANG_UNIVERSAL,NULL);
+-                    DoPlaySoundToSet(m_creature,SOUND_LINE2);
+-                    SpeachTimer = 16000;
+-                    SpeachNum++;
+-                    break;
++                switch (SpeachNum)
++                {
++                    case 0:
++                        //16 seconds till next line
++                        DoYell(SAY_LINE2,LANG_UNIVERSAL,NULL);
++                        DoPlaySoundToSet(m_creature,SOUND_LINE2);
++                        SpeachTimer = 16000;
++                        SpeachNum++;
++                        break;
++                    case 1:
++                        //This one is actually 16 seconds but we only go to 10 seconds because he starts attacking after he says "I must fight this!"
++                        DoYell(SAY_LINE3,LANG_UNIVERSAL,NULL);
++                        DoPlaySoundToSet(m_creature,SOUND_LINE3);
++                        SpeachTimer = 10000;
++                        SpeachNum++;
++                        break;
++                    case 2:
++                        m_creature->setFaction(103);
++                        m_creature->SetHealth(int(m_creature->GetMaxHealth()*.3));
++                        if (PlayerGUID && Unit::GetUnit((*m_creature),PlayerGUID))
++                        {
++                            AttackStart(Unit::GetUnit((*m_creature),PlayerGUID));
++                            DoCast(m_creature,SPELL_ESSENCEOFTHERED);
++                        }
++                        SpeachTimer = 0;
++                        DoingSpeach = false;
++                        break;
++                }
++            }else SpeachTimer -= diff;
++        }
+ 
+-                case 1:
+-                    //This one is actually 16 seconds but we only go to 10 seconds because he starts attacking after he says "I must fight this!"
+-                    DoYell(SAY_LINE3,LANG_UNIVERSAL,NULL);
+-                    DoPlaySoundToSet(m_creature,SOUND_LINE3);
+-                    SpeachTimer = 10000;
+-                    SpeachNum++;
+-                    break;
+-
+-                case 2:
+-                default:
+-                    m_creature->setFaction(103);
+-                    m_creature->SetHealth(int(m_creature->GetMaxHealth()*.3));
+-                    if (PlayerGUID && Unit::GetUnit((*m_creature),PlayerGUID))
+-                    {
+-                        DoStartAttackAndMovement(Unit::GetUnit((*m_creature),PlayerGUID));
+-                        DoCast(m_creature,SPELL_ESSENCEOFTHERED);
+-                    }
+-
+-                    SpeachTimer = 0;
+-                    DoingSpeach = false;
+-                    break;
+-            }
+-        }else SpeachTimer -= diff;
+-
+         //Return since we have no target
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim() )
+             return;
+Index: C:/ScriptDev2/scripts/zone/blades_edge_mountains/blades_edge_mountains.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/blades_edge_mountains/blades_edge_mountains.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/blades_edge_mountains/blades_edge_mountains.cpp	(revision 698)
+@@ -294,11 +294,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                //Begin melee attack if we are within range
+-                DoStartAttackAndMovement(who);
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_nexusprince_shaffar.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_nexusprince_shaffar.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_nexusprince_shaffar.cpp	(revision 698)
+@@ -101,14 +101,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                DoStartAttackAndMovement(who);
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/auchenai_crypts/boss_exarch_maladaar.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/auchenai_crypts/boss_exarch_maladaar.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/auchenai_crypts/boss_exarch_maladaar.cpp	(revision 698)
+@@ -197,14 +197,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                DoStartAttackAndMovement(who);
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_tailonking_ikiss.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_tailonking_ikiss.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_tailonking_ikiss.cpp	(revision 698)
+@@ -110,14 +110,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                DoStartAttackAndMovement(who);
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_grandmaster_vorpil.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_grandmaster_vorpil.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_grandmaster_vorpil.cpp	(revision 698)
+@@ -120,14 +120,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                DoStartAttackAndMovement(who);
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_murmur.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_murmur.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_murmur.cpp	(revision 698)
+@@ -32,9 +32,9 @@
+ #define SPELL_RESONANCE             33657
+ #define SPELL_SHOCKWAVE             33686
+ 
+-struct MANGOS_DLL_DECL boss_murmurAI : public ScriptedAI
++struct MANGOS_DLL_DECL boss_murmurAI : public Scripted_NoMovementAI
+ {
+-    boss_murmurAI(Creature *c) : ScriptedAI(c) {Reset();}
++    boss_murmurAI(Creature *c) : Scripted_NoMovementAI(c) {Reset();}
+ 
+     uint32 SonicBoom_Timer;
+     uint32 MurmursTouch_Timer;
+@@ -62,46 +62,6 @@
+ 
+     void Aggro(Unit *who) { }
+ 
+-    void AttackStart(Unit* who)
+-    {
+-        if (!who)
+-            return;
+-
+-        if (who->isTargetableForAttack())
+-        {
+-            //Begin attack
+-            DoStartAttackNoMovement(who);
+-
+-            if (!InCombat)
+-            {
+-                InCombat = true;
+-                Aggro(who);
+-            }
+-        }
+-    }
+-
+-    void MoveInLineOfSight(Unit* who)
+-    {
+-        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
+-        {
+-            if (!m_creature->canFly() && m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
+-                return;
+-
+-            float attackRadius = m_creature->GetAttackDistance(who);
+-            if(m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+-            {
+-                DoStartAttackNoMovement(who);
+-                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
+-            }
+-        }
+-    }
+-
+     void UpdateAI(const uint32 diff)
+     {
+         //Return since we have no target
+Index: C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 698)
+@@ -237,7 +237,7 @@
+     {
+         //Begin melee attack if we are within range
+         if(Phase != 2)
+-            DoStartAttackAndMovement(who);
++            DoStartMovement(who);
+ 
+         StartEvent();
+     }
+Index: C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_fathomlord_karathress.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_fathomlord_karathress.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_fathomlord_karathress.cpp	(revision 698)
+@@ -197,12 +197,8 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
+-
++                AttackStart(target);
+                 GetAdvisors();
+-
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO);
+-                DoYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
+             }
+         }
+ 
+@@ -294,7 +290,7 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+         }
+ 
+@@ -375,7 +371,7 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+         }
+ 
+@@ -453,7 +449,7 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+         }
+ 
+Index: C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_morogrim_tidewalker.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_morogrim_tidewalker.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/coilfang_resevoir/serpent_shrine/boss_morogrim_tidewalker.cpp	(revision 698)
+@@ -351,10 +351,8 @@
+         if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
+         {
+             //no attack radius check - it attacks the first target that moves in his los
+-            if(who->HasStealthAura())
+-                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-            DoStartAttackAndMovement(who);
++            who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++            AttackStart(who);
+         }
+     }
+ 
+Index: C:/ScriptDev2/scripts/zone/caverns_of_time/dark_portal/boss_temporus.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/caverns_of_time/dark_portal/boss_temporus.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/caverns_of_time/dark_portal/boss_temporus.cpp	(revision 698)
+@@ -108,15 +108,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                DoStartAttackAndMovement(who);
+-                if (!InCombat)
+-                {
+-                    DoYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
+-                    DoPlaySoundToSet(m_creature, SOUND_AGGRO);
+-                }
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/burning_steppes/burning_steppes.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/burning_steppes/burning_steppes.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/burning_steppes/burning_steppes.cpp	(revision 698)
+@@ -56,14 +56,8 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                DoStartAttackAndMovement(who);
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                if (!InCombat)
+-                {
+-                    InCombat = true;
+-                    Aggro(who);
+-                }
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/gruuls_lair/boss_high_king_maulgar.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/gruuls_lair/boss_high_king_maulgar.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/gruuls_lair/boss_high_king_maulgar.cpp	(revision 698)
+@@ -124,7 +124,10 @@
+             pInstance->SetData(DATA_MAULGAREVENT, 0);
+     }
+ 
+-    void Aggro(Unit *who) { StartEvent(who); }
++    void Aggro(Unit *who)
++    {
++        StartEvent(who);
++    }
+ 
+     void GetCouncil()
+     {
+@@ -157,11 +160,8 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
+-
++                AttackStart(target);
+                 GetCouncil();
+-
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO);
+             }
+         }
+ 
+@@ -208,8 +208,8 @@
+             {
+                 Unit* target = NULL;
+                 target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+-                if(target)
+-                    DoStartAttackAndMovement(target);
++                if (target)
++                    AttackStart(target);
+ 
+                 Charging_Timer = 20000;
+             }else Charging_Timer -= diff;
+@@ -274,7 +274,7 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+         }
+ 
+@@ -357,7 +357,7 @@
+ 
+                 if(!InCombat)
+                 {
+-                    DoStartAttackAndMovement(who);
++                    AttackStart(who);
+                     if(pInstance)
+                     {
+                         pInstance->SetData64(DATA_MAULGAREVENT_TANK, who->GetGUID());
+@@ -377,7 +377,7 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+         }
+ 
+@@ -472,7 +472,7 @@
+ 
+                 if(!InCombat)
+                 {
+-                    DoStartAttackAndMovement(who);
++                    AttackStart(who);
+                     if(pInstance)
+                     {
+                         pInstance->SetData64(DATA_MAULGAREVENT_TANK, who->GetGUID());
+@@ -492,7 +492,7 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+         }
+ 
+@@ -572,7 +572,7 @@
+ 
+                 if(!InCombat)
+                 {
+-                    DoStartAttackAndMovement(who);
++                    AttackStart(who);
+                     if(pInstance)
+                     {
+                         pInstance->SetData64(DATA_MAULGAREVENT_TANK, who->GetGUID());
+@@ -592,7 +592,7 @@
+ 
+             if(target)
+             {
+-                DoStartAttackAndMovement(target);
++                AttackStart(target);
+             }
+         }
+ 
+Index: C:/ScriptDev2/scripts/zone/karazhan/bosses_opera.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/karazhan/bosses_opera.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/karazhan/bosses_opera.cpp	(revision 698)
+@@ -1124,7 +1124,7 @@
+             if(Julianne && Julianne->getVictim())
+             {
+                 m_creature->AddThreat(Julianne->getVictim(), 1.0f);
+-                DoStartAttackAndMovement(Julianne->getVictim());
++                AttackStart(Julianne->getVictim());
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/stratholme/boss_timmy_the_cruel.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/stratholme/boss_timmy_the_cruel.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/stratholme/boss_timmy_the_cruel.cpp	(revision 698)
+@@ -54,17 +54,14 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= CREATURE_Z_ATTACK_RANGE && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+                 if (!HasYelled)
+                 {
+                     DoYell(SAY_SPAWN,LANG_UNIVERSAL,NULL);
+                     HasYelled = true;
+                 }
+ 
+-                //Begin melee attack if we are within range
+-                DoStartAttackAndMovement(who);
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+         }
+     }
+Index: C:/ScriptDev2/scripts/zone/naxxramas/boss_anubrekhan.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/naxxramas/boss_anubrekhan.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/naxxramas/boss_anubrekhan.cpp	(revision 698)
+@@ -107,12 +107,6 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                //Begin melee attack if we are within range
+-                DoStartAttackAndMovement(who);
+-
+                 if (!InCombat)
+                 {
+                     switch(rand()%3)
+@@ -131,6 +125,9 @@
+                             break;
+                     }
+                 }
++
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+             else if (!HasTaunted && m_creature->IsWithinDistInMap(who, 60.0f))
+             {
+Index: C:/ScriptDev2/scripts/zone/naxxramas/boss_faerlina.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/naxxramas/boss_faerlina.cpp	(revision 697)
++++ C:/ScriptDev2/scripts/zone/naxxramas/boss_faerlina.cpp	(revision 698)
+@@ -97,10 +97,6 @@
+             float attackRadius = m_creature->GetAttackDistance(who);
+             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                DoStartAttackAndMovement(who);
+                 //Say our dialog on initial aggro
+                 if (!InCombat)
+                 {
+@@ -124,6 +120,9 @@
+                             break;
+                     }
+                 }
++
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                AttackStart(who);
+             }
+             else if (!HasTaunted && m_creature->IsWithinDistInMap(who, 60.0f))
+             {
+
+
+Fixed: use expected way of initiate attack to ensure attacking player always enter combat (also at client side).
+Rename related functions to DoStartMovement()/DoStartNoMovement(). These can be used to control movement. Function Aggro() is now only called in AttackStart() and set global bool InCombat.
+Some code cleanup and needed adjustments in scripts.

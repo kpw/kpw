@@ -1,0 +1,39 @@
+diff --git a/src/game/AggressorAI.cpp b/src/game/AggressorAI.cpp
+index 637410c..9be41e5 100644
+--- a/src/game/AggressorAI.cpp
++++ b/src/game/AggressorAI.cpp
+@@ -55,7 +55,7 @@ AggressorAI::MoveInLineOfSight(Unit *u)
+         if(i_creature.IsWithinDistInMap(u, attackRadius) && i_creature.IsWithinLOSInMap(u) )
+         {
+             AttackStart(u);
+-            u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++            //u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+         }
+     }
+ }
+diff --git a/src/game/GuardAI.cpp b/src/game/GuardAI.cpp
+index 5672f14..b07146d 100644
+--- a/src/game/GuardAI.cpp
++++ b/src/game/GuardAI.cpp
+@@ -50,7 +50,7 @@ void GuardAI::MoveInLineOfSight(Unit *u)
+         {
+             //Need add code to let guard support player
+             AttackStart(u);
+-            u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++            //u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+         }
+     }
+ }
+diff --git a/src/game/PetAI.cpp b/src/game/PetAI.cpp
+index 81ca688..9822209 100644
+--- a/src/game/PetAI.cpp
++++ b/src/game/PetAI.cpp
+@@ -55,7 +55,7 @@ void PetAI::MoveInLineOfSight(Unit *u)
+             if(i_pet.IsWithinLOSInMap(u))
+             {
+                 AttackStart(u);
+-                u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                //u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+             }
+         }
+     }

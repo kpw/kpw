@@ -1,0 +1,26 @@
+Index: src/game/ObjectMgr.cpp
+===================================================================
+--- src/game/ObjectMgr.cpp	(revision 5695)
++++ src/game/ObjectMgr.cpp	(working copy)
+@@ -3939,12 +3939,6 @@
+             continue;
+         }
+ 
+-        if(entry->map_id != areaEntry->mapid && team != 0)
+-        {
+-            sLog.outErrorDb("Table `game_graveyard_zone` has record for ghost zone (%u) at map %u and graveyard (%u) at map %u for team %u, but in case maps are different, player faction setting is ignored. Use faction 0 instead.",zoneId,areaEntry->mapid, safeLocId, entry->map_id, team);
+-            team = 0;
+-        }
+-
+         if(!AddGraveYardLink(safeLocId,zoneId,team,false))
+             sLog.outErrorDb("Table `game_graveyard_zone` has a duplicate record for Garveyard (ID: %u) and Zone (ID: %u), skipped.",safeLocId,zoneId);
+     } while( result->NextRow() );
+@@ -3992,7 +3986,7 @@
+         }
+ 
+         // remember first graveyard at another map and ignore other
+-        if(MapId != entry->map_id)
++        if(MapId != entry->map_id && (data.team == 0 || (team != 0 && data.team == team)))
+         {
+             if(!entryFar)
+                 entryFar = entry;

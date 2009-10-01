@@ -1,0 +1,21 @@
+ src/game/Unit.cpp |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
+index 1621c93..3eb16e5 100644
+--- a/src/game/Unit.cpp
++++ b/src/game/Unit.cpp
+@@ -7789,6 +7789,11 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
+         // Exception
+         switch (spellProto->SpellFamilyName)
+         {
++            case  SPELLFAMILY_GENERIC:      
++                // Frenzied Regeneration triggered Spell
++                if( spellProto->Id == 22845 )
++                    CastingTime = 0;
++                break;      
+             case  SPELLFAMILY_SHAMAN:
+                 // Healing stream from totem (add 6% per tick from hill bonus owner)
+                 if (spellProto->SpellFamilyFlags & 0x000000002000LL)
+warning: LF will be replaced by CRLF in src/game/Unit.cpp
+warning: LF will be replaced by CRLF in src/game/Unit.cpp

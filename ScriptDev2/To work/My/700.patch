@@ -1,0 +1,1806 @@
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_nexusprince_shaffar.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_nexusprince_shaffar.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_nexusprince_shaffar.cpp	(revision 700)
+@@ -28,26 +28,18 @@
+ 
+ #include "precompiled.h"
+ 
+-#define SAY_INTRO           "What is this? You must forgive me, but I was not expecting company. As you can see, we are somewhat preoccupied right now. But no matter. As I am a gracious host, I will tend to you... personally."
+-#define SOUND_INTRO         10539
++#define SAY_INTRO                       -1557000
+ 
+-#define SAY_AGGRO_1         "We have not yet been properly introduced."
+-#define SOUND_AGGRO_1       10541
+-#define SAY_AGGRO_2         "An epic battle. How exciting!"
+-#define SOUND_AGGRO_2       10542
+-#define SAY_AGGRO_3         "I have longed for a good adventure."
+-#define SOUND_AGGRO_3       10543
++#define SAY_AGGRO_1                     -1557001
++#define SAY_AGGRO_2                     -1557002
++#define SAY_AGGRO_3                     -1557003
+ 
+-#define SAY_SLAY_1          "It has been... entertaining."
+-#define SOUND_SLAY_1        10544
+-#define SAY_SLAY_2          "And now we part company."
+-#define SOUND_SLAY_2        10545
++#define SAY_SLAY_1                      -1557004
++#define SAY_SLAY_2                      -1557005
+ 
+-#define SAY_SUMMON          "I have such fascinating things to show you."
+-#define SOUND_SUMMON        10540
++#define SAY_SUMMON                      -1557006
+ 
+-#define SAY_DEAD            "I must bid you... farewell."
+-#define SOUND_DEAD          10546
++#define SAY_DEAD                        -1557007
+ 
+ #define SPELL_BLINK                     34605
+ #define SPELL_FROSTBOLT                 32364
+@@ -90,8 +82,7 @@
+         {
+             if( !HasTaunted && m_creature->IsWithinDistInMap(who, 100.0) )
+             {
+-                DoYell(SAY_INTRO, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_INTRO);
++                DoScriptText(SAY_INTRO, m_creature);
+                 HasTaunted = true;
+             }
+ 
+@@ -111,18 +102,9 @@
+     {
+         switch(rand()%3)
+         {
+-            case 0:
+-                DoYell(SAY_AGGRO_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_1);
+-                break;
+-            case 1:
+-                DoYell(SAY_AGGRO_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_2);
+-                break;
+-            case 2:
+-                DoYell(SAY_AGGRO_3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_3);
+-                break;
++            case 0: DoScriptText(SAY_AGGRO_1, m_creature); break;
++            case 1: DoScriptText(SAY_AGGRO_2, m_creature); break;
++            case 2: DoScriptText(SAY_AGGRO_3, m_creature); break;
+         }
+     }
+ 
+@@ -141,21 +123,14 @@
+     {
+         switch(rand()%2)
+         {
+-            case 0:
+-                DoYell(SAY_SLAY_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SLAY_1);
+-                break;
+-            case 1:
+-                DoYell(SAY_SLAY_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SLAY_2);
+-                break;
++            case 0: DoScriptText(SAY_SLAY_1, m_creature); break;
++            case 1: DoScriptText(SAY_SLAY_2, m_creature); break;
+         }
+     }
+ 
+     void JustDied(Unit* Killer)
+     {
+-        DoYell(SAY_DEAD, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature,SOUND_DEAD);
++        DoScriptText(SAY_DEAD, m_creature);
+     }
+ 
+     void UpdateAI(const uint32 diff)
+@@ -204,10 +179,8 @@
+                 m_creature->InterruptNonMeleeSpells(true);
+ 
+             if( !urand(0,3) )
+-            {
+-                DoYell(SAY_SUMMON, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SUMMON);
+-            }
++                DoScriptText(SAY_SUMMON, m_creature);
++
+             DoCast(m_creature,SPELL_ETHEREAL_BEACON);
+ 
+             Beacon_Timer = 10000;
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_pandemonius.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_pandemonius.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/mana_tombs/boss_pandemonius.cpp	(revision 700)
+@@ -23,22 +23,16 @@
+ 
+ #include "precompiled.h"
+ 
+-#define SAY_AGGRO_1                     "I will feed on your soul."
+-#define SOUND_AGGRO_1                   10561
+-#define SAY_AGGRO_2                     "So... full of life!"
+-#define SOUND_AGGRO_2                   10562
+-#define SAY_AGGRO_3                     "Do not... resist."
+-#define SOUND_AGGRO_3                   10563
++#define SAY_AGGRO_1                     -1557008
++#define SAY_AGGRO_2                     -1557009
++#define SAY_AGGRO_3                     -1557010
+ 
+-#define SAY_KILL_1                      "Yes! I am... empowered!"
+-#define SOUND_KILL_1                    10564
+-#define SAY_KILL_2                      "More... I must have more!"
+-#define SOUND_KILL_2                    10565
++#define SAY_KILL_1                      -1557011
++#define SAY_KILL_2                      -1557012
+ 
+-#define SAY_DEATH                       "To the void... once... more.."
+-#define SOUND_DEATH                     10566
++#define SAY_DEATH                       -1557013
+ 
+-#define EMOTE_DARK_SHELL                "shifts into the void..."
++#define EMOTE_DARK_SHELL                -1557014
+ 
+ #define SPELL_VOID_BLAST                32325
+ #define H_SPELL_VOID_BLAST              38760
+@@ -67,22 +61,15 @@
+ 
+     void JustDied(Unit* Killer)
+     {
+-        DoYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature,SOUND_DEATH);
++        DoScriptText(SAY_DEATH, m_creature);
+     }
+ 
+     void KilledUnit(Unit* victim)
+     {
+         switch(rand()%2)
+         {
+-            case 0:
+-                DoYell(SAY_KILL_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_KILL_1);
+-                break;
+-            case 1:
+-                DoYell(SAY_KILL_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_KILL_2);
+-                break;
++            case 0: DoScriptText(SAY_KILL_1, m_creature); break;
++            case 1: DoScriptText(SAY_KILL_2, m_creature); break;
+         }
+     }
+ 
+@@ -90,18 +77,9 @@
+     {
+         switch(rand()%3)
+         {
+-            case 0:
+-                DoYell(SAY_AGGRO_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_1);
+-                break;
+-            case 1:
+-                DoYell(SAY_AGGRO_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_2);
+-                break;
+-            case 2:
+-                DoYell(SAY_AGGRO_3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_3);
+-                break;
++            case 0: DoScriptText(SAY_AGGRO_1, m_creature); break;
++            case 1: DoScriptText(SAY_AGGRO_2, m_creature); break;
++            case 2: DoScriptText(SAY_AGGRO_3, m_creature); break;
+         }
+ 
+     }
+@@ -134,7 +112,8 @@
+                 if( m_creature->IsNonMeleeSpellCasted(false) )
+                     m_creature->InterruptNonMeleeSpells(true);
+ 
+-                DoTextEmote(EMOTE_DARK_SHELL,NULL,true);
++                DoScriptText(EMOTE_DARK_SHELL, m_creature);
++
+                 DoCast(m_creature,HeroicMode ? H_SPELL_DARK_SHELL : SPELL_DARK_SHELL);
+                 DarkShell_Timer = 20000;
+             }else DarkShell_Timer -= diff;
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/auchenai_crypts/boss_exarch_maladaar.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/auchenai_crypts/boss_exarch_maladaar.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/auchenai_crypts/boss_exarch_maladaar.cpp	(revision 700)
+@@ -52,7 +52,7 @@
+     }
+ 
+     void Aggro(Unit *who)
+-        { }
++    { }
+ 
+     void SetMyClass(uint8 myclass)
+     {
+@@ -64,9 +64,9 @@
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
+             return;
+ 
+-        if( Class_Timer < diff )
++        if (Class_Timer < diff)
+         {
+-            switch( myClass )
++            switch (myClass)
+             {
+                 case CLASS_WARRIOR:
+                     DoCast(m_creature->getVictim(), SPELL_MORTAL_STRIKE);
+@@ -105,7 +105,7 @@
+                     Class_Timer = 10000;
+                     break;
+             }
+-        }else Class_Timer -= diff;
++        } else Class_Timer -= diff;
+ 
+         DoMeleeAttackIfReady();
+     }
+@@ -116,30 +116,20 @@
+     return new mob_stolen_soulAI (_Creature);
+ }
+ 
+-#define SAY_INTRO                   "You have defiled the resting place of our ancestors. For this offense, there can be but one punishment. It is fitting that you have come to a place of the dead... for you will soon be joining them."
+-#define SOUND_INTRO                 10509
+-#define SAY_SUMMON                  "Rise my fallen brothers. Take form and fight!"
+-#define SOUND_SUMMON                10512
++#define SAY_INTRO                   -1558000
++#define SAY_SUMMON                  -1558001
+ 
+-#define SAY_AGGRO_1                 "You will pay with your life!"
+-#define SOUND_AGGRO_1               10513
+-#define SAY_AGGRO_2                 "There's no turning back now!"
+-#define SOUND_AGGRO_2               10514
+-#define SAY_AGGRO_3                 "Serve your penitence!"
+-#define SOUND_AGGRO_3               10515
++#define SAY_AGGRO_1                 -1558002
++#define SAY_AGGRO_2                 -1558003
++#define SAY_AGGRO_3                 -1558004
+ 
+-#define SAY_ROAR                    "Let your mind be clouded."
+-#define SOUND_ROAR                  10510
+-#define SAY_SOUL_CLEAVE             "Stare into the darkness of your soul."
+-#define SOUND_SOUL_CLEAVE           10511
++#define SAY_ROAR                    -1558005
++#define SAY_SOUL_CLEAVE             -1558006
+ 
+-#define SAY_SLAY_1                  "These walls will be your doom."
+-#define SOUND_SLAY_1                10516
+-#define SAY_SLAY_2                  "<laugh> Now, you'll stay for eternity!"
+-#define SOUND_SLAY_2                10517
++#define SAY_SLAY_1                  -1558007
++#define SAY_SLAY_2                  -1558008
+ 
+-#define SAY_DEATH                   "This is... where.. I belong..."
+-#define SOUND_DEATH                 10518
++#define SAY_DEATH                   -1558009
+ 
+ #define SPELL_RIBBON_OF_SOULS       32422
+ #define SPELL_SOUL_SCREAM           32421
+@@ -182,12 +172,11 @@
+ 
+     void MoveInLineOfSight(Unit *who)
+     {
+-        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
++        if (!m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature))
+         {
+-            if( !HasTaunted && m_creature->IsWithinDistInMap(who, 150.0) )
++            if (!HasTaunted && m_creature->IsWithinDistInMap(who, 150.0))
+             {
+-                DoYell(SAY_INTRO, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_INTRO);
++                DoScriptText(SAY_INTRO, m_creature);
+                 HasTaunted = true;
+             }
+ 
+@@ -195,7 +184,7 @@
+                 return;
+ 
+             float attackRadius = m_creature->GetAttackDistance(who);
+-            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
++            if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                 AttackStart(who);
+@@ -205,32 +194,23 @@
+ 
+     void Aggro(Unit *who)
+     {
+-        switch(rand()%3)
++        switch (rand()%3)
+         {
+-            case 0:
+-                DoYell(SAY_AGGRO_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_1);
+-                break;
+-            case 1:
+-                DoYell(SAY_AGGRO_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_2);
+-                break;
+-            case 2:
+-                DoYell(SAY_AGGRO_3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_3);
+-                break;
++            case 0: DoScriptText(SAY_AGGRO_1, m_creature); break;
++            case 1: DoScriptText(SAY_AGGRO_2, m_creature); break;
++            case 2: DoScriptText(SAY_AGGRO_3, m_creature); break;
+         }
+     }
+ 
+     void JustSummoned(Creature *summoned)
+     {
+-        if( summoned->GetEntry() == ENTRY_STOLEN_SOUL )
++        if (summoned->GetEntry() == ENTRY_STOLEN_SOUL)
+         {
+             //SPELL_STOLEN_SOUL_VISUAL has shapeshift effect, but not implemented feature in mangos for this spell.
+             summoned->SetDisplayId(soulmodel);
+             summoned->CastSpell(summoned,SPELL_STOLEN_SOUL_VISUAL,false);
+ 
+-            if( Unit *target = Unit::GetUnit(*m_creature,soulholder) )
++            if (Unit *target = Unit::GetUnit(*m_creature,soulholder))
+                 summoned->AI()->AttackStart(target);
+ 
+             ((mob_stolen_soulAI*)summoned->AI())->SetMyClass(soulclass);
+@@ -242,24 +222,16 @@
+         if (rand()%2)
+             return;
+ 
+-        switch(rand()%2)
++        switch (rand()%2)
+         {
+-            case 0:
+-                DoYell(SAY_SLAY_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SLAY_1);
+-                break;
+-            case 1:
+-                DoYell(SAY_SLAY_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SLAY_2);
+-                break;
++            case 0: DoScriptText(SAY_SLAY_1, m_creature); break;
++            case 1: DoScriptText(SAY_SLAY_2, m_creature); break;
+         }
+     }
+ 
+     void JustDied(Unit* Killer)
+     {
+-        DoYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature,SOUND_DEATH);
+-
++        DoScriptText(SAY_DEATH, m_creature);
+         //When Exarch Maladar is defeated D'ore appear.
+         DoSpawnCreature(19412,0,0,0,0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+     }
+@@ -269,39 +241,32 @@
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
+             return;
+ 
+-        if( !Avatar_summoned && ((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 25) )
++        if (!Avatar_summoned && ((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 25))
+         {
+-            if( m_creature->IsNonMeleeSpellCasted(false) )
++            if (m_creature->IsNonMeleeSpellCasted(false))
+                 m_creature->InterruptNonMeleeSpells(true);
+ 
+-            DoYell(SAY_SUMMON, LANG_UNIVERSAL, NULL);
+-            DoPlaySoundToSet(m_creature,SOUND_SUMMON);
++            DoScriptText(SAY_SUMMON, m_creature);
+ 
+             DoCast(m_creature, SPELL_SUMMON_AVATAR);
+             Avatar_summoned = true;
+             StolenSoul_Timer = 45000;
+         }
+ 
+-        if( StolenSoul_Timer < diff )
++        if (StolenSoul_Timer < diff)
+         {
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+             {
+-                if( target->GetTypeId() == TYPEID_PLAYER )
++                if (target->GetTypeId() == TYPEID_PLAYER)
+                 {
+-                    if( m_creature->IsNonMeleeSpellCasted(false) )
++                    if (m_creature->IsNonMeleeSpellCasted(false))
+                         m_creature->InterruptNonMeleeSpells(true);
+ 
+                     uint32 i = urand(1,2);
+-                    if( i == 1 )
+-                    {
+-                        DoYell(SAY_ROAR, LANG_UNIVERSAL, NULL);
+-                        DoPlaySoundToSet(m_creature,SOUND_ROAR);
+-                    }
++                    if (i == 1)
++                        DoScriptText(SAY_ROAR, m_creature);
+                     else
+-                    {
+-                        DoYell(SAY_SOUL_CLEAVE, LANG_UNIVERSAL, NULL);
+-                        DoPlaySoundToSet(m_creature,SOUND_SOUL_CLEAVE);
+-                    }
++                        DoScriptText(SAY_SOUL_CLEAVE, m_creature);
+ 
+                     soulmodel = target->GetDisplayId();
+                     soulholder = target->GetGUID();
+@@ -315,15 +280,15 @@
+             }
+         }else StolenSoul_Timer -= diff;
+ 
+-        if( Ribbon_of_Souls_timer < diff )
++        if (Ribbon_of_Souls_timer < diff)
+         {
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+                 DoCast(target,SPELL_RIBBON_OF_SOULS);
+ 
+             Ribbon_of_Souls_timer = 5000 + (rand()%20 * 1000);
+         }else Ribbon_of_Souls_timer -= diff;
+ 
+-        if( Fear_timer < diff )
++        if (Fear_timer < diff)
+         {
+             DoCast(m_creature,SPELL_SOUL_SCREAM);
+             Fear_timer = 25000 + rand()% 10000;
+@@ -361,11 +326,11 @@
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
+             return;
+ 
+-        if(Mortal_Strike_timer < diff)
++        if (Mortal_Strike_timer < diff)
+         {
+             DoCast(m_creature->getVictim(), SPELL_MORTAL_STRIKE);
+             Mortal_Strike_timer = 10000 + rand()%20 * 1000;
+-        }else Mortal_Strike_timer -= diff;
++        } else Mortal_Strike_timer -= diff;
+ 
+         DoMeleeAttackIfReady();
+     }
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_tailonking_ikiss.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_tailonking_ikiss.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_tailonking_ikiss.cpp	(revision 700)
+@@ -24,25 +24,18 @@
+ #include "precompiled.h"
+ #include "def_sethekk_halls.h"
+ 
+-#define SAY_INTRO                   "<squawk>..Trinkets yes pretty Trinkets..<squawk>..power, great power.<squawk>..power in Trinkets..<squawk>"
+-#define SOUND_INTRO                 10557
++#define SAY_INTRO                   -1556007
+ 
+-#define SAY_AGGRO_1                 "You make war on Ikiss?..<squawk>"
+-#define SOUND_AGGRO_1               10554
+-#define SAY_AGGRO_2                 "Ikiss cut you pretty..<squawk>..slice you. Yes!"
+-#define SOUND_AGGRO_2               10555
+-#define SAY_AGGRO_3                 "No escape for..<squawk>..for you"
+-#define SOUND_AGGRO_3               10556
++#define SAY_AGGRO_1                 -1556008
++#define SAY_AGGRO_2                 -1556009
++#define SAY_AGGRO_3                 -1556010
+ 
+-#define SAY_SLAY_1                  "You die..<squawk>..stay away from Trinkets"
+-#define SOUND_SLAY_1                10558
+-#define SAY_SLAY_2                  "<squawk>"
+-#define SOUND_SLAY_2                10559
++#define SAY_SLAY_1                  -1556011
++#define SAY_SLAY_2                  -1556012
+ 
+-#define SAY_DEATH                   "Ikiss will not..<squawk>..die"
+-#define SOUND_DEATH                 10560
++#define SAY_DEATH                   -15560013
+ 
+-#define EMOTE_ARCANE_EXP            "begins to channel arcane energy..."
++#define EMOTE_ARCANE_EXP            -15560014
+ 
+ #define SPELL_BLINK                 38194
+ #define SPELL_BLINK_TELEPORT        38203
+@@ -100,8 +93,7 @@
+             if(!Intro && m_creature->IsWithinDistInMap(who, 100))
+             {
+                 Intro = true;
+-                DoYell(SAY_INTRO, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_INTRO);
++                DoScriptText(SAY_INTRO, m_creature);
+             }
+ 
+             if (!m_creature->canFly() && m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
+@@ -120,29 +112,17 @@
+     {
+         switch(rand()%3)
+         {
+-            case 0:
+-                DoYell(SAY_AGGRO_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_1);
+-                break;
+-
+-            case 1:
+-                DoYell(SAY_AGGRO_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_2);
+-                break;
+-
+-            case 2:
+-                DoYell(SAY_AGGRO_3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_3);
+-                break;
++            case 0: DoScriptText(SAY_AGGRO_1, m_creature); break;
++            case 1: DoScriptText(SAY_AGGRO_2, m_creature); break;
++            case 2: DoScriptText(SAY_AGGRO_3, m_creature); break;
+         }
+     }
+ 
+     void JustDied(Unit* Killer)
+     {
+-        DoYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature,SOUND_DEATH);
++        DoScriptText(SAY_DEATH, m_creature);
+ 
+-        if( pInstance )
++        if (pInstance)
+             pInstance->SetData(DATA_IKISSDOOREVENT, DONE);
+     }
+ 
+@@ -150,15 +130,8 @@
+     {
+         switch(rand()%2)
+         {
+-            case 0:
+-                DoYell(SAY_SLAY_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SLAY_1);
+-                break;
+-
+-            case 1:
+-                DoYell(SAY_SLAY_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SLAY_2);
+-                break;
++            case 0: DoScriptText(SAY_SLAY_1, m_creature); break;
++            case 1: DoScriptText(SAY_SLAY_2, m_creature); break;
+         }
+     }
+ 
+@@ -167,51 +140,51 @@
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
+             return;
+ 
+-        if( Blink )
++        if (Blink)
+         {
+             DoCast(m_creature,HeroicMode ? H_SPELL_ARCANE_EXPLOSION : SPELL_ARCANE_EXPLOSION);
+             m_creature->CastSpell(m_creature,SPELL_ARCANE_BUBBLE,true);
+             Blink = false;
+         }
+ 
+-        if( ArcaneVolley_Timer < diff )
++        if (ArcaneVolley_Timer < diff)
+         {
+             DoCast(m_creature,HeroicMode ? H_SPELL_ARCANE_VOLLEY : SPELL_ARCANE_VOLLEY);
+             ArcaneVolley_Timer = 10000+rand()%5000;
+         }else ArcaneVolley_Timer -= diff;
+ 
+-        if( Sheep_Timer < diff )
++        if (Sheep_Timer < diff)
+         {
+             //second top aggro target in normal, random target in heroic correct?
+             Unit *target = NULL;
+-            if( HeroicMode ? target = SelectUnit(SELECT_TARGET_RANDOM,0) : target = SelectUnit(SELECT_TARGET_TOPAGGRO,1) )
++            if (HeroicMode ? target = SelectUnit(SELECT_TARGET_RANDOM,0) : target = SelectUnit(SELECT_TARGET_TOPAGGRO,1))
+                 DoCast(target,HeroicMode ? H_SPELL_POLYMORPH : SPELL_POLYMORPH);
+             Sheep_Timer = 15000+rand()%2500;
+         }else Sheep_Timer -= diff;
+ 
+         //may not be correct time to cast
+-        if( !ManaShield && ((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 20) )
++        if (!ManaShield && ((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 20))
+         {
+             DoCast(m_creature,SPELL_MANA_SHIELD);
+             ManaShield = true;
+         }
+ 
+-        if( HeroicMode )
++        if (HeroicMode)
+         {
+-            if( Slow_Timer < diff )
++            if (Slow_Timer < diff)
+             {
+                 DoCast(m_creature,H_SPELL_SLOW);
+                 Slow_Timer = 15000+rand()%25000;
+             }else Slow_Timer -= diff;
+         }
+ 
+-        if( Blink_Timer < diff )
++        if (Blink_Timer < diff)
+         {
+-            DoTextEmote(EMOTE_ARCANE_EXP,NULL,true);
++            DoScriptText(EMOTE_ARCANE_EXP, m_creature);
+ 
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+             {
+-                if( m_creature->IsNonMeleeSpellCasted(false) )
++                if (m_creature->IsNonMeleeSpellCasted(false))
+                     m_creature->InterruptNonMeleeSpells(false);
+ 
+                 //Spell doesn't work, but we use for visual effect at least
+@@ -230,7 +203,7 @@
+             Blink_Timer = 35000+rand()%5000;
+         }else Blink_Timer -= diff;
+ 
+-        if( !Blink )
++        if (!Blink)
+             DoMeleeAttackIfReady();
+     }
+ };
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_darkweaver_syth.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_darkweaver_syth.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/sethekk_halls/boss_darkweaver_syth.cpp	(revision 700)
+@@ -23,23 +23,16 @@
+ 
+ #include "precompiled.h"
+ 
+-#define SAY_SUMMON                  "I have pets..<squawk>..of my own!"
+-#define SOUND_SUMMON                10502
++#define SAY_SUMMON                  -1556000
+ 
+-#define SAY_AGGRO_1                 "Hrrmm.. Time to.. hrrm.. make my move."
+-#define SOUND_AGGRO_1               10503
+-#define SAY_AGGRO_2                 "Nice pets..hrm.. Yes! <squawking>"
+-#define SOUND_AGGRO_2               10504
+-#define SAY_AGGRO_3                 "Nice pets have.. weapons. No so..<squawk>..nice."
+-#define SOUND_AGGRO_3               10505
++#define SAY_AGGRO_1                 -1556001
++#define SAY_AGGRO_2                 -1556002
++#define SAY_AGGRO_3                 -1556003
+ 
+-#define SAY_SLAY_1                  "Death.. meeting life is.. <squawking>"
+-#define SOUND_SLAY_1                10506
+-#define SAY_SLAY_2                  "Uhn.. Be free..<squawk>"
+-#define SOUND_SLAY_2                10507
++#define SAY_SLAY_1                  -1556004
++#define SAY_SLAY_2                  -1556005
+ 
+-#define SAY_DEATH                   "No more life..hrm. No more pain. <squawks weakly>"
+-#define SOUND_DEATH                 10508
++#define SAY_DEATH                   -1556006
+ 
+ #define SPELL_FROST_SHOCK           37865
+ #define SPELL_FLAME_SHOCK           34354
+@@ -93,25 +86,15 @@
+     {
+         switch(rand()%3)
+         {
+-            case 0:
+-                DoYell(SAY_AGGRO_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_1);
+-                break;
+-            case 1:
+-                DoYell(SAY_AGGRO_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_2);
+-                break;
+-            case 2:
+-                DoYell(SAY_AGGRO_3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_AGGRO_3);
+-                break;
++            case 0: DoScriptText(SAY_AGGRO_1, m_creature); break;
++            case 1: DoScriptText(SAY_AGGRO_2, m_creature); break;
++            case 2: DoScriptText(SAY_AGGRO_3, m_creature); break;
+         }
+     }
+ 
+     void JustDied(Unit* Killer)
+     {
+-        DoYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature,SOUND_DEATH);
++        DoScriptText(SAY_DEATH, m_creature);
+     }
+ 
+     void KilledUnit(Unit* victim)
+@@ -121,30 +104,22 @@
+ 
+         switch(rand()%2)
+         {
+-            case 0:
+-                DoYell(SAY_SLAY_1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SLAY_1);
+-                break;
+-            case 1:
+-                DoYell(SAY_SLAY_2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature,SOUND_SLAY_2);
+-                break;
++            case 0: DoScriptText(SAY_SLAY_1, m_creature); break;
++            case 1: DoScriptText(SAY_SLAY_2, m_creature); break;
+         }
+     }
+ 
+     void JustSummoned(Creature *summoned)
+     {
+-        if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++        if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+             summoned->AI()->AttackStart(target);
+-
+     }
+ 
+     void SythSummoning()
+     {
+-        DoYell(SAY_SUMMON, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature,SOUND_SUMMON);
++        DoScriptText(SAY_SUMMON, m_creature);
+ 
+-        if( m_creature->IsNonMeleeSpellCasted(false) )
++        if (m_creature->IsNonMeleeSpellCasted(false))
+             m_creature->InterruptNonMeleeSpells(false);
+ 
+         DoCast(m_creature,SPELL_SUMMON_SYTH_ARCANE,true);   //front
+@@ -158,63 +133,63 @@
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
+             return;
+ 
+-        if( ((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 90) && !summon90)
++        if (((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 90) && !summon90)
+         {
+             SythSummoning();
+             summon90 = true;
+         }
+ 
+-        if( ((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 50) && !summon50)
++        if (((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 50) && !summon50)
+         {
+             SythSummoning();
+             summon50 = true;
+         }
+ 
+-        if( ((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 10) && !summon10)
++        if (((m_creature->GetHealth()*100) / m_creature->GetMaxHealth() < 10) && !summon10)
+         {
+             SythSummoning();
+             summon10 = true;
+         }
+ 
+-        if( flameshock_timer < diff )
++        if (flameshock_timer < diff)
+         {
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+                 DoCast(target,SPELL_FLAME_SHOCK);
+ 
+             flameshock_timer = 10000 + rand()%5000;
+-        }else flameshock_timer -= diff;
++        } else flameshock_timer -= diff;
+ 
+-        if( arcaneshock_timer < diff )
++        if (arcaneshock_timer < diff)
+         {
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+                 DoCast(target,SPELL_ARCANE_SHOCK);
+ 
+             arcaneshock_timer = 10000 + rand()%5000;
+-        }else arcaneshock_timer -= diff;
++        } else arcaneshock_timer -= diff;
+ 
+-        if( frostshock_timer < diff )
++        if (frostshock_timer < diff)
+         {
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+                 DoCast(target,SPELL_FROST_SHOCK);
+ 
+             frostshock_timer = 10000 + rand()%5000;
+-        }else frostshock_timer -= diff;
++        } else frostshock_timer -= diff;
+ 
+-        if( shadowshock_timer < diff )
++        if (shadowshock_timer < diff)
+         {
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+                 DoCast(target,SPELL_SHADOW_SHOCK);
+ 
+             shadowshock_timer = 10000 + rand()%5000;
+-        }else shadowshock_timer -= diff;
++        } else shadowshock_timer -= diff;
+ 
+-        if( chainlightning_timer < diff )
++        if (chainlightning_timer < diff)
+         {
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM,0))
+                 DoCast(target,SPELL_CHAIN_LIGHTNING);
+ 
+             chainlightning_timer = 25000;
+-        }else chainlightning_timer -= diff;
++        } else chainlightning_timer -= diff;
+ 
+         DoMeleeAttackIfReady();
+     }
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_blackheart_the_inciter.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_blackheart_the_inciter.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_blackheart_the_inciter.cpp	(revision 700)
+@@ -29,21 +29,27 @@
+ #define SPELL_CHARGE          33709
+ #define SPELL_WAR_STOMP       33707
+ 
+-#define SAY_AGGRO1            "You be dead people!"
+-#define SAY_AGGRO2            "Time to kill!"
+-#define SAY_AGGRO3            "I see dead people!"
+-#define SAY_SLAY1             "No coming back for you!"
+-#define SAY_SLAY2             "Nice try!"
+-#define SAY_SLAY3             "Now you gone for good!"
+-#define SAY_DEATH             "This...no...good.."
++#define SAY_INTRO1          -1555008
++#define SAY_INTRO2          -1555009
++#define SAY_INTRO3          -1555010
++#define SAY_AGGRO1          -1555011
++#define SAY_AGGRO2          -1555012
++#define SAY_AGGRO3          -1555013
++#define SAY_SLAY1           -1555014
++#define SAY_SLAY2           -1555015
++#define SAY_HELP            -1555016
++#define SAY_DEATH           -1555017
+ 
+-#define SOUND_AGGRO1          10498
+-#define SOUND_AGGRO2          10497
+-#define SOUND_AGGRO3          10488
+-#define SOUND_SLAY1           10489
+-#define SOUND_SLAY2           10490
+-#define SOUND_SLAY3           10499
+-#define SOUND_DEATH           10491
++#define SAY2_INTRO1         -1555018
++#define SAY2_INTRO2         -1555019
++#define SAY2_INTRO3         -1555020
++#define SAY2_AGGRO1         -1555021
++#define SAY2_AGGRO2         -1555022
++#define SAY2_AGGRO3         -1555023
++#define SAY2_SLAY1          -1555024
++#define SAY2_SLAY2          -1555025
++#define SAY2_HELP           -1555026
++#define SAY2_DEATH          -1555027
+ 
+ struct MANGOS_DLL_DECL boss_blackheart_the_inciterAI : public ScriptedAI
+ {
+@@ -69,33 +75,22 @@
+         Charge_Timer = 5000;
+         Knockback_Timer = 15000;
+ 
+-        if( pInstance )
++        if (pInstance)
+             pInstance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, NOT_STARTED);
+     }
+ 
+     void KilledUnit(Unit *victim)
+     {
+-        switch(rand()%3)
++        switch(rand()%2)
+         {
+-            case 0:
+-                DoYell(SAY_SLAY1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY1);
+-                break;
+-            case 1:
+-                DoYell(SAY_SLAY2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY2);
+-                break;
+-            case 2:
+-                DoYell(SAY_SLAY3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY3);
+-                break;
++            case 0: DoScriptText(SAY_SLAY1, m_creature); break;
++            case 1: DoScriptText(SAY_SLAY2, m_creature); break;
+         }
+     }
+ 
+     void JustDied(Unit *victim)
+     {
+-        DoYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature, SOUND_DEATH);
++        DoScriptText(SAY_DEATH, m_creature);
+ 
+         if( pInstance )
+             pInstance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, DONE);
+@@ -105,21 +100,12 @@
+     {
+         switch(rand()%3)
+         {
+-            case 0:
+-                DoYell(SAY_AGGRO1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO1);
+-                break;
+-            case 1:
+-                DoYell(SAY_AGGRO2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO2);
+-                break;
+-            case 2:
+-                DoYell(SAY_AGGRO3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO3);
+-                break;
++            case 0: DoScriptText(SAY_AGGRO1, m_creature); break;
++            case 1: DoScriptText(SAY_AGGRO2, m_creature); break;
++            case 2: DoScriptText(SAY_AGGRO3, m_creature); break;
+         }
+ 
+-        if( pInstance )
++        if (pInstance)
+             pInstance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, IN_PROGRESS);
+     }
+ 
+@@ -129,9 +115,9 @@
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim() )
+             return;
+ 
+-        if( InciteChaos )
++        if (InciteChaos)
+         {
+-            if( InciteChaosWait_Timer < diff )
++            if (InciteChaosWait_Timer < diff)
+             {
+                 InciteChaos = false;
+                 InciteChaosWait_Timer = 15000;
+@@ -140,7 +126,7 @@
+             return;
+         }
+ 
+-        if( InciteChaos_Timer < diff )
++        if (InciteChaos_Timer < diff)
+         {
+             DoCast(m_creature, SPELL_INCITE_CHAOS);
+ 
+@@ -148,7 +134,7 @@
+             for( std::list<HostilReference *>::iterator itr = t_list.begin(); itr!= t_list.end(); ++itr )
+             {
+                 Unit* target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
+-                if( target && target->GetTypeId() == TYPEID_PLAYER )
++                if (target && target->GetTypeId() == TYPEID_PLAYER)
+                     target->CastSpell(target,SPELL_INCITE_CHAOS_B,true);
+             }
+ 
+@@ -159,15 +145,15 @@
+         }else InciteChaos_Timer -= diff;
+ 
+         //Charge_Timer
+-        if( Charge_Timer < diff )
++        if (Charge_Timer < diff)
+         {
+-            if( Unit *target = SelectUnit(SELECT_TARGET_RANDOM, 0) )
++            if (Unit *target = SelectUnit(SELECT_TARGET_RANDOM, 0))
+                 DoCast(target, SPELL_CHARGE);
+             Charge_Timer = 25000;
+         }else Charge_Timer -= diff;
+ 
+         //Knockback_Timer
+-        if( Knockback_Timer < diff )
++        if (Knockback_Timer < diff)
+         {
+             DoCast(m_creature, SPELL_WAR_STOMP);
+             Knockback_Timer = 20000;
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_grandmaster_vorpil.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_grandmaster_vorpil.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_grandmaster_vorpil.cpp	(revision 700)
+@@ -24,6 +24,15 @@
+ #include "precompiled.h"
+ #include "def_shadow_labyrinth.h"
+ 
++#define SAY_INTRO                       -1555028
++#define SAY_AGGRO1                      -1555029
++#define SAY_AGGRO2                      -1555030
++#define SAY_AGGRO3                      -1555031
++#define SAY_HELP                        -1555032
++#define SAY_SLAY1                       -1555033
++#define SAY_SLAY2                       -1555034
++#define SAY_DEATH                       -1555035
++
+ #define SPELL_DRAW_SHADOWS              33563
+ #define SPELL_VOID_PORTAL_A             33566               //spell only summon one unit, but we use it for the visual effect and summon the 4 other portals manual way(only one spell exist)
+ #define SPELL_VOID_PORTAL_VISUAL        33569
+@@ -37,31 +46,13 @@
+ #define H_SPELL_RAIN_OF_FIRE            39363
+ #define H_SPELL_BANISH                  38791
+ 
+-#define SAY_INTRO               "Keep your minds focused for the days of reckoning are close at hand. Soon, the destroyer of worlds will return to make good on his promise. Soon the destruction of all that is will begin!"
+-#define SAY_AGGRO1              "I'll make an offering of your blood!"
+-#define SAY_AGGRO2              "You'll be a fine example, for the others."
+-#define SAY_AGGRO3              "Good, a worthy sacrifice."
+-#define SAY_HELP                "Come to my aid, heed your master now!"
+-#define SAY_SLAY1               "I serve with pride."
+-#define SAY_SLAY2               "Your death is for the greater cause!"
+-#define SAY_DEATH               "I give my life... Gladly."
++#define ENTRY_VOID_PORTAL               19224
++#define ENTRY_VOID_TRAVELER             19226
+ 
+-#define SOUND_INTRO             10522
+-#define SOUND_AGGRO1            10524
+-#define SOUND_AGGRO2            10525
+-#define SOUND_AGGRO3            10526
+-#define SOUND_HELP              10523
+-#define SOUND_SLAY1             10527
+-#define SOUND_SLAY2             10528
+-#define SOUND_DEATH             10529
++#define LOCX                            -253.06f
++#define LOCY                            -264.02f
++#define LOCZ                            17.08
+ 
+-#define ENTRY_VOID_PORTAL       19224
+-#define ENTRY_VOID_TRAVELER     19226
+-
+-#define LOCX                    -253.06f
+-#define LOCY                    -264.02f
+-#define LOCZ                    17.08
+-
+ struct MANGOS_DLL_DECL boss_grandmaster_vorpilAI : public ScriptedAI
+ {
+     boss_grandmaster_vorpilAI(Creature *c) : ScriptedAI(c)
+@@ -93,20 +84,20 @@
+         Intro = false;
+         Teleport = false;
+ 
+-        if( pInstance )
++        if (pInstance)
+             pInstance->SetData(DATA_GRANDMASTERVORPILEVENT, NOT_STARTED);
+     }
+ 
+     void MoveInLineOfSight(Unit *who)
+     {
+-        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
++        if (!m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature))
+         {
+             //not sure about right radius
+             if(!Intro && m_creature->IsWithinDistInMap(who, 50))
+             {
+-                DoYell(SAY_INTRO, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_INTRO);
++                DoScriptText(SAY_INTRO, m_creature);
+                 DoCast(m_creature, SPELL_VOID_PORTAL_A,true);
++
+                 m_creature->SummonCreature(ENTRY_VOID_PORTAL,-262.40,-229.57,17.08,0,TEMPSUMMON_CORPSE_DESPAWN,0);
+                 m_creature->SummonCreature(ENTRY_VOID_PORTAL,-260.35,-297.56,17.08,0,TEMPSUMMON_CORPSE_DESPAWN,0);
+                 m_creature->SummonCreature(ENTRY_VOID_PORTAL,-292.05,-270.37,12.68,0,TEMPSUMMON_CORPSE_DESPAWN,0);
+@@ -118,7 +109,7 @@
+                 return;
+ 
+             float attackRadius = m_creature->GetAttackDistance(who);
+-            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
++            if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who))
+             {
+                 who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                 AttackStart(who);
+@@ -130,21 +121,12 @@
+     {
+         switch(rand()%3)
+         {
+-            case 0:
+-                DoYell(SAY_AGGRO1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO1);
+-                break;
+-            case 1:
+-                DoYell(SAY_AGGRO2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO2);
+-                break;
+-            case 2:
+-                DoYell(SAY_AGGRO3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO3);
+-                break;
++            case 0: DoScriptText(SAY_AGGRO1, m_creature); break;
++            case 1: DoScriptText(SAY_AGGRO2, m_creature); break;
++            case 2: DoScriptText(SAY_AGGRO3, m_creature); break;
+         }
+ 
+-        if( pInstance )
++        if (pInstance)
+             pInstance->SetData(DATA_GRANDMASTERVORPILEVENT, IN_PROGRESS);
+     }
+ 
+@@ -152,14 +134,8 @@
+     {
+         switch(rand()%2)
+         {
+-            case 0:
+-                DoYell(SAY_SLAY1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY1);
+-                break;
+-            case 1:
+-                DoYell(SAY_SLAY2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY2);
+-                break;
++            case 0: DoScriptText(SAY_SLAY1, m_creature); break;
++            case 1: DoScriptText(SAY_SLAY2, m_creature); break;
+         }
+     }
+ 
+@@ -177,10 +153,9 @@
+ 
+     void JustDied(Unit *victim)
+     {
+-        DoYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature, SOUND_DEATH);
++        DoScriptText(SAY_DEATH, m_creature);
+ 
+-        if( pInstance )
++        if (pInstance)
+             pInstance->SetData(DATA_GRANDMASTERVORPILEVENT, DONE);
+     }
+ 
+@@ -190,9 +165,9 @@
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim() )
+             return;
+ 
+-        if( Teleport )
++        if (Teleport)
+         {
+-            if( Teleport_Timer <= diff )
++            if (Teleport_Timer <= diff)
+             {
+                 m_creature->Relocate(LOCX,LOCY,LOCZ);
+                 m_creature->SendMonsterMove(LOCX,LOCY,LOCZ,0,true,0);
+@@ -205,7 +180,7 @@
+                 for( std::list<HostilReference *>::iterator itr = t_list.begin(); itr!= t_list.end(); ++itr )
+                 {
+                     Unit* target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
+-                    if( target && target->GetTypeId() == TYPEID_PLAYER )
++                    if (target && target->GetTypeId() == TYPEID_PLAYER)
+                     {
+                         target->GetRandomPoint(LOCX,LOCY,LOCZ,3.0,ranX,ranY,ranZ);
+                         DoTeleportPlayer(target,ranX,ranY,ranZ,m_creature->GetAngle(m_creature->GetPositionX(),m_creature->GetPositionY()));
+@@ -213,20 +188,20 @@
+                 }
+                 Teleport = false;
+ 
+-                if( HeroicMode ) DoCast(m_creature->getVictim(), H_SPELL_RAIN_OF_FIRE);
++                if (HeroicMode) DoCast(m_creature->getVictim(), H_SPELL_RAIN_OF_FIRE);
+                 else DoCast(m_creature->getVictim(), SPELL_RAIN_OF_FIRE);
+ 
+                 Teleport_Timer = 1000;
+             }else Teleport_Timer -= diff;
+         }
+ 
+-        if( ShadowBoltVolley_Timer < diff )
++        if (ShadowBoltVolley_Timer < diff)
+         {
+             DoCast(m_creature->getVictim(), SPELL_SHADOW_BOLT_VOLLEY);
+             ShadowBoltVolley_Timer = 30000;
+         }else ShadowBoltVolley_Timer -= diff;
+ 
+-        if( DrawShadows_Timer < diff )
++        if (DrawShadows_Timer < diff)
+         {
+             DoCast(m_creature,SPELL_DRAW_SHADOWS);
+             DrawShadows_Timer = 35000;
+@@ -235,8 +210,7 @@
+ 
+         if( VoidTraveler_Timer < diff )
+         {
+-            DoYell(SAY_HELP, LANG_UNIVERSAL, NULL);
+-            DoPlaySoundToSet(m_creature, SOUND_HELP);
++            DoScriptText(SAY_HELP, m_creature);
+ 
+             switch(rand()%5)
+             {
+@@ -260,11 +234,11 @@
+             VoidTraveler_Timer = 35000;
+         }else VoidTraveler_Timer -= diff;
+ 
+-        if( HeroicMode )
++        if (HeroicMode)
+         {
+-            if( Banish_Timer < diff )
++            if (Banish_Timer < diff)
+             {
+-                if( Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 1) )
++                if (Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 1))
+                     DoCast(target,H_SPELL_BANISH);
+                 Banish_Timer = 35000;
+             }else Banish_Timer -= diff;
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_ambassador_hellmaw.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_ambassador_hellmaw.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_ambassador_hellmaw.cpp	(revision 700)
+@@ -24,26 +24,18 @@
+ #include "precompiled.h"
+ #include "def_shadow_labyrinth.h"
+ 
+-#define SAY_INTRO       "Infidels have invaded the sanctuary! Sniveling pests...You have yet to learn the true meaning of agony!"
+-#define SOUND_INTRO     10473
++#define SAY_INTRO       -1555000
+ 
+-#define SAY_AGGRO1      "Pathetic mortals! You will pay dearly!"
+-#define SOUND_AGGRO1    10475
+-#define SAY_AGGRO2      "I will break you!"
+-#define SOUND_AGGRO2    10476
+-#define SAY_AGGRO3      "Finally! Something to relieve the tedium!"
+-#define SOUND_AGGRO3    10477
++#define SAY_AGGRO1      -1555001
++#define SAY_AGGRO2      -1555002
++#define SAY_AGGRO3      -1555003
+ 
+-#define SAY_HELP        "Aid me, you fools, before it's too late!"
+-#define SOUND_HELP      10474
++#define SAY_HELP        -1555004
+ 
+-#define SAY_SLAY1       "Do you fear death?"
+-#define SOUND_SLAY1     10478
+-#define SAY_SLAY2       "This is the part I enjoy most."
+-#define SOUND_SLAY2     10479
++#define SAY_SLAY1       -1555005
++#define SAY_SLAY2       -1555006
+ 
+-#define SAY_DEATH       "Do not...grow...overconfident, mortal."
+-#define SOUND_DEATH     10480
++#define SAY_DEATH       -1555007
+ 
+ #define SPELL_BANISH            30231
+ #define SPELL_CORROSIVE_ACID    23313
+@@ -79,18 +71,18 @@
+         Intro = false;
+         IsBanished = false;
+ 
+-        if( pInstance )
++        if (pInstance)
+         {
+-            if( pInstance->GetData(TYPE_HELLMAW) == NOT_STARTED )
++            if (pInstance->GetData(TYPE_HELLMAW) == NOT_STARTED)
+             {
+                 DoCast(m_creature,SPELL_BANISH);
+                 IsBanished = true;
+             }
+             else pInstance->SetData(TYPE_HELLMAW,FAIL);
+ 
+-            if( pInstance->GetData(TYPE_OVERSEER) == DONE )
++            if (pInstance->GetData(TYPE_OVERSEER) == DONE)
+             {
+-                if( m_creature->HasAura(SPELL_BANISH,0) )
++                if (m_creature->HasAura(SPELL_BANISH,0))
+                     m_creature->RemoveAurasDueToSpell(SPELL_BANISH);
+                 Intro = true;
+             }
+@@ -99,22 +91,21 @@
+ 
+     void MovementInform(uint32 type, uint32 id)
+     {
+-        if( type != POINT_MOTION_TYPE )
++        if (type != POINT_MOTION_TYPE)
+             return;
+     }
+ 
+     void DoIntro()
+     {
+-        DoYell(SAY_INTRO, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature, SOUND_INTRO);
++        DoScriptText(SAY_INTRO, m_creature);
+ 
+-        if( m_creature->HasAura(SPELL_BANISH,0) )
++        if (m_creature->HasAura(SPELL_BANISH,0))
+             m_creature->RemoveAurasDueToSpell(SPELL_BANISH);
+ 
+         IsBanished = false;
+         Intro = true;
+ 
+-        if( pInstance )
++        if (pInstance)
+             pInstance->SetData(TYPE_HELLMAW, IN_PROGRESS);
+     }
+ 
+@@ -122,18 +113,9 @@
+     {
+         switch(rand()%3)
+         {
+-            case 0:
+-                DoYell(SAY_AGGRO1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO1);
+-                break;
+-            case 1:
+-                DoYell(SAY_AGGRO2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO2);
+-                break;
+-            case 2:
+-                DoYell(SAY_AGGRO3, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO3);
+-                break;
++            case 0: DoScriptText(SAY_AGGRO1, m_creature); break;
++            case 1: DoScriptText(SAY_AGGRO2, m_creature); break;
++            case 2: DoScriptText(SAY_AGGRO3, m_creature); break;
+         }
+     }
+ 
+@@ -141,42 +123,35 @@
+     {
+         switch(rand()%2)
+         {
+-            case 0:
+-                DoYell(SAY_SLAY1, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY1);
+-                break;
+-            case 1:
+-                DoYell(SAY_SLAY2, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY2);
+-                break;
++            case 0: DoScriptText(SAY_SLAY1, m_creature); break;
++            case 1: DoScriptText(SAY_SLAY2, m_creature); break;
+         }
+     }
+ 
+     void JustDied(Unit *victim)
+     {
+-        DoYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
+-        DoPlaySoundToSet(m_creature, SOUND_DEATH);
++        DoScriptText(SAY_DEATH, m_creature);
+ 
+-        if( pInstance )
++        if (pInstance)
+             pInstance->SetData(TYPE_HELLMAW, DONE);
+     }
+ 
+     void UpdateAI(const uint32 diff)
+     {
+-        if( !Intro )
++        if (!Intro)
+         {
+-            if( EventCheck_Timer < diff )
++            if (EventCheck_Timer < diff)
+             {
+-                if( pInstance )
++                if (pInstance)
+                 {
+-                    if( pInstance->GetData(TYPE_OVERSEER) == DONE )
++                    if (pInstance->GetData(TYPE_OVERSEER) == DONE)
+                         DoIntro();
+                 }
+                 EventCheck_Timer = 5000;
+             }else EventCheck_Timer -= diff;
+         }
+ 
+-        if( !InCombat && !IsBanished )
++        if (!InCombat && !IsBanished)
+         {
+             //this is where we add MovePoint()
+             //DoWhine("I haz no mount!", LANG_UNIVERSAL, NULL);
+@@ -185,21 +160,21 @@
+         if (!m_creature->SelectHostilTarget() || !m_creature->getVictim() )
+             return;
+ 
+-        if( CorrosiveAcid_Timer < diff )
++        if (CorrosiveAcid_Timer < diff)
+         {
+             DoCast(m_creature,SPELL_CORROSIVE_ACID);
+             CorrosiveAcid_Timer = 25000;
+         }else CorrosiveAcid_Timer -= diff;
+ 
+-        if( Fear_Timer < diff )
++        if (Fear_Timer < diff)
+         {
+             DoCast(m_creature,SPELL_FEAR);
+             Fear_Timer = 35000;
+         }else Fear_Timer -= diff;
+ 
+-        /*if( HeroicMode )
++        /*if (HeroicMode)
+         {
+-            if( Enrage_Timer < diff )
++            if (Enrage_Timer < diff)
+             {
+                 DoCast(m_creature,SPELL_ENRAGE);
+             }else Enrage_Timer -= diff;
+Index: C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_murmur.cpp
+===================================================================
+--- C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_murmur.cpp	(revision 699)
++++ C:/ScriptDev2/scripts/zone/aunchindoun/shadow_labyrinth/boss_murmur.cpp	(revision 700)
+@@ -23,7 +23,7 @@
+ 
+ #include "precompiled.h"
+ 
+-#define EMOTE_SONIC_BOOM            "draws energy from the air."
++#define EMOTE_SONIC_BOOM            -1555036
+ 
+ #define SPELL_MAGNETIC_PULL         33689
+ #define SPELL_SONIC_BOOM_PRE        33923
+@@ -56,7 +56,7 @@
+ 
+         //database should have `RegenHealth`=0 to prevent regen
+         uint32 hp = m_creature->GetMaxHealth()*0.4;
+-        if( hp )
++        if (hp)
+             m_creature->SetHealth(hp);
+     }
+ 
+@@ -69,9 +69,9 @@
+             return;
+ 
+         //SonicBoom_Timer
+-        if(SonicBoom_Timer < diff)
++        if (SonicBoom_Timer < diff)
+         {
+-            if(CanSonicBoom)
++            if (CanSonicBoom)
+             {
+                 DoCast(m_creature, SPELL_SONIC_BOOM_CAST,true);
+                 CanSonicBoom = false;
+@@ -79,7 +79,7 @@
+             }
+             else
+             {
+-                DoTextEmote(EMOTE_SONIC_BOOM,NULL);
++                DoScriptText(EMOTE_SONIC_BOOM, m_creature);
+                 DoCast(m_creature,SPELL_SONIC_BOOM_PRE);
+                 CanSonicBoom = true;
+                 SonicBoom_Timer = 5000;
+@@ -87,7 +87,7 @@
+         }else SonicBoom_Timer -= diff;
+ 
+         //MurmursTouch_Timer
+-        if(MurmursTouch_Timer < diff)
++        if (MurmursTouch_Timer < diff)
+         {
+             /*Unit* target = NULL;
+             target = SelectUnit(SELECT_TARGET_RANDOM,0);
+@@ -98,21 +98,21 @@
+         }else MurmursTouch_Timer -= diff;
+ 
+         //Resonance_Timer
+-        if(Resonance_Timer < diff)
++        if (Resonance_Timer < diff)
+         {
+-            if( !m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE) )
++            if (!m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
+                 DoCast(m_creature->getVictim(), SPELL_RESONANCE);
+             Resonance_Timer = 5000;
+         }else Resonance_Timer -= diff;
+ 
+         //MagneticPull_Timer
+-        if(MagneticPull_Timer < diff)
++        if (MagneticPull_Timer < diff)
+         {
+-            if( !CanShockWave )
++            if (!CanShockWave)
+             {
+-                if( Unit* temp = SelectUnit(SELECT_TARGET_RANDOM,0) )
++                if (Unit* temp = SelectUnit(SELECT_TARGET_RANDOM,0))
+                 {
+-                    if( temp->GetTypeId() == TYPEID_PLAYER )
++                    if (temp->GetTypeId() == TYPEID_PLAYER)
+                     {
+                         DoCast(temp, SPELL_MAGNETIC_PULL);
+                         pTarget = temp->GetGUID();
+@@ -123,7 +123,7 @@
+             }
+             else
+             {
+-                if( Unit* target = Unit::GetUnit(*m_creature,pTarget) )
++                if (Unit* target = Unit::GetUnit(*m_creature,pTarget))
+                     target->CastSpell(target,SPELL_SHOCKWAVE,true);
+ 
+                 MagneticPull_Timer = 35000;
+@@ -133,7 +133,7 @@
+         }else MagneticPull_Timer -= diff;
+ 
+         //no meele if preparing for sonic boom
+-        if(!CanSonicBoom)
++        if (!CanSonicBoom)
+             DoMeleeAttackIfReady();
+     }
+ };
+Index: C:/ScriptDev2/sql/Updates/r700_scriptdev2_script_texts.sql
+===================================================================
+--- C:/ScriptDev2/sql/Updates/r700_scriptdev2_script_texts.sql	(revision 0)
++++ C:/ScriptDev2/sql/Updates/r700_scriptdev2_script_texts.sql	(revision 700)
+@@ -0,0 +1,81 @@
++TRUNCATE `script_texts`;
++
++INSERT INTO `script_texts` (`entry`,`content_default`,`sound`,`type`,`language`,`comment`) VALUES
++(-1000000,'<ScriptDev2 Text Entry Missing!>',0,0,0,'DEFAULT_TEXT'),
++(-1555000,'Infidels have invaded the sanctuary! Sniveling pests...You have yet to learn the true meaning of agony!',10473,1,0,'hellmaw SAY_INTRO'),
++(-1555001,'Pathetic mortals! You will pay dearly!',10475,1,0,'hellmaw SAY_AGGRO1'),
++(-1555002,'I will break you!',10476,1,0,'hellmaw SAY_AGGRO2'),
++(-1555003,'Finally! Something to relieve the tedium!',10477,1,0,'hellmaw SAY_AGGRO3'),
++(-1555004,'Aid me, you fools, before it\'s too late!',10474,1,0,'hellmaw SAY_HELP'),
++(-1555005,'Do you fear death?',10478,1,0,'hellmaw SAY_SLAY1'),
++(-1555006,'This is the part I enjoy most.',10479,1,0,'hellmaw SAY_SLAY2'),
++(-1555007,'Do not...grow...overconfident, mortal.',10480,1,0,'hellmaw SAY_DEATH'),
++(-1555008,'All flesh must burn.',10482,1,0,'blackhearth SAY_INTRO1'),
++(-1555009,'All creation must be unmade!',10483,1,0,'blackhearth SAY_INTRO2'),
++(-1555010,'Power will be yours!',10484,1,0,'blackhearth SAY_INTRO3'),
++(-1555011,'You\'ll be sorry!',10486,1,0,'blackhearth SAY_AGGRO1'),
++(-1555012,'Time for fun!',10487,1,0,'blackhearth SAY_AGGRO2'),
++(-1555013,'I see dead people!',10488,1,0,'blackhearth SAY_AGGRO3'),
++(-1555014,'No comin\' back for you!',10489,1,0,'blackhearth SAY_SLAY1'),
++(-1555015,'Nice try!',10490,1,0,'blackhearth SAY_SLAY2'),
++(-1555016,'Help us, hurry!',10485,1,0,'blackhearth SAY_HELP'),
++(-1555017,'This... no... good...',10491,1,0,'blackhearth SAY_DEATH'),
++(-1555018,'Be ready for Dark One\'s return.',10492,1,0,'blackhearth SAY2_INTRO1'),
++(-1555019,'So we have place in new universe.',10493,1,0,'blackhearth SAY2_INTRO2'),
++(-1555020,'Dark one promise!',10494,1,0,'blackhearth SAY2_INTRO3'),
++(-1555021,'You\'ll be sorry!',10496,1,0,'blackhearth SAY2_AGGRO1'),
++(-1555022,'Time to kill!',10497,1,0,'blackhearth SAY2_AGGRO2'),
++(-1555023,'You be dead people!',10498,1,0,'blackhearth SAY2_AGGRO3'),
++(-1555024,'Now you gone for good.',10499,1,0,'blackhearth SAY2_SLAY1'),
++(-1555025,'You failed, haha haha',10500,1,0,'blackhearth SAY2_SLAY2'),
++(-1555026,'Help us, hurry!',10495,1,0,'blackhearth SAY2_HELP'),
++(-1555027,'Arrgh, aah...ahhh',10501,1,0,'blackhearth SAY2_DEATH'),
++(-1555028,'Keep your minds focused for the days of reckoning are close at hand. Soon, the destroyer of worlds will return to make good on his promise. Soon the destruction of all that is will begin!',10522,1,0,'vorpil SAY_INTRO'),
++(-1555029,'I\'ll make an offering of your blood!',10524,1,0,'vorpil SAY_AGGRO1'),
++(-1555030,'You\'ll be a fine example, for the others.',10525,1,0,'vorpil SAY_AGGRO2'),
++(-1555031,'Good, a worthy sacrifice.',10526,1,0,'vorpil SAY_AGGRO3'),
++(-1555032,'Come to my aid, heed your master now!',10523,1,0,'vorpil SAY_HELP'),
++(-1555033,'I serve with pride.',10527,1,0,'vorpil SAY_SLAY1'),
++(-1555034,'Your death is for the greater cause!',10528,1,0,'vorpil SAY_SLAY2'),
++(-1555035,'I give my life... Gladly.',10529,1,0,'vorpil SAY_DEATH'),
++(-1555036,'draws energy from the air.',0,2,0,'murmur EMOTE_SONIC_BOOM'),
++(-1556000,'I have pets..<squawk>..of my own!',10502,1,0,'syth SAY_SUMMON'),
++(-1556001,'Hrrmm.. Time to.. hrrm.. make my move.',10503,1,0,'syth SAY_AGGRO_1'),
++(-1556002,'Nice pets..hrm.. Yes! <squawking>',10504,1,0,'syth SAY_AGGRO_2'),
++(-1556003,'Nice pets have.. weapons. No so..<squawk>..nice.',10505,1,0,'syth SAY_AGGRO_3'),
++(-1556004,'Death.. meeting life is.. <squawking>',10506,1,0,'syth SAY_SLAY_1'),
++(-1556005,'Uhn.. Be free..<squawk>',10507,1,0,'syth SAY_SLAY_2'),
++(-1556006,'No more life..hrm. No more pain. <squawks weakly>',10508,1,0,'syth SAY_DEATH'),
++(-1556007,'<squawk>..Trinkets yes pretty Trinkets..<squawk>..power, great power.<squawk>..power in Trinkets..<squawk>',10557,1,0,'ikiss SAY_INTRO'),
++(-1556008,'You make war on Ikiss?..<squawk>',10554,1,0,'ikiss SAY_AGGRO_1'),
++(-1556009,'Ikiss cut you pretty..<squawk>..slice you. Yes!',10555,1,0,'ikiss SAY_AGGRO_2'),
++(-1556010,'No escape for..<squawk>..for you',10556,1,0,'ikiss SAY_AGGRO_3'),
++(-1556011,'You die..<squawk>..stay away from Trinkets',10558,1,0,'ikiss SAY_SLAY_1'),
++(-1556012,'<squawk>',10559,1,0,'ikiss SAY_SLAY_2'),
++(-1556013,'Ikiss will not..<squawk>..die',10560,1,0,'ikiss SAY_DEATH'),
++(-1556015,'begins to channel arcane energy...',0,3,0,'ikiss EMOTE_ARCANE_EXP'),
++(-1557000,'What is this? You must forgive me, but I was not expecting company. As you can see, we are somewhat preoccupied right now. But no matter. As I am a gracious host, I will tend to you... personally.',10539,1,0,'shaffar SAY_INTRO'),
++(-1557001,'We have not yet been properly introduced.',10541,1,0,'shaffar SAY_AGGRO_1'),
++(-1557002,'An epic battle. How exciting!',10542,1,0,'shaffar SAY_AGGRO_2'),
++(-1557003,'I have longed for a good adventure.',10543,1,0,'shaffar SAY_AGGRO_3'),
++(-1557004,'It has been... entertaining.',10544,1,0,'shaffar SAY_SLAY_1'),
++(-1557005,'And now we part company.',10545,1,0,'shaffar SAY_SLAY_2'),
++(-1557006,'I have such fascinating things to show you.',10540,1,0,'shaffar SAY_SUMMON'),
++(-1557007,'I must bid you... farewell.',10546,1,0,'shaffar SAY_DEAD'),
++(-1557008,'I will feed on your soul.',10561,1,0,'pandemonius SAY_AGGRO_1'),
++(-1557009,'So... full of life!',10562,1,0,'pandemonius SAY_AGGRO_2'),
++(-1557010,'Do not... resist.',10563,1,0,'pandemonius SAY_AGGRO_3'),
++(-1557011,'Yes! I am... empowered!',10564,1,0,'pandemonius SAY_KILL_1'),
++(-1557012,'More... I must have more!',10565,1,0,'pandemonius SAY_KILL_2'),
++(-1557013,'To the void... once... more..',10566,1,0,'pandemonius SAY_DEATH'),
++(-1557014,'shifts into the void...',0,3,0,'pandemonius EMOTE_DARK_SHELL'),
++(-1558000,'You have defiled the resting place of our ancestors. For this offense, there can be but one punishment. It is fitting that you have come to a place of the dead... for you will soon be joining them.',10509,1,0,'maladaar SAY_INTRO'),
++(-1558001,'Rise my fallen brothers. Take form and fight!',10512,1,0,'maladaar SAY_SUMMON'),
++(-1558002,'You will pay with your life!',10513,1,0,'maladaar SAY_AGGRO_1'),
++(-1558003,'There\'s no turning back now!',10514,1,0,'maladaar SAY_AGGRO_2'),
++(-1558004,'Serve your penitence!',10515,1,0,'maladaar SAY_AGGRO_3'),
++(-1558005,'Let your mind be clouded.',10510,1,0,'maladaar SAY_ROAR'),
++(-1558006,'Stare into the darkness of your soul.',10511,1,0,'maladaar SAY_SOUL_CLEAVE'),
++(-1558007,'These walls will be your doom.',10516,1,0,'maladaar SAY_SLAY_1'),
++(-1558008,'<laugh> Now, you\'ll stay for eternity!',10517,1,0,'maladaar SAY_SLAY_2'),
++(-1558009,'This is... where.. I belong...',10518,1,0,'maladaar SAY_DEATH');
+\ No newline at end of file
+
+Property changes on: C:\ScriptDev2\sql\Updates\r700_scriptdev2_script_texts.sql
+___________________________________________________________________
+Name: svn:eol-style
+   + native
+
+Index: C:/ScriptDev2/sql/Updates/Makefile.am
+===================================================================
+--- C:/ScriptDev2/sql/Updates/Makefile.am	(revision 699)
++++ C:/ScriptDev2/sql/Updates/Makefile.am	(revision 700)
+@@ -213,4 +213,7 @@
+ 	r656_scriptdev2.sql \
+ 	r658_mangos.sql \
+ 	r659_mangos.sql \
+-	r681_scriptdev2.sql
++	r681_scriptdev2.sql \
++	r695_scriptdev2.sql \
++	r699_scriptdev2_script_texts.sql \
++	r700_scriptdev2_script_texts.sql
+Index: C:/ScriptDev2/sql/scriptdev2_script_texts.sql
+===================================================================
+--- C:/ScriptDev2/sql/scriptdev2_script_texts.sql	(revision 699)
++++ C:/ScriptDev2/sql/scriptdev2_script_texts.sql	(revision 700)
+@@ -1,23 +1,213 @@
+ -- 
+--- scriptdev2_script_texts.sql Contains data for table `script_texts` mainly used in C++ parts
+--- valied entries for table are between -100000 and -199999
++-- scriptdev2_script_texts.sql Contains data for table `script_texts` mainly used in C++ parts.
++-- valid entries for table are between -1000000 and -1999999
+ -- 
+ 
+ TRUNCATE `script_texts`;
+ 
+ -- 
+--- First entries are reserved for special use, do not add regular text here.
++-- -1 000 000 First 100 entries are reserved for special use, do not add regular text here.
+ -- 
+ 
+ INSERT INTO `script_texts` (`entry`,`content_default`,`sound`,`type`,`language`,`comment`) VALUES
+-(-100000,'<ScriptDev2 Text Entry Missing!>',0,0,0,'DEFAULT_TEXT');
++(-1000000,'<ScriptDev2 Text Entry Missing!>',0,0,0,'DEFAULT_TEXT');
+ 
+ -- 
+--- Normal text entries. Say/Yell/Whisper/Emote for any regular creature.
++-- Normal text entries. Say/Yell/Whisper/Emote for any regular world object.
+ -- 
+ 
++-- -1 000 100 GENERAL MAPS (not typical instance maps)
+ 
++-- -1 033 000 SHADOWFANG KEEP
+ 
++-- -1 034 000 STOCKADES
++
++-- -1 036 000 DEADMINES
++
++-- -1 043 000 WAILING CAVERNS
++
++-- -1 047 000 RAZORFEN KRAUL
++
++-- -1 048 000 BLACKFATHOM DEEPS
++
++-- -1 070 000 ULDAMAN
++
++-- -1 090 000 GNOMEREGAN
++
++-- -1 109 000 SUNKEN TEMPLE
++
++-- -1 129 000 RAZORFEN DOWNS
++
++-- -1 189 000 SCARLET MONASTERY
++
++-- -1 209 000 ZUL'FARRAK
++
++-- -1 229 000 BLACKROCK SPIRE
++
++-- -1 230 000 BLACKROCK DEPTHS
++
++-- -1 249 000 ONYXIA'S LAIR
++
++-- -1 269 000 OPENING OF THE DARK PORTAL (BLACK MORASS)
++
++-- -1 289 000 SCHOLOMANCE
++
++-- -1 309 000 ZUL'GURUB
++
++-- -1 329 000 STRATHOLME
++
++-- -1 349 000 MARAUDON
++
++-- -1 389 000 RAGEFIRE CHASM
++
++-- -1 409 000 MOLTEN CORE
++
++-- -1 429 000 DIRE MAUL
++
++-- -1 469 000 BLACKWING LAIR
++
++-- -1 509 000 RUINS OF AHN'QIRAJ
++
++-- -1 531 000 TEMPLE OF AHN'QIRAJ
++
++-- -1 532 000 KARAZHAN
++
++-- -1 533 000 NAXXRAMAS
++
++-- -1 534 000 THE BATTLE OF MT. HYJAL
++
++-- -1 540 000 SHATTERED HALLS
++
++-- -1 542 000 BLOOD FURNACE
++
++-- -1 543 000 HELLFIRE RAMPARTS
++
++-- -1 544 000 MAGTHERIDON'S LAIR
++
++-- -1 545 000 THE STEAMVAULT
++
++-- -1 546 000 THE UNDERBOG
++
++-- -1 547 000 THE SLAVE PENS
++
++-- -1 548 000 SERPENTSHRINE CAVERN
++
++-- -1 550 000 THE EYE
++
++-- -1 552 000 THE ARCATRAZ
++
++-- -1 553 000 THE BOTANICA
++
++-- -1 554 000 THE MECHANAR
++
++-- -1 555 000 SHADOW LABYRINTH
++INSERT INTO `script_texts` (`entry`,`content_default`,`sound`,`type`,`language`,`comment`) VALUES
++(-1555000,'Infidels have invaded the sanctuary! Sniveling pests...You have yet to learn the true meaning of agony!',10473,1,0,'hellmaw SAY_INTRO'),
++(-1555001,'Pathetic mortals! You will pay dearly!',10475,1,0,'hellmaw SAY_AGGRO1'),
++(-1555002,'I will break you!',10476,1,0,'hellmaw SAY_AGGRO2'),
++(-1555003,'Finally! Something to relieve the tedium!',10477,1,0,'hellmaw SAY_AGGRO3'),
++(-1555004,'Aid me, you fools, before it\'s too late!',10474,1,0,'hellmaw SAY_HELP'),
++(-1555005,'Do you fear death?',10478,1,0,'hellmaw SAY_SLAY1'),
++(-1555006,'This is the part I enjoy most.',10479,1,0,'hellmaw SAY_SLAY2'),
++(-1555007,'Do not...grow...overconfident, mortal.',10480,1,0,'hellmaw SAY_DEATH'),
++
++(-1555008,'All flesh must burn.',10482,1,0,'blackhearth SAY_INTRO1'),
++(-1555009,'All creation must be unmade!',10483,1,0,'blackhearth SAY_INTRO2'),
++(-1555010,'Power will be yours!',10484,1,0,'blackhearth SAY_INTRO3'),
++(-1555011,'You\'ll be sorry!',10486,1,0,'blackhearth SAY_AGGRO1'),
++(-1555012,'Time for fun!',10487,1,0,'blackhearth SAY_AGGRO2'),
++(-1555013,'I see dead people!',10488,1,0,'blackhearth SAY_AGGRO3'),
++(-1555014,'No comin\' back for you!',10489,1,0,'blackhearth SAY_SLAY1'),
++(-1555015,'Nice try!',10490,1,0,'blackhearth SAY_SLAY2'),
++(-1555016,'Help us, hurry!',10485,1,0,'blackhearth SAY_HELP'),
++(-1555017,'This... no... good...',10491,1,0,'blackhearth SAY_DEATH'),
++
++(-1555018,'Be ready for Dark One\'s return.',10492,1,0,'blackhearth SAY2_INTRO1'),
++(-1555019,'So we have place in new universe.',10493,1,0,'blackhearth SAY2_INTRO2'),
++(-1555020,'Dark one promise!',10494,1,0,'blackhearth SAY2_INTRO3'),
++(-1555021,'You\'ll be sorry!',10496,1,0,'blackhearth SAY2_AGGRO1'),
++(-1555022,'Time to kill!',10497,1,0,'blackhearth SAY2_AGGRO2'),
++(-1555023,'You be dead people!',10498,1,0,'blackhearth SAY2_AGGRO3'),
++(-1555024,'Now you gone for good.',10499,1,0,'blackhearth SAY2_SLAY1'),
++(-1555025,'You failed, haha haha',10500,1,0,'blackhearth SAY2_SLAY2'),
++(-1555026,'Help us, hurry!',10495,1,0,'blackhearth SAY2_HELP'),
++(-1555027,'Arrgh, aah...ahhh',10501,1,0,'blackhearth SAY2_DEATH'),
++
++(-1555028,'Keep your minds focused for the days of reckoning are close at hand. Soon, the destroyer of worlds will return to make good on his promise. Soon the destruction of all that is will begin!',10522,1,0,'vorpil SAY_INTRO'),
++(-1555029,'I\'ll make an offering of your blood!',10524,1,0,'vorpil SAY_AGGRO1'),
++(-1555030,'You\'ll be a fine example, for the others.',10525,1,0,'vorpil SAY_AGGRO2'),
++(-1555031,'Good, a worthy sacrifice.',10526,1,0,'vorpil SAY_AGGRO3'),
++(-1555032,'Come to my aid, heed your master now!',10523,1,0,'vorpil SAY_HELP'),
++(-1555033,'I serve with pride.',10527,1,0,'vorpil SAY_SLAY1'),
++(-1555034,'Your death is for the greater cause!',10528,1,0,'vorpil SAY_SLAY2'),
++(-1555035,'I give my life... Gladly.',10529,1,0,'vorpil SAY_DEATH'),
++
++(-1555036,'draws energy from the air.',0,2,0,'murmur EMOTE_SONIC_BOOM');
++
++-- -1 556 000 SETHEKK HALLS
++INSERT INTO `script_texts` (`entry`,`content_default`,`sound`,`type`,`language`,`comment`) VALUES
++(-1556000,'I have pets..<squawk>..of my own!',10502,1,0,'syth SAY_SUMMON'),
++(-1556001,'Hrrmm.. Time to.. hrrm.. make my move.',10503,1,0,'syth SAY_AGGRO_1'),
++(-1556002,'Nice pets..hrm.. Yes! <squawking>',10504,1,0,'syth SAY_AGGRO_2'),
++(-1556003,'Nice pets have.. weapons. No so..<squawk>..nice.',10505,1,0,'syth SAY_AGGRO_3'),
++(-1556004,'Death.. meeting life is.. <squawking>',10506,1,0,'syth SAY_SLAY_1'),
++(-1556005,'Uhn.. Be free..<squawk>',10507,1,0,'syth SAY_SLAY_2'),
++(-1556006,'No more life..hrm. No more pain. <squawks weakly>',10508,1,0,'syth SAY_DEATH'),
++
++(-1556007,'<squawk>..Trinkets yes pretty Trinkets..<squawk>..power, great power.<squawk>..power in Trinkets..<squawk>',10557,1,0,'ikiss SAY_INTRO'),
++(-1556008,'You make war on Ikiss?..<squawk>',10554,1,0,'ikiss SAY_AGGRO_1'),
++(-1556009,'Ikiss cut you pretty..<squawk>..slice you. Yes!',10555,1,0,'ikiss SAY_AGGRO_2'),
++(-1556010,'No escape for..<squawk>..for you',10556,1,0,'ikiss SAY_AGGRO_3'),
++(-1556011,'You die..<squawk>..stay away from Trinkets',10558,1,0,'ikiss SAY_SLAY_1'),
++(-1556012,'<squawk>',10559,1,0,'ikiss SAY_SLAY_2'),
++(-1556013,'Ikiss will not..<squawk>..die',10560,1,0,'ikiss SAY_DEATH'),
++(-1556015,'begins to channel arcane energy...',0,3,0,'ikiss EMOTE_ARCANE_EXP');
++
++-- -1 557 000 MANA TOMBS
++INSERT INTO `script_texts` (`entry`,`content_default`,`sound`,`type`,`language`,`comment`) VALUES
++(-1557000,'What is this? You must forgive me, but I was not expecting company. As you can see, we are somewhat preoccupied right now. But no matter. As I am a gracious host, I will tend to you... personally.',10539,1,0,'shaffar SAY_INTRO'),
++(-1557001,'We have not yet been properly introduced.',10541,1,0,'shaffar SAY_AGGRO_1'),
++(-1557002,'An epic battle. How exciting!',10542,1,0,'shaffar SAY_AGGRO_2'),
++(-1557003,'I have longed for a good adventure.',10543,1,0,'shaffar SAY_AGGRO_3'),
++(-1557004,'It has been... entertaining.',10544,1,0,'shaffar SAY_SLAY_1'),
++(-1557005,'And now we part company.',10545,1,0,'shaffar SAY_SLAY_2'),
++(-1557006,'I have such fascinating things to show you.',10540,1,0,'shaffar SAY_SUMMON'),
++(-1557007,'I must bid you... farewell.',10546,1,0,'shaffar SAY_DEAD'),
++
++(-1557008,'I will feed on your soul.',10561,1,0,'pandemonius SAY_AGGRO_1'),
++(-1557009,'So... full of life!',10562,1,0,'pandemonius SAY_AGGRO_2'),
++(-1557010,'Do not... resist.',10563,1,0,'pandemonius SAY_AGGRO_3'),
++(-1557011,'Yes! I am... empowered!',10564,1,0,'pandemonius SAY_KILL_1'),
++(-1557012,'More... I must have more!',10565,1,0,'pandemonius SAY_KILL_2'),
++(-1557013,'To the void... once... more..',10566,1,0,'pandemonius SAY_DEATH'),
++(-1557014,'shifts into the void...',0,3,0,'pandemonius EMOTE_DARK_SHELL');
++
++-- -1 558 000 AUCHENAI CRYPTS
++INSERT INTO `script_texts` (`entry`,`content_default`,`sound`,`type`,`language`,`comment`) VALUES
++(-1558000,'You have defiled the resting place of our ancestors. For this offense, there can be but one punishment. It is fitting that you have come to a place of the dead... for you will soon be joining them.',10509,1,0,'maladaar SAY_INTRO'),
++(-1558001,'Rise my fallen brothers. Take form and fight!',10512,1,0,'maladaar SAY_SUMMON'),
++(-1558002,'You will pay with your life!',10513,1,0,'maladaar SAY_AGGRO_1'),
++(-1558003,'There\'s no turning back now!',10514,1,0,'maladaar SAY_AGGRO_2'),
++(-1558004,'Serve your penitence!',10515,1,0,'maladaar SAY_AGGRO_3'),
++(-1558005,'Let your mind be clouded.',10510,1,0,'maladaar SAY_ROAR'),
++(-1558006,'Stare into the darkness of your soul.',10511,1,0,'maladaar SAY_SOUL_CLEAVE'),
++(-1558007,'These walls will be your doom.',10516,1,0,'maladaar SAY_SLAY_1'),
++(-1558008,'<laugh> Now, you\'ll stay for eternity!',10517,1,0,'maladaar SAY_SLAY_2'),
++(-1558009,'This is... where.. I belong...',10518,1,0,'maladaar SAY_DEATH');
++
++-- -1 560 000 ESCAPE FROM DURNHOLDE (OLD HILLSBRAD)
++
++-- -1 564 000 BLACK TEMPLE
++
++-- -1 565 000 GRUUL'S LAIR
++
++-- -1 568 000 ZUL'AMAN
++
++-- -1 580 000 SUNWELL PLATEAU
++
++-- -1 585 000 MAGISTER'S TERRACE
++
++
+ -- 
+ -- Below just for beautiful view in table, run at own desire
+ -- 
+
+
+Start converting texts in c++ scripts to be using data from database table script_texts.
+* Auchindoun
+Fixed: missing sql files in makefile

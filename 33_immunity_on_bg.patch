@@ -1,0 +1,127 @@
+diff --git a/src/game/Player.cpp b/src/game/Player.cpp
+index 25b35a9..8694ac4 100644
+--- a/src/game/Player.cpp
++++ b/src/game/Player.cpp
+@@ -18153,9 +18153,34 @@ bool Player::isAllowUseBattleGroundObject()
+ {
+     return ( //InBattleGround() &&                            // in battleground - not need, check in other cases
+              !IsMounted() &&                                  // not mounted
++             !isTotalImmunity() &&                            // not totally immuned
+              !HasStealthAura() &&                             // not stealthed
+              !HasInvisibilityAura() &&                        // not invisible
+              !HasAura(SPELL_RECENTLY_DROPPED_FLAG, 0) &&      // can't pickup
+              isAlive()                                        // live player
+            );
+ }
++
++bool Player::isTotalImmunity()
++{
++    AuraList const& immune = GetAurasByType(SPELL_AURA_SCHOOL_IMMUNITY);
++
++    for(AuraList::const_iterator itr = immune.begin(); itr != immune.end(); ++itr)
++    {
++        if (((*itr)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_ALL) !=0)   // total immunity
++        {
++            return true;
++        }
++        if (((*itr)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL) !=0)   // physical damage immunity
++        {
++            for(AuraList::const_iterator i = immune.begin(); i != immune.end(); ++i)
++            {
++                if (((*i)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_MAGIC) !=0)   // magic immunity
++                {
++                    return true;
++                }
++            }
++        }
++    }
++    return false;
++}
+diff --git a/src/game/Player.h b/src/game/Player.h
+index aaaaac6..c2426b6 100644
+--- a/src/game/Player.h
++++ b/src/game/Player.h
+@@ -1883,6 +1883,7 @@ class MANGOS_DLL_SPEC Player : public Unit
+ 
+         bool GetBGAccessByLevel(uint32 bgTypeId) const;
+         bool isAllowUseBattleGroundObject();
++        bool isTotalImmunity();
+ 
+         /*********************************************************/
+         /***                    REST SYSTEM                    ***/
+diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
+index 26e77c8..6f800b6 100644
+--- a/src/game/SpellAuras.cpp
++++ b/src/game/SpellAuras.cpp
+@@ -3126,6 +3126,7 @@ void Aura::HandleFeignDeath(bool apply, bool Real)
+ 
+         m_target->addUnitState(UNIT_STAT_DIED);
+         m_target->CombatStop();
++        m_target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LOST_SELECTION);
+ 
+         // prevent interrupt message
+         if(m_caster_guid==m_target->GetGUID() && m_target->m_currentSpells[CURRENT_GENERIC_SPELL])
+@@ -3263,9 +3264,7 @@ void Aura::HandleModStealth(bool apply, bool Real)
+     if(apply)
+     {
+         // drop flag at stealth in bg
+-        if(Real && m_target->GetTypeId()==TYPEID_PLAYER && ((Player*)m_target)->InBattleGround())
+-            if(BattleGround *bg = ((Player*)m_target)->GetBattleGround())
+-                bg->EventPlayerDroppedFlag((Player*)m_target);
++         m_target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LOST_SELECTION);
+ 
+         // only at real aura add
+         if(Real)
+@@ -3338,15 +3337,13 @@ void Aura::HandleInvisibility(bool apply, bool Real)
+     {
+         m_target->m_invisibilityMask |= (1 << m_modifier.m_miscvalue);
+ 
++         m_target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LOST_SELECTION);
++
+         if(Real && m_target->GetTypeId()==TYPEID_PLAYER)
+         {
+             // apply glow vision
+             m_target->SetFlag(PLAYER_FIELD_BYTES2,PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
+ 
+-            // drop flag at invisible in bg
+-            if(((Player*)m_target)->InBattleGround())
+-                if(BattleGround *bg = ((Player*)m_target)->GetBattleGround())
+-                    bg->EventPlayerDroppedFlag((Player*)m_target);
+         }
+ 
+         // apply only if not in GM invisibility and not stealth
+@@ -3847,6 +3844,9 @@ void Aura::HandleAuraModStateImmunity(bool apply, bool Real)
+ 
+ void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
+ {
++     if(apply && m_modifier.m_miscvalue == SPELL_SCHOOL_MASK_NORMAL)
++          m_target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LOST_SELECTION);
++
+     m_target->ApplySpellImmune(GetId(),IMMUNITY_SCHOOL,m_modifier.m_miscvalue,apply);
+ 
+     if(Real && apply && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
+@@ -5429,8 +5429,10 @@ void Aura::HandleAuraRetainComboPoints(bool apply, bool Real)
+ void Aura::HandleModUnattackable( bool Apply, bool Real )
+ {
+     if(Real && Apply)
++     {
+         m_target->CombatStop();
+-
++        m_target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LOST_SELECTION);
++     }
+     m_target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE,Apply);
+ }
+ 
+diff --git a/src/game/Unit.h b/src/game/Unit.h
+index c4495a2..2ba0720 100644
+--- a/src/game/Unit.h
++++ b/src/game/Unit.h
+@@ -75,7 +75,7 @@ enum SpellAuraInterruptFlags
+     AURA_INTERRUPT_FLAG_MOUNTING            = 0x00020000,   // 17   removed by mounting
+     AURA_INTERRUPT_FLAG_NOT_SEATED          = 0x00040000,   // 18   removed by standing up
+     AURA_INTERRUPT_FLAG_CHANGE_MAP          = 0x00080000,   // 19   leaving map/getting teleported
+-    AURA_INTERRUPT_FLAG_UNK20               = 0x00100000,   // 20
++    AURA_INTERRUPT_FLAG_LOST_SELECTION      = 0x00100000,   // 20      removed by auras that make you invulnerable, or make lost selection on you
+     AURA_INTERRUPT_FLAG_UNK21               = 0x00200000,   // 21
+     AURA_INTERRUPT_FLAG_UNK22               = 0x00400000,   // 22
+     AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT    = 0x00800000,   // 23   removed by entering pvp combat

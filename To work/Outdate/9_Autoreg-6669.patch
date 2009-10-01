@@ -1,0 +1,164 @@
+Index: src/realmd/AuthSocket.cpp
+===================================================================
+--- src/realmd/AuthSocket.cpp	(revision 6669)
++++ src/realmd/AuthSocket.cpp	(working copy)
+@@ -28,6 +28,7 @@
+ #include "RealmList.h"
+ #include "AuthSocket.h"
+ #include "AuthCodes.h"
++#include <cwctype>                                          // needs for towupper
+ #include <openssl/md5.h>
+ #include "Auth/Sha1.h"
+ //#include "Util.h" -- for commented utf8ToUpperOnlyLatin
+@@ -206,6 +207,9 @@
+ 
+ #define AUTH_TOTAL_COMMANDS sizeof(table)/sizeof(AuthHandler)
+ 
++// check used symbols in account name at creating
++std::string notAllowedChars = "\t\v\b\f\a\n\r\\\"\'\? <>[](){}_=+-|/!@#$%^&*~`.,\0";
++
+ ///Holds the MD5 hash of client patches present on the server
+ Patcher PatchesCache;
+ 
+@@ -215,6 +219,7 @@
+     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
+     g.SetDword(7);
+     _authed = false;
++    _autoreg=sConfig.GetIntDefault("UseAutoReg", 0) !=0;
+     pPatch=NULL;
+ 
+     _accountSecurityLevel = SEC_PLAYER;
+@@ -474,6 +479,7 @@
+                         pkt.append(s.AsByteArray(), s.GetNumBytes());   // 32 bytes
+                         pkt.append(unk3.AsByteArray(), 16);
+                         pkt << (uint8)0;                    // Added in 1.12.x client branch
++                        _autoreg = false;
+ 
+                         uint8 secLevel = (*result)[4].GetUInt8();
+                         _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
+@@ -492,7 +498,73 @@
+             }
+             else                                            //no account
+             {
+-                pkt<< (uint8) REALM_AUTH_NO_MATCH;
++                if(_autoreg)
++                {
++                    if(uint32 amountip = sConfig.GetIntDefault("AmountIP", 0))
++                    {
++                        QueryResult *result2 = dbRealmServer.PQuery("SELECT COUNT(last_ip) FROM account where last_ip='%s'",GetRemoteAddress().c_str());
++                        if (result2&&((*result2)[0].GetUInt8() > amountip || (*result2)[0].GetUInt8() == amountip))
++                        {
++                            _autoreg=false;
++                        }
++                        delete result2;
++                    }
++
++                    if(_safelogin.find_first_of(notAllowedChars)!=_safelogin.npos || _safelogin.length()<4)
++                    {
++                        pkt<< (uint8) REALM_AUTH_NO_MATCH;
++                    }
++                    else if(_autoreg)
++                    {
++                        ///- Get the password from the account table, upper it, and make the SRP6 calculation
++                        std::transform(_safelogin.begin(), _safelogin.end(), _safelogin.begin(), std::towupper);
++                        Sha1Hash sha;
++                        std::string sI = _safelogin + ":" + _safelogin;
++                        sha.UpdateData(sI);
++                        sha.Finalize();
++
++                        BigNumber bn;
++                        bn.SetBinary(sha.GetDigest(), sha.GetLength());
++                        uint8 *val = bn.AsByteArray();
++                        std::reverse(val, val+bn.GetNumBytes());
++                        bn.SetBinary(val, bn.GetNumBytes());
++
++                        const char* rI = bn.AsHexStr();
++                        _SetVSFields(rI);
++                        OPENSSL_free((void*)rI);
++
++                        b.SetRand(19 * 8);
++                        BigNumber gmod=g.ModExp(b, N);
++                        B = ((v * 3) + gmod) % N;
++                        
++                        if (B.GetNumBytes() < 32)
++                            sLog.outDetail("Interesting, calculation of B in realmd is < 32.");
++                        
++                        ASSERT(gmod.GetNumBytes() <= 32);
++
++                        BigNumber unk3;
++                        unk3.SetRand(16*8);
++
++                        ///- Fill the response packet with the result
++                        pkt << (uint8)REALM_AUTH_SUCCESS;
++                        pkt.append(B.AsByteArray(), 32);
++                        pkt << (uint8)1;
++                        pkt.append(g.AsByteArray(), 1);
++                        pkt << (uint8)32;
++                        pkt.append(N.AsByteArray(), 32);
++                        pkt.append(s.AsByteArray(), s.GetNumBytes());
++                        pkt.append(unk3.AsByteArray(), 16);
++                        pkt << (uint8)0;                // Added in 1.12.x client branch
++                    }
++                    else
++                    {
++                        pkt<< (uint8) REALM_AUTH_NO_MATCH;
++                    }
++                }
++                else
++                {
++                      pkt<< (uint8) REALM_AUTH_NO_MATCH;
++                }  
+             }
+         }
+     }                                                       //valid version
+@@ -631,6 +703,13 @@
+     ///- Check if SRP6 results match (password is correct), else send an error
+     if (!memcmp(M.AsByteArray(), lp.M1, 20))
+     {
++        //create new account if use auto registration
++        if (_autoreg)
++        {
++            dbRealmServer.PExecute("INSERT INTO account (username,sha_pass_hash,joindate) VALUES ('%s',SHA1(CONCAT(UPPER('%s'),':',UPPER('%s'))),NOW())",_safelogin.c_str(),_safelogin.c_str(),_safelogin.c_str());
++            sLog.outBasic("New account [%s] created successfully", _login.c_str());
++        }
++      
+         sLog.outBasic("User '%s' successfully authenticated", _login.c_str());
+ 
+         ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
+Index: src/realmd/AuthSocket.h
+===================================================================
+--- src/realmd/AuthSocket.h	(revision 6669)
++++ src/realmd/AuthSocket.h	(working copy)
+@@ -65,6 +65,7 @@
+         BigNumber K;
+ 
+         bool _authed;
++        bool _autoreg;
+ 
+         std::string _login;
+         std::string _safelogin;
+Index: src/realmd/realmd.conf.dist.in
+===================================================================
+--- src/realmd/realmd.conf.dist.in	(revision 6669)
++++ src/realmd/realmd.conf.dist.in	(working copy)
+@@ -94,6 +94,14 @@
+ #        Default: 0 (Ban IP)
+ #                 1 (Ban Account)
+ #
++#    Auto Registration setting
++#        Default: 0 (not to use)
++#                 1 (Use)
++#
++#    Amount account registered on IP  (Used only Auto Registration)
++#        Default: 0 (not to use)
++#                 1 or more
++#
+ ###################################################################################################################
+ 
+ LoginDatabaseInfo = "127.0.0.1;3306;root;mangos;realmd"
+@@ -114,3 +122,5 @@
+ WrongPass.MaxCount = 0
+ WrongPass.BanTime = 600
+ WrongPass.BanType = 0
++UseAutoReg = 0
++AmountIP = 0

@@ -1,0 +1,28 @@
+diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
+index 26e77c8..e8dfac0 100644
+--- a/src/game/SpellAuras.cpp
++++ b/src/game/SpellAuras.cpp
+@@ -5912,6 +5912,12 @@ void Aura::PeriodicTick()
+             if(m_target->getPowerType() != power)
+                 break;
+ 
++            // mark of  kaz'rogal part 1/2
++            bool explode = false;
++            if(GetSpellProto()->Id == 31447)
++                if(pdamage>m_target->GetPower(POWER_MANA))
++                    explode = true;
++
+             int32 drain_amount = m_target->GetPower(power) > pdamage ? pdamage : m_target->GetPower(power);
+ 
+             // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
+@@ -5920,6 +5926,10 @@ void Aura::PeriodicTick()
+ 
+             m_target->ModifyPower(power, -drain_amount);
+ 
++            // mark of kaz'rogal part 2/2
++            if(explode)
++                pCaster->CastSpell(m_target,31463,true,0,this);
++
+             float gain_multiplier = 0;
+ 
+             if(pCaster->GetMaxPower(power) > 0)

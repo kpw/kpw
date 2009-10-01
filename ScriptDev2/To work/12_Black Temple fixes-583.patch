@@ -1,0 +1,194 @@
+Index: scripts/zone/black_temple/boss_mother_shahraz.cpp
+===================================================================
+--- scripts/zone/black_temple/boss_mother_shahraz.cpp	(revision 583)
++++ scripts/zone/black_temple/boss_mother_shahraz.cpp	(working copy)
+@@ -32,8 +32,7 @@
+ #define SPELL_ATTRACTION        40871
+ #define SPELL_SILENCING_SHRIEK  40823
+ #define SPELL_ENRAGE            23537
+-#define SPELL_SABER_LASH        43267
+-#define SPELL_SABER_LASH_IMM    43690
++#define SPELL_SABER_LASH        40810
+ #define SPELL_TELEPORT_VISUAL   40869
+ #define SPELL_BERSERK           45078
+ 
+@@ -129,16 +128,17 @@
+         for(uint8 i = 0; i<3; i++)
+             TargetGUID[i] = 0;
+ 
+-        BeamTimer = 60000; // Timers may be incorrect
++        BeamTimer = 10000 + rand()%11 * 1000;
+         BeamCount = 0;
+         CurrentBeam = 0; // 0 - Sinister, 1 - Vile, 2 - Wicked, 3 - Sinful
+         PrismaticShieldTimer = 0;
+-        FatalAttractionTimer = 60000;
+-        FatalAttractionExplodeTimer = 70000;
++        FatalAttractionTimer = 25000;
++        FatalAttractionExplodeTimer = 35000;
+         ShriekTimer = 30000;
+         RandomYellTimer = 70000 + rand()%41 * 1000;
+         EnrageTimer = 600000;
+         ExplosionCount = 0;
++		SaberLashTimer = 10000 + rand()%21 * 1000;
+ 
+         Enraged = false;
+     }
+@@ -208,6 +208,12 @@
+             DoPlaySoundToSet(m_creature, SOUND_ENRAGE);
+         }
+ 
++		if(SaberLashTimer < diff)
++		{
++			DoCast(m_creature->getVictim, SPELL_SABER_LASH);
++			SaberLashTimer = 10000 + rand()%21 * 1000;
++		}else SaberLashTimer -= diff;
++		
+         //Randomly cast one beam.
+         if(BeamTimer < diff)
+         {
+@@ -215,7 +221,7 @@
+             if(!target || !target->isAlive())
+                 return;
+ 
+-            BeamTimer = 9000;
++            BeamTimer = 10000 + rand()%11 * 1000;
+ 
+             switch(CurrentBeam)
+             {
+@@ -268,7 +274,7 @@
+                     break;
+             }
+             FatalAttractionExplodeTimer = 2000;
+-            FatalAttractionTimer = 40000 + rand()%31 * 1000;
++            FatalAttractionTimer = 25000;
+         }else FatalAttractionTimer -= diff;
+ 
+         if(FatalAttractionExplodeTimer < diff)
+Index: scripts/zone/black_temple/boss_shade_of_akama.cpp
+===================================================================
+--- scripts/zone/black_temple/boss_shade_of_akama.cpp	(revision 583)
++++ scripts/zone/black_temple/boss_shade_of_akama.cpp	(working copy)
+@@ -376,6 +376,10 @@
+                     }else move = false;
+                     if(!move)
+                         Defender->GetMotionMaster()->MovePoint(0, AKAMA_X, AKAMA_Y, AKAMA_Z);
++					
++					Unit* Akama = Unit::GetUnit((*m_creature), AkamaGUID);
++					if(Akama && Akama->isAlive())
++						Defender->Attack(Akama, true);
+                 }
+                 DefenderTimer = 15000;
+             }else DefenderTimer -= diff;
+@@ -518,8 +522,7 @@
+     bool EventBegun;
+     bool ShadeHasDied;
+     bool StartCombat;
+-    bool HasYelledOnce;
+-    bool HasYelledTwice;
++    bool HasYelled;
+ 
+     void Reset()
+     {
+@@ -535,8 +538,7 @@
+         BrokenList.clear();
+ 
+         EventBegun = false;
+-        HasYelledOnce = false;
+-        HasYelledTwice = false;
++        HasYelled = false;
+         
+         m_creature->SetUInt32Value(UNIT_NPC_FLAGS, 0); // Database sometimes has very very strange values
+         m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+@@ -606,10 +608,11 @@
+         if(!EventBegun)
+             return;
+ 
+-        if ((m_creature->GetHealth()*100 / m_creature->GetMaxHealth()) < 15)
++        if (((m_creature->GetHealth()*100 / m_creature->GetMaxHealth()) < 15) && !HasYelled)
+         {
+             DoYell(SAY_LOW_HEALTH, LANG_UNIVERSAL, NULL);
+             DoPlaySoundToSet(m_creature, SOUND_LOW_HEALTH);
++			HasYelled = true;
+         }
+ 
+         if(ShadeGUID && !StartCombat)
+Index: scripts/zone/black_temple/boss_supremus.cpp
+===================================================================
+--- scripts/zone/black_temple/boss_supremus.cpp	(revision 583)
++++ scripts/zone/black_temple/boss_supremus.cpp	(working copy)
+@@ -115,7 +115,7 @@
+         CheckTimer = 1000;
+         SupremusGUID = 0;
+         FireballTimer = 500;
+-        GeyserTimer = 0;
++        GeyserTimer = 2000;
+     }
+ 
+     void Aggro(Unit *who) {}
+@@ -313,17 +313,8 @@
+ 
+                 if(target)
+                 {
+-                    Creature* Volcano = NULL;
+-                    Volcano = SummonCreature(CREATURE_VOLCANO, target);
+-
+-                    if(Volcano)
+-                    {
+-                        DoCast(target, SPELL_VOLCANIC_ERUPTION);
+-                        ((npc_volcanoAI*)Volcano->AI())->SetSupremusGUID(m_creature->GetGUID());
+-                    }
+-                    
++                    DoCast(target, SPELL_VOLCANIC_ERUPTION);
+                     DoTextEmote("roars and the ground begins to crack open!", NULL);
+-                    
+                     SummonVolcanoTimer = 10000;
+                 }
+             }else SummonVolcanoTimer -= diff;
+Index: scripts/zone/black_temple/instance_black_temple.cpp
+===================================================================
+--- scripts/zone/black_temple/instance_black_temple.cpp	(revision 583)
++++ scripts/zone/black_temple/instance_black_temple.cpp	(working copy)
+@@ -26,6 +26,8 @@
+ 
+ #define ENCOUNTERS     9
+ 
++#define MAIN_TEMPLE_DOORS	185882 // Main Temple Doors, doors after Supremus
++
+ /* Black Temple encounters:
+ 0 - High Warlord Naj'entus event
+ 1 - Supremus Event
+@@ -59,9 +61,13 @@
+     uint64 IllidanDoor[2];
+ 
+     uint32 Encounters[ENCOUNTERS];
++	
++	GameObject *Main_Temple_Doors;
+ 
+     void Initialize()
+     {
++		Main_Temple_Doors = NULL;
++		
+         Najentus = 0;
+         Akama = 0;
+         Akama_Shade = 0;
+@@ -160,6 +166,10 @@
+             case 186262: // Left door at Temple Summit
+                 IllidanDoor[1] = go->GetGUID();
+                 break;
++			
++			case 185882:
++				Main_Temple_Doors = go;
++				break;
+         }
+     }
+ 
+@@ -225,6 +235,9 @@
+                 break;
+ 
+             case DATA_SUPREMUSEVENT:
++				if( data == DONE )
++					if( Main_Temple_Doors )
++						Main_Temple_Doors->UseDoorOrButton();
+                 Encounters[1] = data;
+                 break;
+ 

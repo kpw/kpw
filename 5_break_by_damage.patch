@@ -1,0 +1,66 @@
+diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
+index 339a590..a2ac253 100644
+--- a/src/game/Unit.cpp
++++ b/src/game/Unit.cpp
+@@ -435,19 +435,6 @@ bool Unit::HasAuraType(AuraType auraType) const
+     return (!m_modAuras[auraType].empty());
+ }
+ 
+-/* Called by DealDamage for auras that have a chance to be dispelled on damage taken. */
+-void Unit::RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage)
+-{
+-    if(!HasAuraType(auraType))
+-        return;
+-
+-    // The chance to dispell an aura depends on the damage taken with respect to the casters level.
+-    uint32 max_dmg = getLevel() > 8 ? 25 * getLevel() - 150 : 50;
+-    float chance = float(damage) / max_dmg * 100.0f;
+-    if (roll_chance_f(chance))
+-        RemoveSpellsCausingAura(auraType);
+-}
+-
+ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss)
+ {
+     if (!pVictim->isAlive() || pVictim->isInFlight() || pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
+@@ -495,11 +482,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+         return 0;
+     }
+ 
+-    pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_FEAR, damage);
+-    // root type spells do not dispell the root effect
+-    if(!spellProto || spellProto->Mechanic != MECHANIC_ROOT)
+-        pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, damage);
+-
+     if(pVictim->GetTypeId() != TYPEID_PLAYER)
+     {
+         // no xp,health if type 8 /critters/
+@@ -851,6 +833,16 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+                     // FIXME: this may cause the auras with proc chance to be rerolled several times
+                     next = vAuras.begin();
+                 }
++            } 
++            else if ( (se->Attributes & 0x40000000LL) && (!spellProto || se->Id != spellProto->Id) )
++            {
++                uint32 max_dmg = pVictim->getLevel() > 8 ? 25 * pVictim->getLevel() - 150 : 50;
++                float chance = float(damage) / max_dmg * 100.0f;
++                if (roll_chance_f(chance))
++                {
++                    pVictim->RemoveAurasDueToSpell(i->second->GetId());
++                    next = vAuras.begin();
++                }
+             }
+         }
+ 
+diff --git a/src/game/Unit.h b/src/game/Unit.h
+index c4495a2..c47f77a 100644
+--- a/src/game/Unit.h
++++ b/src/game/Unit.h
+@@ -911,8 +911,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
+ 
+         bool isFrozen() const;
+ 
+-        void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
+-
+         bool isTargetableForAttack() const;
+         virtual bool IsInWater() const;
+         virtual bool IsUnderWater() const;

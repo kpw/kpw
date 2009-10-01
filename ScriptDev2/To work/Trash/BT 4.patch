@@ -1,0 +1,76 @@
+Index: src/bindings/ScriptDev2/scripts/zone/black_temple/boss_mother_shahraz.cpp
+===================================================================
+--- src/bindings/ScriptDev2/scripts/zone/black_temple/boss_mother_shahraz.cpp	(revision 569)
++++ src/bindings/ScriptDev2/scripts/zone/black_temple/boss_mother_shahraz.cpp	(working copy)
+@@ -30,10 +30,9 @@
+ #define SPELL_BEAM_WICKED       40861
+ #define SPELL_BEAM_SINFUL       40827
+ #define SPELL_ATTRACTION        40871
++#define SPELL_SABER_LASH        40810
+ #define SPELL_SILENCING_SHRIEK  40823
+ #define SPELL_ENRAGE            23537
+-#define SPELL_SABER_LASH        43267
+-#define SPELL_SABER_LASH_IMM    43690
+ #define SPELL_TELEPORT_VISUAL   40869
+ #define SPELL_BERSERK           45078
+ 
+@@ -118,6 +117,7 @@
+     uint32 RandomYellTimer;
+     uint32 EnrageTimer;
+     uint32 ExplosionCount;
++	uint32 SaberLashTimer;
+ 
+     bool Enraged;
+ 
+@@ -129,16 +129,17 @@
+         for(uint8 i = 0; i<3; i++)
+             TargetGUID[i] = 0;
+ 
+-        BeamTimer = 60000; // Timers may be incorrect
++        BeamTimer = 10000 + rand()%11 * 1000;
+         BeamCount = 0;
+         CurrentBeam = 0; // 0 - Sinister, 1 - Vile, 2 - Wicked, 3 - Sinful
+         PrismaticShieldTimer = 0;
+-        FatalAttractionTimer = 60000;
+-        FatalAttractionExplodeTimer = 70000;
++        FatalAttractionTimer = 25000;
++        FatalAttractionExplodeTimer = 35000;
+         ShriekTimer = 30000;
+         RandomYellTimer = 70000 + rand()%41 * 1000;
+         EnrageTimer = 600000;
+         ExplosionCount = 0;
++		SaberLashTimer = 10000 + rand()%21 * 1000;
+ 
+         Enraged = false;
+     }
+@@ -207,6 +208,12 @@
+             DoYell(SAY_ENRAGE, LANG_UNIVERSAL, NULL);
+             DoPlaySoundToSet(m_creature, SOUND_ENRAGE);
+         }
++		
++		if(SaberLashTimer < diff)
++		{
++			DoCast(m_creature->getVictim, SPELL_SABER_LASH);
++			SaberLashTimer = 10000 + rand()%21 * 1000;
++		}else SaberLashTimer -= diff;
+ 
+         //Randomly cast one beam.
+         if(BeamTimer < diff)
+@@ -215,7 +222,7 @@
+             if(!target || !target->isAlive())
+                 return;
+ 
+-            BeamTimer = 9000;
++            BeamTimer = 10000 + rand()%11 * 1000;
+ 
+             switch(CurrentBeam)
+             {
+@@ -268,7 +275,7 @@
+                     break;
+             }
+             FatalAttractionExplodeTimer = 2000;
+-            FatalAttractionTimer = 40000 + rand()%31 * 1000;
++            FatalAttractionTimer = 25000;
+         }else FatalAttractionTimer -= diff;
+ 
+         if(FatalAttractionExplodeTimer < diff)

@@ -1,0 +1,196 @@
+Index: Makefile.am
+===================================================================
+--- Makefile.am	(revision 667)
++++ Makefile.am	(working copy)
+@@ -189,6 +189,7 @@
+ scripts/zone/hellfire_citadel/magtheridons_lair/instance_magtheridons_lair.cpp \
+ scripts/zone/hellfire_citadel/shattered_halls/boss_nethekurse.cpp \
+ scripts/zone/hellfire_citadel/shattered_halls/boss_warbringer_omrogg.cpp \
++scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_bladefist.cpp \
+ scripts/zone/hellfire_citadel/shattered_halls/def_shattered_halls.h \
+ scripts/zone/hellfire_citadel/shattered_halls/instance_shattered_halls.cpp \
+ scripts/zone/hellfire_peninsula/boss_doomlord_kazzak.cpp \
+Index: ScriptMgr.cpp
+===================================================================
+--- ScriptMgr.cpp	(revision 667)
++++ ScriptMgr.cpp	(working copy)
+@@ -313,6 +313,7 @@
+ //--Shattered Halls
+ extern void AddSC_boss_grand_warlock_nethekurse();
+ extern void AddSC_boss_warbringer_omrogg();
++extern void AddSC_boss_warchief_kargath_bladefist();
+ extern void AddSC_instance_shattered_halls();
+ 
+ //--Ramparts
+@@ -1416,6 +1417,7 @@
+     //--Shattered Halls
+     AddSC_boss_grand_warlock_nethekurse();
+     AddSC_boss_warbringer_omrogg();
++    AddSC_boss_warchief_kargath_bladefist();
+     AddSC_instance_shattered_halls();
+ 
+     //--Ramparts
+Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_bladefist.cpp
+===================================================================
+--- scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_bladefist.cpp	(revision 0)
++++ scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_bladefist.cpp	(revision 0)
+@@ -0,0 +1,114 @@
++#include "precompiled.h"
++
++#define SAY_AGGRO_1        "" 
++#define SAY_AGGRO_2        "I will carve the meat from your bones!" 
++#define SAY_AGGRO_3        "I am called Bladefist for a reason, as you will see..." 
++#define SAY_SLAY_1           "For the real horde!"
++#define SAY_SLAY_2           "I am an only warchief!"
++#define SAY_DEATH             "The true horde... will prevail..."
++
++#define SOUND_AGGRO_1         10323
++#define SOUND_AGGRO_2         10324
++#define SOUND_AGGRO_3         10325
++#define SOUND_SLAY_1             10326
++#define SOUND_SLAY_2             10327
++#define SOUND_DEATH              10328
++
++
++#define AB_BLADEDANCE      30739 
++
++struct MANGOS_DLL_DECL boss_warchief_kargath_bladefistAI : public ScriptedAI 
++{ 
++    boss_warchief_kargath_bladefistAI(Creature *c) : ScriptedAI(c) {Reset();} 
++
++    uint32 BladeDance_Timer; 
++    bool InCombat;    
++
++    void Reset() 
++    { 
++        BladeDance_Timer = 30000;  //GC      
++        InCombat=false;
++    } 
++
++    void KilledUnit(Unit* victim) 
++    { 
++        if (!victim) 
++            return; 
++        switch(rand()%2)
++        {
++        case 0:
++            DoYell(SAY_SLAY_1, LANG_UNIVERSAL, NULL);
++            DoPlaySoundToSet(m_creature, SOUND_SLAY_1);
++            break;
++        case 1:
++            DoYell(SAY_SLAY_2, LANG_UNIVERSAL, NULL);
++            DoPlaySoundToSet(m_creature, SOUND_SLAY_2);
++            break;
++        }
++        
++    } 
++
++    void JustDied(Unit *victim)
++    {
++        DoYell(SAY_DEATH, LANG_UNIVERSAL, NULL);
++        DoPlaySoundToSet(m_creature, SOUND_DEATH);
++    }
++
++    
++   void Aggro(Unit *who) 
++    {
++        switch(rand()%3)
++        {
++            case 0:
++                DoYell(SAY_AGGRO_1, LANG_UNIVERSAL, NULL);
++                DoPlaySoundToSet(m_creature, SOUND_AGGRO_1);
++            break;
++            case 1:
++                DoYell(SAY_AGGRO_2, LANG_UNIVERSAL, NULL);
++                DoPlaySoundToSet(m_creature, SOUND_AGGRO_2);
++            break;
++            case 2:
++                DoYell(SAY_AGGRO_3, LANG_UNIVERSAL, NULL);
++                DoPlaySoundToSet(m_creature, SOUND_AGGRO_3);
++            break;
++        }
++    } 
++    
++    void UpdateAI(const uint32 diff) 
++   { 
++        
++        if (!m_creature->SelectHostilTarget()) 
++         return; 
++
++        
++        if( m_creature->getVictim() && m_creature->isAlive()) 
++      { 
++
++      if(BladeDance_Timer<diff) 
++      { 
++         DoCast(m_creature->getVictim(),AB_BLADEDANCE); 
++         BladeDance_Timer=30000; 
++      }else BladeDance_Timer-=diff; 
++
++          
++      DoMeleeAttackIfReady(); 
++      } 
++   } 
++    
++}; 
++
++CreatureAI* GetAI_boss_warchief_kargath_bladefist(Creature *_Creature) 
++{ 
++    return new boss_warchief_kargath_bladefistAI (_Creature); 
++} 
++
++
++void AddSC_boss_warchief_kargath_bladefist() 
++{ 
++    Script *newscript; 
++    newscript = new Script; 
++    newscript->Name="boss_warchief_kargath_bladefist"; 
++    newscript->GetAI = GetAI_boss_warchief_kargath_bladefist; 
++    m_scripts[nrscripts++] = newscript; 
++   return; 
++}
+Index: VC71/71ScriptDev2.vcproj
+===================================================================
+--- VC71/71ScriptDev2.vcproj	(revision 667)
++++ VC71/71ScriptDev2.vcproj	(working copy)
+@@ -1376,6 +1376,10 @@
+ 							>
+ 						</File>
+ 						<File
++							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\boss_warchief_kargath_bladefist.cpp"
++							>
++						</File>
++						<File
+ 							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
+ 							>
+ 						</File>
+Index: VC80/80ScriptDev2.vcproj
+===================================================================
+--- VC80/80ScriptDev2.vcproj	(revision 667)
++++ VC80/80ScriptDev2.vcproj	(working copy)
+@@ -1615,6 +1615,10 @@
+ 							>
+ 						</File>
+ 						<File
++							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\boss_warchief_kargath_bladefist.cpp"
++							>
++						</File>
++						<File
+ 							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
+ 							>
+ 						</File>
+Index: VC90/90ScriptDev2.vcproj
+===================================================================
+--- VC90/90ScriptDev2.vcproj	(revision 667)
++++ VC90/90ScriptDev2.vcproj	(working copy)
+@@ -1614,6 +1614,10 @@
+ 							>
+ 						</File>
+ 						<File
++							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\boss_warchief_kargath_bladefist.cpp"
++							>
++						</File>
++						<File
+ 							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
+ 							>
+ 						</File>

@@ -1,0 +1,42 @@
+Index: scripts/item/item_scripts.cpp
+===================================================================
+--- scripts/item/item_scripts.cpp	(revision 682)
++++ scripts/item/item_scripts.cpp	(working copy)
+@@ -393,6 +393,25 @@
+ }
+ 
+ /*#####
++# item_wolpertinger_net
++#####*/
++
++bool ItemUse_item_wolpertinger_net(Player *player, Item* _Item, SpellCastTargets const& targets)
++{
++    if( targets.getUnitTarget() && targets.getUnitTarget()->GetTypeId()==TYPEID_UNIT &&
++        targets.getUnitTarget()->GetEntry() == 23487 )
++        return false;
++
++    WorldPacket data(SMSG_CAST_FAILED, (4+2));              // prepare packet error message
++    data << uint32(_Item->GetEntry());                      // itemId
++    data << uint8(SPELL_FAILED_BAD_TARGETS);                // reason
++    player->GetSession()->SendPacket(&data);                // send message: Invalid target
++
++    player->SendEquipError(EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM,_Item,NULL);
++    return true;
++}
++
++/*#####
+ # item_yehkinyas_bramble
+ #####*/
+ 
+@@ -518,6 +537,11 @@
+     m_scripts[nrscripts++] = newscript;
+ 
+     newscript = new Script;
++    newscript->Name="item_wolpertinger_net";
++    newscript->pItemUse = ItemUse_item_wolpertinger_net;
++    m_scripts[nrscripts++] = newscript;
++
++    newscript = new Script;
+     newscript->Name="item_yehkinyas_bramble";
+     newscript->pItemUse = ItemUse_item_yehkinyas_bramble;
+     m_scripts[nrscripts++] = newscript;

@@ -1,0 +1,11 @@
+#Benediction
+DELETE FROM `spell_affect` WHERE `entry` IN (20101);
+INSERT INTO `spell_affect` VALUES (20101, 0, 0x000004000A840200);
+DELETE FROM `spell_affect` WHERE `entry` IN (20102);
+INSERT INTO `spell_affect` VALUES (20102, 0, 0x000004000A840200);
+DELETE FROM `spell_affect` WHERE `entry` IN (20103);
+INSERT INTO `spell_affect` VALUES (20103, 0, 0x000004000A840200);
+DELETE FROM `spell_affect` WHERE `entry` IN (20104);
+INSERT INTO `spell_affect` VALUES (20104, 0, 0x000004000A840200);
+DELETE FROM `spell_affect` WHERE `entry` IN (20105);
+INSERT INTO `spell_affect` VALUES (20105, 0, 0x000004000A840200);

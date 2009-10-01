@@ -1,0 +1,56 @@
+Index: SpellAuras.cpp
+===================================================================
+--- SpellAuras.cpp	(revision 6467)
++++ SpellAuras.cpp	(revision 6468)
+@@ -2676,9 +2676,6 @@
+         return;
+ 
+     Unit* caster = GetCaster();
+-
+-    if(caster && caster->GetTypeId() == TYPEID_PLAYER)
+-        m_target->SendUpdateToPlayer((Player*)caster);
+ }
+ 
+ void Aura::HandleForceReaction(bool apply, bool Real)
+@@ -3195,9 +3192,6 @@
+             // apply only if not in GM invisibility
+             if(m_target->GetVisibility()!=VISIBILITY_OFF)
+             {
+-                m_target->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
+-                if(m_target->GetTypeId() == TYPEID_PLAYER)
+-                    m_target->SendUpdateToPlayer((Player*)m_target);
+                 m_target->SetVisibility(VISIBILITY_GROUP_STEALTH);
+             }
+ 
+@@ -3223,8 +3217,6 @@
+                     m_target->SetByteValue(PLAYER_FIELD_BYTES2, 1, 0x00);
+ 
+                 m_target->SetVisibility(VISIBILITY_ON);
+-                if(m_target->GetTypeId() == TYPEID_PLAYER)
+-                    m_target->SendUpdateToPlayer((Player*)m_target);
+             }
+         }
+     }
+@@ -3268,9 +3260,6 @@
+         if(m_target->GetVisibility()!=VISIBILITY_OFF)
+         {
+             // Aura not added yet but visibility code expect temporary add aura
+-            m_target->SetVisibility(VISIBILITY_GROUP_NO_DETECT);
+-            if(m_target->GetTypeId() == TYPEID_PLAYER)
+-                m_target->SendUpdateToPlayer((Player*)m_target);
+             m_target->SetVisibility(VISIBILITY_GROUP_INVISIBILITY);
+         }
+     }
+@@ -3293,8 +3282,6 @@
+             if(m_target->GetVisibility()!=VISIBILITY_OFF)
+             {
+                 m_target->SetVisibility(VISIBILITY_ON);
+-                if(m_target->GetTypeId() == TYPEID_PLAYER)
+-                    m_target->SendUpdateToPlayer((Player*)m_target);
+             }
+         }
+     }
+
+
+* Fixed client freezes caused by stealth, invisibility and transform auras
+* Removed no longer used visibility type VISIBILITY_GROUP_NO_DETECT

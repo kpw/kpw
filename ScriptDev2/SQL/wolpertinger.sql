@@ -1,0 +1,1 @@
+UPDATE `item_template` SET `ScriptName`='item_wolpertinger_net' WHERE `entry`='32907';

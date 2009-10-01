@@ -1,0 +1,326 @@
+Index: Makefile.am
+===================================================================
+--- Makefile.am	(revision 667)
++++ Makefile.am	(working copy)
+@@ -167,6 +167,7 @@
+ scripts/zone/coilfang_resevoir/underbog/boss_hungarfen.cpp \
+ scripts/zone/darkshore/darkshore.cpp \
+ scripts/zone/deadmines/deadmines.cpp \
++scripts/zone/deadmines/def_deadmines.h \
+ scripts/zone/dun_morogh/dun_morogh.cpp \
+ scripts/zone/dustwallow_marsh/dustwallow_marsh.cpp \
+ scripts/zone/eastern_plaguelands/eastern_plaguelands.cpp \
+Index: ScriptMgr.cpp
+===================================================================
+--- ScriptMgr.cpp	(revision 667)
++++ ScriptMgr.cpp	(working copy)
+@@ -264,6 +264,8 @@
+ //Darkshore
+ //Darnassus
+ //Deadmines
++extern void AddSC_instance_deadmines();
++
+ //Deadwind pass
+ //Desolace
+ //Dire Maul
+@@ -1367,6 +1369,8 @@
+     //Darkshore
+     //Darnassus
+     //Deadmines
++    AddSC_instance_deadmines();
++
+     //Deadwind pass
+     //Desolace
+     //Dire Maul
+Index: scripts/zone/deadmines/deadmines.cpp
+===================================================================
+--- scripts/zone/deadmines/deadmines.cpp	(revision 667)
++++ scripts/zone/deadmines/deadmines.cpp	(working copy)
+@@ -22,3 +22,223 @@
+ EndScriptData */
+ 
+ #include "precompiled.h"
++#include "def_deadmines.h"
++#include "GameObject.h"
++#include "Player.h"
++#include "Spell.h"
++#include "WorldPacket.h"
++
++#define SOUND_CANNONFIRE	1400
++#define SOUND_DESTROYDOOR	3079
++#define SAY_MR_SMITE_ALARM1 "You there, check out that noise!"
++#define SOUND_MR_SMITE_ALARM1  5775
++#define SAY_MR_SMITE_ALARM2 "We're under attack! A vast, ye swabs! Repel the invaders!"
++#define SOUND_MR_SMITE_ALARM2  5777
++
++#define GO_IRONCLAD_DOOR	16397
++#define GO_DEFIAS_CANNON	16398
++#define GO_DOOR_LEVER		101833
++
++#define DEFIAS_PIRATE		657
++#define DEFIAS_COMPANION	3450
++
++#define CANNON_BLAST_TIMER 3000
++#define PIRATES_DELAY_TIMER 1000
++
++struct MANGOS_DLL_DECL instance_deadmines : public ScriptedInstance
++{
++	GameObject* IronCladDoor;
++	GameObject* DefiasCannon;
++	GameObject* DoorLever;
++	Creature* DefiasPirate1;
++	Creature* DefiasPirate2;
++	Creature* DefiasCompanion;
++	uint32 State;
++	uint32 CannonBlast_Timer;
++	uint32 PiratesDelay_Timer;
++
++	instance_deadmines(Map *Map) : ScriptedInstance(Map) {Initialize();};
++
++	void Initialize()
++	{
++		IronCladDoor = NULL;
++		DefiasCannon = NULL;
++		DoorLever =	NULL;
++		State = CANNON_NOT_USED;
++	}
++
++	virtual void Update(uint32 diff)
++	{
++		switch(State)
++		{
++			case CANNON_GUNPOWDER_USED:
++				CannonBlast_Timer = CANNON_BLAST_TIMER;
++				if(IronCladDoor)
++				{
++					// it's a hack - Mr. Smite should do that but his too far away
++					IronCladDoor->SetName("Mr. Smite");
++					IronCladDoor->Yell(SAY_MR_SMITE_ALARM1, LANG_UNIVERSAL, 0);
++					DoPlaySound(IronCladDoor, SOUND_MR_SMITE_ALARM1);
++				}
++				State = CANNON_BLAST_INITIATED;
++				break;
++			case CANNON_BLAST_INITIATED:	
++				PiratesDelay_Timer = PIRATES_DELAY_TIMER;
++				if(CannonBlast_Timer<diff)
++				{
++					SummonCreatures();
++					ShootCannon();
++					BlastOutDoor();
++					LeverStucked();
++					if(IronCladDoor)
++					{
++						IronCladDoor->Yell(SAY_MR_SMITE_ALARM2, LANG_UNIVERSAL, 0);
++						DoPlaySound(IronCladDoor, SOUND_MR_SMITE_ALARM2);
++					}
++					State = CANNON_PIRATES_ATTACK;						
++				}else
++					CannonBlast_Timer-=diff;								
++				break;
++			case CANNON_PIRATES_ATTACK:
++				if(PiratesDelay_Timer<diff)
++				{
++					MoveCreaturesInside();
++					State = CANNON_EVENT_DONE;
++				}else
++					PiratesDelay_Timer-=diff;
++				break;
++		}
++	}
++
++	void SummonCreatures()
++	{
++		if (IronCladDoor)
++		{
++			DefiasPirate1 = IronCladDoor->SummonCreature(DEFIAS_PIRATE, -100.97, -677, 7.42, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 360000);
++			DefiasPirate2 = IronCladDoor->SummonCreature(DEFIAS_PIRATE, -98.5, -675.77, 7.42, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 360000);
++			DefiasCompanion = IronCladDoor->SummonCreature(DEFIAS_COMPANION, -98.19, -675.08, 7.42, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 360000);
++		}
++	}
++	
++	void MoveCreaturesInside()
++	{
++		MoveCreatureInside(DefiasPirate1);
++		MoveCreatureInside(DefiasPirate2);
++		MoveCreatureInside(DefiasCompanion);
++	}
++
++	void MoveCreatureInside(Creature *creature)
++	{
++		if (creature)
++		{
++			creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALK_MODE);
++			creature->GetMotionMaster()->MovePoint(0, -102.7,-655.9, 7.43);
++		}
++	}
++
++	void ShootCannon()
++	{
++		if (DefiasCannon)
++		{
++			DefiasCannon->SetUInt32Value(GAMEOBJECT_STATE, 0);
++			DoPlaySound(DefiasCannon, SOUND_CANNONFIRE);
++		}
++	}
++
++	void BlastOutDoor()
++	{
++		if(IronCladDoor)
++		{
++			IronCladDoor->SetUInt32Value(GAMEOBJECT_STATE, 2);
++			DoPlaySound(IronCladDoor, SOUND_DESTROYDOOR);
++		}
++	}
++
++	void LeverStucked()
++	{
++		if (DoorLever)
++			DoorLever->SetUInt32Value(GAMEOBJECT_FLAGS, 4);
++	}
++
++	void OnObjectCreate(GameObject *go)
++	{
++		switch(go->GetEntry())
++		{
++			case GO_IRONCLAD_DOOR:
++				IronCladDoor = go;
++				break;
++			case GO_DEFIAS_CANNON:
++				DefiasCannon = go;
++				break;
++			case GO_DOOR_LEVER:
++				DoorLever = go;
++				break;
++		}
++	}
++
++	void SetData(uint32 type, uint32 data)
++	{
++		if (type == EVENT_STATE)
++		{
++			if (DefiasCannon && IronCladDoor)			
++				State=data;			
++		}
++	}
++
++	uint32 GetData(uint32 type)
++	{
++		if (type == EVENT_STATE)		
++			return State;
++		return 0;
++	}
++
++	void DoPlaySound(GameObject* unit, uint32 sound)
++	{
++		WorldPacket data(4);
++		data.SetOpcode(SMSG_PLAY_SOUND);
++		data << uint32(sound);
++		unit->SendMessageToSet(&data,false);
++	}
++};
++
++/*#####
++# item_Defias_Gunpowder
++#####*/
++
++bool ItemUse_item_Defias_Gunpowder(Player *player, Item* _Item, SpellCastTargets const& targets)
++{
++	ScriptedInstance *pInstance = (player->GetInstanceData()) ? ((ScriptedInstance*)player->GetInstanceData()) : NULL;
++
++	if(!pInstance)
++	{
++		player->GetSession()->SendNotification("Instance script not initialized");
++		return true;
++	}
++	if (pInstance->GetData(EVENT_STATE)!=CANNON_NOT_USED)
++		return false;
++	if(targets.getGOTarget() && targets.getGOTarget()->GetTypeId()==TYPEID_GAMEOBJECT && targets.getGOTarget()->GetEntry() == GO_DEFIAS_CANNON)
++		pInstance->SetData(EVENT_STATE, CANNON_GUNPOWDER_USED);
++
++	player->DestroyItemCount(_Item->GetEntry(), 1, true);
++	return true;
++}
++
++InstanceData* GetInstanceData_instance_deadmines(Map* map)
++{
++	return new instance_deadmines(map);
++}
++
++void AddSC_instance_deadmines()
++{
++	Script *newscript;
++	newscript = new Script;
++	newscript->Name = "instance_deadmines";
++	newscript->GetInstanceData = GetInstanceData_instance_deadmines;
++	m_scripts[nrscripts++] = newscript;
++	
++	newscript = new Script;
++	newscript->Name="item_Defias_Gunpowder";
++	newscript->pItemUse = ItemUse_item_Defias_Gunpowder;
++	m_scripts[nrscripts++] = newscript;
++
++}
+Index: scripts/zone/deadmines/def_deadmines.h
+===================================================================
+--- scripts/zone/deadmines/def_deadmines.h	(revision 0)
++++ scripts/zone/deadmines/def_deadmines.h	(revision 0)
+@@ -0,0 +1,14 @@
++#ifndef DEF_DEADMINES_H
++#define DEF_DEADMINES_H
++
++#include "sc_creature.h"
++#include "sc_instance.h"
++
++#define CANNON_NOT_USED 0
++#define CANNON_GUNPOWDER_USED 1
++#define CANNON_BLAST_INITIATED 2
++#define CANNON_PIRATES_ATTACK 3
++#define CANNON_EVENT_DONE 4
++
++#define EVENT_STATE 0
++#endif
+Index: VC71/71ScriptDev2.vcproj
+===================================================================
+--- VC71/71ScriptDev2.vcproj	(revision 667)
++++ VC71/71ScriptDev2.vcproj	(working copy)
+@@ -312,6 +312,10 @@
+ 						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"
+ 						>
+ 					</File>
++					<File
++						RelativePath="..\scripts\zone\deadmines\def_deadmines.h"
++						>
++					</File>
+ 				</Filter>
+ 				<Filter
+ 					Name="Deadwind Pass"
+Index: VC80/80ScriptDev2.vcproj
+===================================================================
+--- VC80/80ScriptDev2.vcproj	(revision 667)
++++ VC80/80ScriptDev2.vcproj	(working copy)
+@@ -551,6 +551,10 @@
+ 						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"
+ 						>
+ 					</File>
++					<File
++						RelativePath="..\scripts\zone\deadmines\def_deadmines.h"
++						>
++					</File>
+ 				</Filter>
+ 				<Filter
+ 					Name="Deadwind Pass"
+Index: VC90/90ScriptDev2.vcproj
+===================================================================
+--- VC90/90ScriptDev2.vcproj	(revision 667)
++++ VC90/90ScriptDev2.vcproj	(working copy)
+@@ -550,6 +550,10 @@
+ 						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"
+ 						>
+ 					</File>
++					<File
++						RelativePath="..\scripts\zone\deadmines\def_deadmines.h"
++						>
++					</File>
+ 				</Filter>
+ 				<Filter
+ 					Name="Deadwind Pass"

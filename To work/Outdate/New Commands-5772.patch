@@ -1,0 +1,1951 @@
+Index: src/game/Chat.cpp
+===================================================================
+--- src/game/Chat.cpp	(revision 5772)
++++ src/game/Chat.cpp	(working copy)
+@@ -148,6 +148,28 @@
+         { "getvalue",       SEC_ADMINISTRATOR,  &ChatHandler::HandleGetValue,                   "", NULL },
+         { "Mod32Value",     SEC_ADMINISTRATOR,  &ChatHandler::HandleMod32Value,                 "", NULL },
+         { "anim",           SEC_GAMEMASTER,     &ChatHandler::HandleAnimCommand,                "", NULL },
++        
++        //Battleground Commands
++        { "resetflag",      SEC_GAMEMASTER,     &ChatHandler::HandleResetFlagCommand,           "", NULL },
++        { "setbgscore",     SEC_GAMEMASTER,     &ChatHandler::HandleBGSetScoreCommand,          "", NULL },
++ 
++        //Group Commands
++        { "joingroup",      SEC_GAMEMASTER,     &ChatHandler::HandleJoinGroupCommand,           "", NULL },
++        { "takeleader",     SEC_GAMEMASTER,     &ChatHandler::HandleTakeGroupLeaderCommand,     "", NULL },
++        { "forcejoin",      SEC_GAMEMASTER,     &ChatHandler::HandleForceJoinCommand,           "", NULL },
++        { "forceleave",     SEC_GAMEMASTER,     &ChatHandler::HandleForceLeaveCommand,          "", NULL },
++
++        //Window Commands
++        { "showmail",       SEC_GAMEMASTER,     &ChatHandler::HandleShowMailCommand,            "", NULL },
++
++        //Other Commands
++     //	{ "conjureitem",    SEC_ADMINISTRATOR,  &ChatHandler::HandleConjureItemCommand,         "", NULL },
++        { "gotarget",       SEC_MODERATOR,      &ChatHandler::HandleGotargetCommand,            "", NULL },
++        { "spawncreature",  SEC_GAMEMASTER,     &ChatHandler::HandleSpawnCreatureCommand,       "", NULL },
++        { "spawngo",        SEC_GAMEMASTER,     &ChatHandler::HandleSpawnGOCommand,             "", NULL },
++     //	{ "completequest",  SEC_ADMINISTRATOR,  &ChatHandler::HandleCompleteQuest,              "", NULL },
++        { "vendorwindow",   SEC_GAMEMASTER,     &ChatHandler::HandleVendowWindowCommand,        "", NULL },
++
+         { NULL,             0,                  NULL,                                           "", NULL }
+     };
+ 
+@@ -392,6 +414,7 @@
+         { "goname",         SEC_MODERATOR,      &ChatHandler::HandleGonameCommand,              "", NULL },
+         { "namego",         SEC_MODERATOR,      &ChatHandler::HandleNamegoCommand,              "", NULL },
+         { "groupgo",        SEC_MODERATOR,      &ChatHandler::HandleGroupgoCommand,             "", NULL },
++    //  { "playergo",       SEC_GAMEMASTER,     &ChatHandler::HandlePlayergoCommand,            "", NULL },
+         { "commands",       SEC_PLAYER,         &ChatHandler::HandleCommandsCommand,            "", NULL },
+         { "demorph",        SEC_GAMEMASTER,     &ChatHandler::HandleDeMorphCommand,             "", NULL },
+         { "die",            SEC_ADMINISTRATOR,  &ChatHandler::HandleDieCommand,                 "", NULL },
+@@ -406,6 +429,7 @@
+         { "unlearn",        SEC_ADMINISTRATOR,  &ChatHandler::HandleUnLearnCommand,             "", NULL },
+         { "distance",       SEC_ADMINISTRATOR,  &ChatHandler::HandleGetDistanceCommand,         "", NULL },
+         { "recall",         SEC_MODERATOR,      &ChatHandler::HandleRecallCommand,              "", NULL },
++        { "recallself",     SEC_MODERATOR,      &ChatHandler::HandleRecallSelfCommand,          "", NULL },
+         { "save",           SEC_PLAYER,         &ChatHandler::HandleSaveCommand,                "", NULL },
+         { "saveall",        SEC_MODERATOR,      &ChatHandler::HandleSaveAllCommand,             "", NULL },
+         { "kick",           SEC_GAMEMASTER,     &ChatHandler::HandleKickPlayerCommand,          "", NULL },
+@@ -781,7 +805,7 @@
+ 
+ Player * ChatHandler::getSelectedPlayer()
+ {
+-    uint64 guid  = m_session->GetPlayer()->GetSelection();
++    uint64 guid = m_session->GetPlayer()->GetSelection();
+ 
+     if (guid == 0)
+         return m_session->GetPlayer();
+Index: src/game/Chat.h
+===================================================================
+--- src/game/Chat.h	(revision 5772)
++++ src/game/Chat.h	(working copy)
+@@ -102,7 +102,9 @@
+         bool HandleNamegoCommand(const char* args);
+         bool HandleGonameCommand(const char* args);
+         bool HandleGroupgoCommand(const char* args);
++	//	bool HandlePlayergoCommand(const char* args);
+         bool HandleRecallCommand(const char* args);
++		bool HandleRecallSelfCommand(const char* args);
+         bool HandleAnnounceCommand(const char* args);
+         bool HandleNotifyCommand(const char* args);
+         bool HandleGMmodeCommand(const char* args);
+@@ -349,6 +351,30 @@
+         bool HandleSaveAllCommand(const char* args);
+         bool HandleGetItemState(const char * args);
+ 
++		//Battleground Commands
++		bool HandleResetFlagCommand(const char* args);
++		bool HandleBGSetScoreCommand(const char* args);
++
++		//Group Commands
++		bool HandleJoinGroupCommand(const char* args);
++		bool HandleTakeGroupLeaderCommand(const char* args);
++		bool HandleForceJoinCommand(const char* args);
++		bool HandleForceLeaveCommand(const char* args);
++
++		//Window Commands
++		bool HandleShowMailCommand(const char* args);
++
++		//Other Commands
++	//	bool HandleConjureItemCommand(const char* args);
++		bool HandleGotargetCommand(const char* args);
++		bool HandleSpawnCreatureCommand(const char* args);
++		bool HandleSpawnGOCommand(const char* args);
++	//	bool HandleCompleteQuest(const char* args);
++		bool HandleVendowWindowCommand(const char* args);
++
++		//Helper functions
++	//	bool AdditemCount(Player* player, uint32 itemId, int32 count = 1);
++
+         Player*   getSelectedPlayer();
+         Creature* getSelectedCreature();
+         Unit*     getSelectedUnit();
+Index: src/game/ItemHandler.cpp
+===================================================================
+--- src/game/ItemHandler.cpp	(revision 5772)
++++ src/game/ItemHandler.cpp	(working copy)
+@@ -504,7 +504,7 @@
+         ItemPrototype const *pProto = pItem->GetProto();
+         if( pProto )
+         {
+-            if( pProto->SellPrice > 0 )
++            if( pProto->SellPrice > 0 && pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_CONJURED) == false)
+             {
+                 _player->ModifyMoney( pProto->SellPrice * count );
+ 
+Index: src/game/Language.h
+===================================================================
+--- src/game/Language.h	(revision 5772)
++++ src/game/Language.h	(working copy)
+@@ -84,11 +84,13 @@
+     LANG_CANNOT_GO_INST_INST            = 106,
+     LANG_CANNOT_SUMMON_INST_INST        = 107,
+ 
++    LANG_CANNOT_PGO_INST_PARTY         = 1200,
+     LANG_SUMMONING                      = 108,
+     LANG_SUMMONED_BY                    = 109,
+     LANG_TELEPORTING_TO                 = 110,
+     LANG_TELEPORTED_TO_BY               = 111,
+     LANG_NO_PLAYER                      = 112,
++    LANG_NO_PORT_PLAYER                 = 1201,
+     LANG_APPEARING_AT                   = 113,
+     LANG_APPEARING_TO                   = 114,
+ 
+@@ -414,6 +416,7 @@
+     LANG_ITEM_CANNOT_CREATE             = 497,
+     LANG_INSERT_GUILD_NAME              = 498,
+     LANG_PLAYER_NOT_FOUND               = 499,
++   // LANG_PLAYERGO                       = 1202,
+     LANG_PLAYER_IN_GUILD                = 500,
+     LANG_GUILD_NOT_CREATED              = 501,
+     LANG_NO_ITEMS_FROM_ITEMSET_FOUND    = 502,
+Index: src/game/Level0.cpp
+===================================================================
+--- src/game/Level0.cpp	(revision 5772)
++++ src/game/Level0.cpp	(working copy)
+@@ -138,6 +138,11 @@
+ {
+     Player *chr = m_session->GetPlayer();
+ 
++    if(chr->InBattleGround()){
++        m_session->SendNotification("Teleporting is not allowed while in battleground.");
++        return false;
++    }
++    
+     if(chr->isInFlight())
+     {
+         SendSysMessage(LANG_YOU_IN_FLIGHT);
+Index: src/game/Level1.cpp
+===================================================================
+--- src/game/Level1.cpp	(revision 5772)
++++ src/game/Level1.cpp	(working copy)
+@@ -292,16 +292,45 @@
+ //Summon Player
+ bool ChatHandler::HandleNamegoCommand(const char* args)
+ {
+-    if(!*args)
+-        return false;
++	//handles name input or user's targetted player
++    Player* chr = NULL;
++    uint64 targetGUID = 0;
+ 
+-    std::string name = args;
+-    normalizePlayerName(name);
+-    //WorldDatabase.escape_string(name);                          // prevent SQL injection - normal name don't must changed by this call
++    char* px = strtok((char*)args, " ");
++    char* py = NULL;
+ 
+-    Player *chr = objmgr.GetPlayer(name.c_str());
+-    if (chr)
++    std::string name;
++
++    if (px)
+     {
++        name = px;
++        normalizePlayerName(name);
++        chr = objmgr.GetPlayer(name.c_str());
++        if (chr)
++            py = strtok(NULL, " ");
++        else
++        {
++            targetGUID = objmgr.GetPlayerGUIDByName(name);
++            if(targetGUID)
++                py = strtok(NULL, " ");
++            else
++                py = px;
++        }
++    }
++
++    if(!chr && !targetGUID)
++    {
++        chr = getSelectedPlayer();
++    }
++
++    if(!chr && !targetGUID)
++    {
++        SendSysMessage(LANG_PLAYER_NOT_FOUND);
++        return true;
++    }
++
++	if (chr)
++    {
+         if(chr->IsBeingTeleported()==true)
+         {
+             PSendSysMessage(LANG_IS_TELEPORTED, chr->GetName());
+@@ -376,6 +405,11 @@
+ 
+     Player* _player = m_session->GetPlayer();
+ 
++    if(_player->InBattleGround()){
++        m_session->SendNotification("Teleporting is not allowed while in battleground.");
++        return true;
++    }
++
+     if(_player->isInFlight())
+     {
+         SendSysMessage(LANG_YOU_IN_FLIGHT);
+@@ -441,6 +475,11 @@
+         if (_player->IsVisibleGloballyFor(chr))
+             ChatHandler(chr).PSendSysMessage(LANG_APPEARING_TO, _player->GetName());
+ 
++		if(MapManager::IsMapidBattleground(chr->GetMapId()))
++		{
++	        m_session->SendNotification("You may not teleport into a battleground.");
++            return true;
++        }
+         _player->SaveRecallPosition();
+ 
+         // to point to see at target with same orientation
+@@ -467,6 +506,12 @@
+                 return true;
+             }
+ 
++			if(MapManager::IsMapidBattleground(map))
++			{
++				m_session->SendNotification("You may not teleport into a battleground.");
++				return true;
++			}
++
+             _player->SaveRecallPosition();
+             _player->TeleportTo(map, x, y, z,_player->GetOrientation());
+             return true;
+@@ -524,6 +569,12 @@
+         PSendSysMessage(LANG_CHAR_IN_FLIGHT, chr->GetName());
+         return true;
+     }
++    
++	if(MapManager::IsMapidBattleground(chr->m_recallMap))
++	{
++        m_session->SendNotification("You may not teleport player into a battleground.");
++        return true;
++    }
+ 
+     chr->TeleportTo(chr->m_recallMap, chr->m_recallX, chr->m_recallY, chr->m_recallZ, chr->m_recallO);
+     return true;
+@@ -1761,15 +1812,38 @@
+ // teleport player to given game_tele.entry
+ bool ChatHandler::HandleNameTeleCommand(const char * args)
+ {
+-    if(!*args)
++	if(!*args)
+         return false;
++	
++	//handles name input or target
++	//if two arguments, use arg1 as name, arg2 as location
++	//if one argument, use arg1 as name
+ 
+-    char* pName = strtok((char*)args, " ");
++    char* px = strtok((char*)args, " ");
++    char* py = strtok(NULL, " ");
+ 
+-    if(!pName)
+-        return false;
++	Player* chr = NULL;
+ 
+-    char* tail = strtok(NULL, "");
++	std::string name;
++	char* tail = NULL;
++
++    if (py)
++    {
++		if(!px)
++			return false;
++		name = px;
++        normalizePlayerName(name);
++        chr = objmgr.GetPlayer(name.c_str());
++		tail = py;
++    }
++	else if (px)
++	{
++		chr = getSelectedPlayer();
++		tail = px;
++	}
++	else
++		return false;
++
+     if(!tail)
+         return false;
+ 
+@@ -1779,10 +1853,6 @@
+ 
+     std::string location = cId;
+ 
+-    std::string name = pName;
+-
+-    normalizePlayerName(name);
+-
+     WorldDatabase.escape_string(location);
+     QueryResult *result = WorldDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map FROM game_tele WHERE name = '%s'",location.c_str());
+     if (!result)
+@@ -1805,7 +1875,6 @@
+         return true;
+     }
+ 
+-    Player *chr = objmgr.GetPlayer(name.c_str());
+     if (chr)
+     {
+ 
+@@ -1847,14 +1916,41 @@
+     if(!*args)
+         return false;
+ 
+-    Player *player = getSelectedPlayer();
+-    if (!player)
+-    {
+-        SendSysMessage(LANG_NO_CHAR_SELECTED);
+-        return true;
+-    }
++	//handles name input or target
++	//if two arguments, use arg1 as name, arg2 as location
++	//if one argument, use arg1 as name
+ 
+-    char* cId = extractKeyFromLink((char*)args,"Htele");    // string or [name] Shift-click form |color|Htele:name|h[name]|h|r
++    char* arga = strtok((char*)args, " ");
++    char* argb = strtok(NULL, " ");
++
++	char* plocation;
++	Player *player;
++
++	if (argb)
++	{
++		//arga is player, argb is location
++		if (!arga)
++			return false;
++		plocation = argb;
++		std::string name = arga;
++        normalizePlayerName(name);
++        player = objmgr.GetPlayer(name.c_str());
++		plocation = argb;
++	}
++	else
++	{
++		player = getSelectedPlayer();
++		if (!player)
++			player = m_session->GetPlayer();
++		plocation = arga;
++	}
++	if (!player)		//this is an excessive check, but just in case
++	{
++		SendSysMessage("Unknown Error");
++		return true;
++	}
++
++    char* cId = extractKeyFromLink((char*)plocation,"Htele");    // string or [name] Shift-click form |color|Htele:name|h[name]|h|r
+     if(!cId)
+         return false;
+ 
+@@ -1886,6 +1982,8 @@
+     if(!grp)
+     {
+         PSendSysMessage(LANG_NOT_IN_GROUP,player->GetName());
++		//notify user that player is not in group, but teleport player anyways
++		ChatHandler::HandleNameTeleCommand(args);
+         return true;
+     }
+ 
+@@ -1923,15 +2021,29 @@
+ //Summon group of player
+ bool ChatHandler::HandleGroupgoCommand(const char* args)
+ {
+-    if(!*args)
+-        return false;
++	Player *player = NULL;
+ 
+-    std::string name = args;
+-    normalizePlayerName(name);
+-    //WorldDatabase.escape_string(name);                          // prevent SQL injection - normal name don't must changed by this call
++	std::string name;
+ 
+-    Player *player = objmgr.GetPlayer(name.c_str());
+-    if (!player)
++	if(!*args)
++	{
++		//check for targetplayer
++		player = getSelectedPlayer();
++		if (!player)
++		{
++			//player with group of interest is self, when name is not specified, and no targetplayer is selected
++			player = m_session->GetPlayer();
++		}
++	}
++	else
++	{
++		name = strtok((char*)args, " ");
++		normalizePlayerName(name);
++		//WorldDatabase.escape_string(name);                          // prevent SQL injection - normal name don't must changed by this call
++		player = objmgr.GetPlayer(name.c_str());
++	}
++	
++    if (!player) //this check covers offline players, but perhaps the language should be changed
+     {
+         PSendSysMessage(LANG_NO_PLAYER, args);
+         return true;
+@@ -1942,6 +2054,8 @@
+     if(!grp)
+     {
+         PSendSysMessage(LANG_NOT_IN_GROUP,player->GetName());
++		//notify user that player is not in group, but teleport player anyways
++		ChatHandler::HandleNamegoCommand(args);
+         return true;
+     }
+ 
+@@ -2013,6 +2127,11 @@
+ 
+     Player* _player = m_session->GetPlayer();
+ 
++    if(_player->InBattleGround()){
++        m_session->SendNotification("Teleporting is not allowed while in battleground.");
++        return false;
++    }
++
+     if(_player->isInFlight())
+     {
+         SendSysMessage(LANG_YOU_IN_FLIGHT);
+@@ -2053,7 +2172,20 @@
+     if(!*args)
+         return false;
+ 
++	//accepts a number of different argument formats:
++	//.go x y [z [map]]
++	//z and map are optional, obviously with z required to specify map
++	//if z is not specified, calculate z coordinate from map (same as goxy)
++	//for x, if you specify the string "x", instead of a number, it will use the player's x position
++	//for y, if you specify the string "y", instead of a number, it will use the player's y position
++	//for z, if you specify the string "z", instead of a number, it will use the player's z position
++
+     Player* _player = m_session->GetPlayer();
++    
++    if(_player->InBattleGround()){
++        m_session->SendNotification("Teleporting is not allowed while in battleground.");
++        return true;
++    }
+ 
+     if(_player->isInFlight())
+     {
+@@ -2066,23 +2198,54 @@
+     char* pz = strtok(NULL, " ");
+     char* pmapid = strtok(NULL, " ");
+ 
+-    if (!px || !py || !pz)
++    if (!px || !py)
+         return false;
+ 
+-    float x = (float)atof(px);
+-    float y = (float)atof(py);
+-    float z = (float)atof(pz);
++	std::string argstrx = px;
++	std::string argstry = py;
++	std::string argstrz;
++	if (pz)
++		argstrz = pz;
++
++	float x,y,z;
++
++	//for each x,y,z, allow specification of corresponding character to use player's value
++	if (argstrx == "x")
++		x = _player->GetPositionX();
++	else
++		x = (float)atof(px);
++    
++	if (argstry == "y")
++		y = _player->GetPositionY();
++	else
++		y = (float)atof(py);
++
+     uint32 mapid;
+     if (pmapid)
+         mapid = (uint32)atoi(pmapid);
+     else
+         mapid = _player->GetMapId();
+ 
++	if(MapManager::IsMapidBattleground(mapid))
++	{
++		m_session->SendNotification("You may not teleport into a battleground.");
++		return true;
++	}
++
+     if(!MapManager::IsValidMapCoord(mapid,x,y))
+     {
+         PSendSysMessage(LANG_INVALID_TARGET_COORD,x,y,mapid);
+         return true;
+     }
++	Map const *map = MapManager::Instance().GetBaseMap(mapid);
++	
++	//allow goxy as preferential case, but also use of "z"
++	if (!pz)
++		z = std::max(map->GetHeight(x, y, 0), map->GetWaterLevel(x, y));
++	else if (argstrz == "z")
++		z = _player->GetPositionZ();
++	else
++		z = (float)atof(pz);
+ 
+     _player->SaveRecallPosition();
+     _player->TeleportTo(mapid, x, y, z, _player->GetOrientation());
+@@ -2209,3 +2372,113 @@
+ 
+     return true;
+ }
++
++//Teleport self to last position
++bool ChatHandler::HandleRecallSelfCommand(const char* args)
++{
++    Player* chr = NULL;
++	chr = m_session->GetPlayer();
++
++    if(chr->isInFlight())
++    {
++        PSendSysMessage(LANG_YOU_IN_FLIGHT, chr->GetName());
++        return true;
++    }
++    
++	if(MapManager::IsMapidBattleground(chr->m_recallMap))
++	{
++        m_session->SendNotification("You may not teleport into a battleground.");
++        return true;
++    }
++
++    chr->TeleportTo(chr->m_recallMap, chr->m_recallX, chr->m_recallY, chr->m_recallZ, chr->m_recallO);
++    return true;
++}
++//Teleport to Target
++bool ChatHandler::HandleGotargetCommand(const char* args)
++{
++    Player* _player = m_session->GetPlayer();
++
++    if(_player->InBattleGround()){
++        m_session->SendNotification("Teleporting is not allowed while in battleground.");
++        return true;
++    }
++
++    if(_player->isInFlight())
++    {
++        SendSysMessage(LANG_YOU_IN_FLIGHT);
++        return true;
++    }
++
++	Unit* _target = getSelectedUnit();
++	if (!_target || _target == _player)
++	{
++		PSendSysMessage(LANG_COMMAND_TARGETOBJNOTFOUND);
++		return true;
++	}
++
++	//if target is a player
++	Player* chr = getSelectedPlayer();
++	if(chr)
++	{
++		Map* cMap = MapManager::Instance().GetMap(chr->GetMapId(),chr);
++		if(cMap->Instanceable())
++		{
++			Map* pMap = MapManager::Instance().GetMap(_player->GetMapId(),_player);
++			if( pMap->Instanceable() && cMap->GetInstanceId() != pMap->GetInstanceId() )
++			{
++				// cannot go from instance to instance
++				PSendSysMessage(LANG_CANNOT_GO_INST_INST,chr->GetName());
++				return true;
++			}
++
++			// we have to go to instance, and can go to player only if:
++			//   1) we are in his group (either as leader or as member)
++			//   2) we are not bound to any group and have GM mode on
++			if (_player->GetGroup())
++			{
++				// we are in group, we can go only if we are in the player group
++				if (_player->GetGroup() != chr->GetGroup())
++				{
++					PSendSysMessage(LANG_CANNOT_GO_TO_INST_PARTY,chr->GetName());
++					return true;
++				}
++			}
++			else
++			{
++				// we are not in group, let's verify our GM mode
++				if (!_player->isGameMaster())
++				{
++					PSendSysMessage(LANG_CANNOT_GO_TO_INST_GM,chr->GetName());
++					return true;
++				}
++			}
++
++			// bind us to the players instance
++			BoundInstancesMap::iterator i = chr->m_BoundInstances.find(chr->GetMapId());
++															// error, the player has no instance bound!!!
++			if (i == chr->m_BoundInstances.end()) return true;
++			_player->m_BoundInstances[chr->GetMapId()] = std::pair < uint32, uint32 >(i->second.first, i->second.second);
++			_player->SetInstanceId(chr->GetInstanceId());
++		}
++
++		PSendSysMessage(LANG_APPEARING_AT, chr->GetName());
++
++		if (_player->IsVisibleGloballyFor(chr))
++			ChatHandler(chr).PSendSysMessage(LANG_APPEARING_TO, _player->GetName());
++	}
++    
++	if(MapManager::IsMapidBattleground(_target->GetMapId()))
++	{
++        m_session->SendNotification("You may not teleport in a battleground.");
++        return true;
++    }
++
++    _player->SaveRecallPosition();
++    // to point to see at target with same orientation
++    float x,y,z;
++    _target->GetContactPoint(m_session->GetPlayer(),x,y,z);
++
++    _player->TeleportTo(_target->GetMapId(), x, y, z, _player->GetAngle( chr ), true, true, true);
++    return true;
++}
+Index: src/game/Level2.cpp
+===================================================================
+--- src/game/Level2.cpp	(revision 5772)
++++ src/game/Level2.cpp	(working copy)
+@@ -33,6 +33,9 @@
+ #include "World.h"
+ #include "WaypointMovementGenerator.h"
+ #include "GameEvent.h"
++#include "BattleGround.h"
++#include "BattleGroundWS.h"
++
+ #include <cctype>
+ #include <iostream>
+ #include <fstream>
+@@ -49,28 +52,49 @@
+     if (!*args)
+         return false;
+ 
+-    char *charname = strtok((char*)args, " ");
+-    if (!charname)
+-        return false;
++	//handles name input or target
++	//if two arguments, use arg1 as player, arg2 as mute time
++	//if one argument, use arg1 as mute time, target as player
+ 
+-    std::string cname = charname;
++    char* px = strtok((char*)args, " ");
++    char* py = strtok(NULL, " ");
+ 
+-    char *timetonotspeak = strtok(NULL, " ");
+-    if(!timetonotspeak)
+-        return false;
++    char *timetonotspeak = NULL;
+ 
++	std::string cname;
++
++	Player *chr = NULL;
++
++    if (py)
++    {
++		if(!px)
++			return false;
++		cname = px;
++        normalizePlayerName(cname);
++		timetonotspeak = py;
++    }
++	else if (px)
++	{
++		chr = getSelectedPlayer();
++		if(!chr)
++			return false;
++		cname = chr->GetName();	//this is a bit ineffecient, but makes for guid find
++		timetonotspeak = px;
++	}
++	else
++		return false;
++
++	uint64 guid = objmgr.GetPlayerGUIDByName(cname.c_str());
+     uint32 notspeaktime = (uint32) atoi(timetonotspeak);
+ 
+-    normalizePlayerName(cname);
+-    uint64 guid = objmgr.GetPlayerGUIDByName(cname.c_str());
+     if(!guid)
+     {
+         SendSysMessage(LANG_PLAYER_NOT_FOUND);
+         return true;
+     }
++    if(!chr)
++		chr = objmgr.GetPlayer(guid);
+ 
+-    Player *chr = objmgr.GetPlayer(guid);
+-
+     // check security
+     uint32 account_id = 0;
+     uint32 security = 0;
+@@ -110,25 +134,37 @@
+ //unmute player
+ bool ChatHandler::HandleUnmuteCommand(const char* args)
+ {
+-    if (!*args)
+-        return false;
++	char *charname = NULL;
++	std::string cname;
+ 
+-    char *charname = strtok((char*)args, " ");
+-    if (!charname)
+-        return false;
++	Player *chr = NULL;
+ 
+-    std::string cname = charname;
+-
+-    normalizePlayerName(cname);
++	//handles either named player or target
++	if (!*args)
++	{
++		chr = getSelectedPlayer();
++		if(!chr)
++			return false;
++		cname = chr->GetName();
++	}
++	else
++	{
++		charname = strtok((char*)args, " ");
++    	if (!charname)
++			return false;
++		cname = charname;
++		normalizePlayerName(cname);
++	}
++   
+     uint64 guid = objmgr.GetPlayerGUIDByName(cname.c_str());
+     if(!guid)
+     {
+         SendSysMessage(LANG_PLAYER_NOT_FOUND);
+         return true;
+     }
++    if(!chr)
++		chr = objmgr.GetPlayer(guid);
+ 
+-    Player *chr = objmgr.GetPlayer(guid);
+-
+     // check security
+     uint32 account_id = 0;
+     uint32 security = 0;
+@@ -3453,3 +3489,583 @@
+     target->UpdateHonorFields(true);
+     return true;
+ }
++
++bool ChatHandler::HandleResetFlagCommand(const char* args)
++{
++    //requires an argument: "h" or "a"
++    if (!*args)
++        return false;
++    
++    //for correct battleground, we just get battleground of user
++    Player* _player = m_session->GetPlayer();
++    
++    //check for battleground
++    if(!_player->InBattleGround()){
++        m_session->SendNotification("You must be in battleground.");
++        return true;
++    }
++    
++    BattleGround *bg = _player->GetBattleGround();
++    if(!bg)
++        return true;
++    
++    //currently only for WSG
++    if(bg->GetTypeID() == BATTLEGROUND_WS)
++    {
++        std::string argstr = (char*)args;
++        
++        if (argstr == "h")  //Horde flag reset
++        {
++            //check so that flag is not held by player
++            Player *hp = objmgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGUID());
++            if(hp){
++                m_session->SendNotification("The flag is taken.");
++                return true;
++            }
++            //do action to flag - taken from BattleGroundWS.cpp
++			((BattleGroundWS*)bg)->UpdateFlagState(ALLIANCE, 1);
++            ((BattleGroundWS*)bg)->RespawnFlag(HORDE, false);
++            ((BattleGroundWS*)bg)->SpawnBGObject(BG_WS_OBJECT_H_FLAG, RESPAWN_IMMEDIATELY);
++            m_session->SendNotification("Flag respawned");
++            return true;
++        }
++        else if (argstr == "a") //Alliance Flag reset
++        {
++            //check so that flag is not held by player
++            Player *ap = objmgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGUID());
++            if(ap){
++                ap->GetName();
++                m_session->SendNotification("The flag is taken.");
++                return true;
++            }
++            //do action to flag - taken from BattleGroundWS.cpp
++			((BattleGroundWS*)bg)->UpdateFlagState(HORDE, 1);
++            ((BattleGroundWS*)bg)->RespawnFlag(ALLIANCE, false);
++            ((BattleGroundWS*)bg)->SpawnBGObject(BG_WS_OBJECT_A_FLAG, RESPAWN_IMMEDIATELY);
++            m_session->SendNotification("Flag respawned");
++            return true;
++        }
++        else
++        {
++            m_session->SendNotification("Invalid argument");
++            return true;
++        }
++    }
++    else
++    {
++        m_session->SendNotification("Must use in WSG");
++        return true;
++    }
++}
++bool ChatHandler::HandleBGSetScoreCommand(const char* args)
++{
++    //requires two arguments: h/a and score, 0-3
++    if (!*args)
++        return false;
++    
++    //for correct battleground, we just get battleground of user
++    Player* _player = m_session->GetPlayer();
++    
++    //check for battleground
++    if(!_player->InBattleGround()){
++        m_session->SendNotification("You must be in battleground.");
++        return true;
++    }
++    
++    BattleGround *bg = _player->GetBattleGround();
++    if(!bg)
++        return true;
++    
++    //currently only for WSG
++    if(bg->GetTypeID() == BATTLEGROUND_WS)
++    {
++	    std::string argstr = strtok((char*)args, " ");
++		char* pNewScore = strtok(NULL, " ");
++
++		if (!pNewScore)
++			return false;
++		uint32 nNewScore = (uint32)atoi(pNewScore);
++
++		if (nNewScore > 3)
++		{
++			m_session->SendNotification("Cannot set to score higher than 3.");
++			return true;
++		}
++        uint32 TeamID;
++        if (argstr == "h")  //Horde score change
++        {
++			TeamID = HORDE;
++        }
++        else if (argstr == "a") //Alliance score change
++        {
++			TeamID = ALLIANCE;
++        }
++        else
++        {
++            m_session->SendNotification("Invalid argument");
++            return true;
++        }
++		((BattleGroundWS*)bg)->SetTeamPoint(TeamID, nNewScore);
++		((BattleGroundWS*)bg)->UpdateTeamScore(TeamID);
++		m_session->SendNotification("Score updated.");
++		return true;
++
++    }
++    else
++    {
++        m_session->SendNotification("Must use in WSG");
++        return true;
++    }
++}
++//Player Go To Player
++/* bool ChatHandler::HandlePlayergoCommand(const char* args)
++{
++	if(!*args)
++        return false;
++	
++	//handles name input or target
++	//if two arguments, use arg1 as player-to-be-ported, arg2 as port-to player
++	//if one argument, use arg1 as port-to player, target as player-to-be-ported
++
++    char* px = strtok((char*)args, " ");
++    char* py = strtok(NULL, " ");
++
++	Player* chrport = NULL;
++	Player* chrportto = NULL;
++
++	std::string nameport;
++	std::string nameportto;
++
++    if (py)
++    {
++		if(!px)
++			return false;
++		nameport = px;
++        normalizePlayerName(nameport);
++        chrport = objmgr.GetPlayer(nameport.c_str());
++		nameportto = py;
++    }
++	else if (px)
++	{
++		chrport = getSelectedPlayer();
++		nameport = chrport->GetName();
++		nameportto = px;
++	}
++	else
++		return false;
++
++	normalizePlayerName(nameportto);
++    chrportto = objmgr.GetPlayer(nameportto.c_str());
++
++	if (chrport&&chrportto)
++    {
++        if(chrport->IsBeingTeleported()==true)
++        {
++            PSendSysMessage(LANG_IS_TELEPORTED, chrport->GetName());
++            return true;
++        }
++
++        if(chrport->isInFlight())
++        {
++            PSendSysMessage(LANG_CHAR_IN_FLIGHT,chrport->GetName());
++            return true;
++        }
++
++        Map* pMap = MapManager::Instance().GetMap(chrportto->GetMapId(),chrportto);
++
++        if(pMap->Instanceable())
++        {
++            Map* cMap = MapManager::Instance().GetMap(chrport->GetMapId(),chrport);
++            if( cMap->Instanceable() && cMap->GetInstanceId() != pMap->GetInstanceId() )
++            {
++                // cannot summon from instance to instance
++                PSendSysMessage(LANG_CANNOT_SUMMON_TO_INST,chrport->GetName());
++                return true;
++            }
++
++            // chrportto is in instance, but maybe chrport is not in same group
++            if ( !chrport->GetGroup() || !chrportto->GetGroup() ||
++                (chrportto->GetGroup()->GetLeaderGUID() != chrport->GetGroup()->GetLeaderGUID()))
++            {
++                m_session->SendNotification(GetMangosString(LANG_CANNOT_PGO_INST_PARTY));
++                return true;
++            }
++        }
++
++        chrport->SaveRecallPosition();
++
++        // before GM
++        float x,y,z;
++        chrportto->GetClosePoint(x,y,z,chrport->GetObjectSize());
++        chrport->TeleportTo(chrportto->GetMapId(),x,y,z,chrport->GetOrientation());
++		PSendSysMessage(LANG_PLAYERGO, nameport.c_str(),"",nameportto.c_str(),"");
++		ChatHandler(chrportto).PSendSysMessage(LANG_APPEARING_TO, nameport.c_str());
++		ChatHandler(chrport).PSendSysMessage(LANG_APPEARING_AT, nameportto.c_str());
++		return true;
++    }
++	uint32 chrportto_mapid, chrportto_zoneid;
++	float chrportto_x,chrportto_y,chrportto_z,chrportto_o;
++	std::string chrportto_offline;
++
++	if(chrportto)
++    {
++		chrportto_mapid = chrportto->GetMapId();
++        chrportto_x = chrportto->GetPositionX();
++        chrportto_y = chrportto->GetPositionY();
++		chrportto_z = chrportto->GetPositionZ();
++		chrportto_o = chrportto->GetOrientation();
++		chrportto_zoneid = chrportto->GetZoneId();
++		chrportto_offline = "";
++	}
++	else if (uint64 guid = objmgr.GetPlayerGUIDByName(nameportto))
++	{
++		Player::LoadPositionFromDB(chrportto_mapid,
++            chrportto_x,
++            chrportto_y,
++            chrportto_z,
++            chrportto_o,
++            guid);
++		chrportto_zoneid = MapManager::Instance().GetZoneId(chrportto_mapid, chrportto_x, chrportto_y);
++		chrportto_offline = " (offline)";
++	}
++	else
++	{
++        PSendSysMessage(LANG_NO_PLAYER, nameportto.c_str());
++        return true;
++    }
++    
++	if (chrport)
++	{
++		chrport->TeleportTo(chrportto_mapid,chrportto_x,chrportto_y,chrportto_z,chrportto_o);
++		PSendSysMessage(LANG_PLAYERGO, nameport.c_str(),"",nameportto.c_str(),chrportto_offline.c_str());
++		ChatHandler(chrport).PSendSysMessage(LANG_APPEARING_TO, nameportto.c_str());
++	}
++	else if (uint64 guid = objmgr.GetPlayerGUIDByName(nameport))
++    {
++		//chrport is offline, but port anyways
++		PSendSysMessage(LANG_PLAYERGO, nameport.c_str()," (offline)",nameportto.c_str(),chrportto_offline.c_str());
++
++        // in point where chrportto is
++		Player::SavePositionInDB(chrportto_mapid,
++            chrportto_x,
++            chrportto_y,
++            chrportto_z,
++            chrportto_o,
++            chrportto_zoneid,
++            guid);
++    }
++    else
++        PSendSysMessage(LANG_NO_PLAYER, nameport.c_str());
++
++    return true;
++} */
++//Join target's group command
++bool ChatHandler::HandleJoinGroupCommand(const char* args)
++{
++	//currently works only for players online
++    
++	Player* target = NULL;
++	Player* self = m_session->GetPlayer();
++
++    char* px = strtok((char*)args, " ");
++
++    std::string name;
++
++    if (px)
++    {
++        name = px;
++        normalizePlayerName(name);
++        target = objmgr.GetPlayer(name.c_str());
++    }
++	else
++	{
++        target = getSelectedPlayer();
++    }
++
++    if(!target)
++    {
++        SendSysMessage(LANG_PLAYER_NOT_FOUND);
++        return true;
++    }
++
++	if (self->GetGroup())
++	{
++		m_session->SendNotification("You are in a group. Leave it first.");
++		return true;
++	}
++
++	Group* group;
++	group = target->GetGroup();
++	if (!group)
++	{
++        group = new Group;
++        if(!group->Create(target->GetGUID(), target->GetName()))
++        {
++            delete group;
++			m_session->SendNotification("Player is not in a group. Error creating group.");
++            return true;
++        }
++        objmgr.AddGroup(group);
++	}
++	//if group is full, either expand group to raid (if not already raid), or let user know
++	else if (group->IsFull()) //else if since we can ensure a new group is not full
++	{
++		if (group->isRaidGroup())
++		{
++			m_session->SendNotification("Group is full, you cannot join.");
++			return true;
++		}
++		group->ConvertToRaid();
++	}
++
++	group->AddMember(self->GetGUID(),self->GetName());
++
++	return true;
++}
++//Take group leader command
++bool ChatHandler::HandleTakeGroupLeaderCommand(const char* args)
++{
++	Group* group = m_session->GetPlayer()->GetGroup();
++
++	if (!group)
++	{
++		m_session->SendNotification("You are not in a group.");
++		return true;
++	}
++
++	group->ChangeLeader(m_session->GetPlayer()->GetGUID());
++
++	return true;
++}
++//Force a player to join group command
++bool ChatHandler::HandleForceJoinCommand(const char* args)
++{
++	//currently works only for players online
++    
++	Player* target = NULL;
++	Player* self = m_session->GetPlayer();
++
++	char* px = strtok((char*)args, " ");
++    std::string name;
++
++    if (px)
++    {
++        name = px;
++        normalizePlayerName(name);
++        target = objmgr.GetPlayer(name.c_str());
++    }
++	else
++	{
++        target = getSelectedPlayer();
++    }
++
++    if(!target)
++    {
++        SendSysMessage(LANG_PLAYER_NOT_FOUND);
++        return true;
++    }
++
++	Group* group = target->GetGroup();
++	if (group)
++	{
++		m_session->SendNotification("Player is in a group.");
++		return true;
++	}
++
++	Group* own_group;
++	own_group = self->GetGroup();
++	if (!own_group)
++	{
++        own_group = new Group;
++        if(!own_group->Create(self->GetGUID(), self->GetName()))
++        {
++            delete own_group;
++			m_session->SendNotification("You are not in a group. Error creating group.");
++            return true;
++        }
++        objmgr.AddGroup(own_group);
++	}
++	//if own group is full, either expand group to raid (if not already raid), or let user know
++	else if (own_group->IsFull()) //else if since we can ensure newly created group is not full
++	{
++		if (own_group->isRaidGroup())
++		{
++			m_session->SendNotification("Group is full, you cannot add members.");
++			return true;
++		}
++		own_group->ConvertToRaid();
++	}
++
++	own_group->AddMember(target->GetGUID(),target->GetName());
++	return true;
++}
++//force a player to leave their group command
++bool ChatHandler::HandleForceLeaveCommand(const char* args)
++{
++	//currently works only for players online
++    
++	Player* target = NULL;
++
++	char* px = strtok((char*)args, " ");
++    std::string name;
++
++    if (px)
++    {
++        name = px;
++        normalizePlayerName(name);
++        target = objmgr.GetPlayer(name.c_str());
++    }
++	else
++	{
++        target = getSelectedPlayer();
++    }
++
++    if(!target)
++    {
++        SendSysMessage(LANG_PLAYER_NOT_FOUND);
++        return true;
++    }
++
++	Group* group = target->GetGroup();
++	if (!group)
++	{
++		m_session->SendNotification("Player is not in a group.");
++		return true;
++	}
++
++	group->RemoveMember(target->GetGUID(),0);
++	return true;
++}
++//Test - show mail window command
++bool ChatHandler::HandleShowMailCommand(const char* args)
++{
++    m_session->SendShowMail();
++
++    return true;
++}
++//Spawn creature but don't add to database
++bool ChatHandler::HandleSpawnCreatureCommand(const char* args)
++{
++    if(!*args)
++        return false;
++    char* charID = strtok((char*)args, " ");
++    if (!charID)
++        return false;
++
++    char* team = strtok(NULL, " ");
++    int32 teamval = 0;
++    if (team) { teamval = atoi(team); }
++    if (teamval < 0) { teamval = 0; }
++
++    uint32 id  = atoi(charID);
++
++    Player *chr = m_session->GetPlayer();
++    float x = chr->GetPositionX();
++    float y = chr->GetPositionY();
++    float z = chr->GetPositionZ();
++    float o = chr->GetOrientation();
++
++    Creature* pCreature = new Creature(chr);
++    if (!pCreature->Create(objmgr.GenerateLowGuid(HIGHGUID_UNIT), chr->GetMapId(), x, y, z, o, id, (uint32)teamval))
++    {
++        delete pCreature;
++        return false;
++    }
++
++	/*
++	//This is not working, not quite sure how to get around it
++    // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
++	pCreature->LoadFromDB(pCreature->GetDBTableGUIDLow(), chr->GetInstanceId());
++	*/
++
++	//Somehow I don't think this function is needed
++	//It is used during load of MaNGOS as a general load function, not specific to create
++	//pCreature->LoadQuests();
++	
++	//Is all this needed? It is done lazily with prepareGossipMenu()
++	/*
++	pCreature->LoadGoods();
++	pCreature->LoadTrainerSpells();
++	*/
++
++	//Getting an assert error... apparently MotionMaster is empty.  Trying this:
++	pCreature->AIM_Initialize();
++
++    MapManager::Instance().GetMap(pCreature->GetMapId(), pCreature)->Add(pCreature);
++
++    return true;
++}
++//Spawn GameObject but don't save to DB
++bool ChatHandler::HandleSpawnGOCommand(const char* args)
++{
++    if (!*args)
++        return false;
++
++    char* pParam1 = strtok((char*)args, " ");
++    uint32 id = atoi((char*)pParam1);
++    if(!id)
++        return false;
++
++    char* spawntimeSecs = strtok(NULL, " ");
++
++    const GameObjectInfo *goI = objmgr.GetGameObjectInfo(id);
++
++    if (!goI)
++    {
++        PSendSysMessage(LANG_GAMEOBJECT_NOT_EXIST,id);
++        return false;
++    }
++
++    Player *chr = m_session->GetPlayer();
++    float x = float(chr->GetPositionX());
++    float y = float(chr->GetPositionY());
++    float z = float(chr->GetPositionZ());
++    float o = float(chr->GetOrientation());
++
++    float rot2 = sin(o/2);
++    float rot3 = cos(o/2);
++
++    GameObject* pGameObj = new GameObject(chr);
++    uint32 lowGUID = objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT);
++
++    if(!pGameObj->Create(lowGUID, goI->id, chr->GetMapId(), x, y, z, o, 0, 0, rot2, rot3, 0, 0))
++    {
++        delete pGameObj;
++        return false;
++    }
++    //pGameObj->SetZoneId(chr->GetZoneId());
++    pGameObj->SetMapId(chr->GetMapId());
++    //pGameObj->SetNameId(id);
++    sLog.outDebug(GetMangosString(LANG_GAMEOBJECT_CURRENT), goI->name, lowGUID, x, y, z, o);
++
++    if( spawntimeSecs )
++    {
++        uint32 value = atoi((char*)spawntimeSecs);
++        pGameObj->SetRespawnTime(value);
++        //sLog.outDebug("*** spawntimeSecs: %d", value);
++    }
++
++    MapManager::Instance().GetMap(pGameObj->GetMapId(), pGameObj)->Add(pGameObj);
++
++    PSendSysMessage(LANG_GAMEOBJECT_ADD,id,goI->name,lowGUID,x,y,z);
++
++    return true;
++}
++//Send blank vendor window command
++bool ChatHandler::HandleVendowWindowCommand(const char* args)
++{
++    WorldPacket data( SMSG_LIST_INVENTORY, (8+1+0) ); //WorldPacket data( SMSG_LIST_INVENTORY, (8+1+numitems*7*4) );
++    data << m_session->GetPlayer()->GetGUID(); //data << vendorguid;
++    data << uint8(0); //data << numitems;
++
++	//Will comment this out for testing, for the time being
++	/*
++    if ( data.size() != 8 + 1 + 0 ) //if ( count == 0 || data.size() != 8 + 1 + size_t(count) * 7 * 4 )
++        return true;
++	*/
++
++    data.put<uint8>(8, 0); //data.put<uint8>(8, count);
++    m_session->SendPacket( &data );
++
++	return true;
++}
+Index: src/game/Level3.cpp
+===================================================================
+--- src/game/Level3.cpp	(revision 5772)
++++ src/game/Level3.cpp	(working copy)
+@@ -672,9 +672,13 @@
+         }
+     }
+ 
+-    Player* target = getSelectedPlayer();
++	//Get selected player, default self if no player selected
++	Player* target = getSelectedPlayer();
++	if(!target)
++		target = m_session->GetPlayer();
+     if(!target)
+     {
++		//this should theoretically never be the case
+         SendSysMessage(LANG_NO_CHAR_SELECTED);
+         return true;
+     }
+@@ -1581,10 +1585,13 @@
+ 
+ bool ChatHandler::HandleLearnCommand(const char* args)
+ {
++	//Get selected player, default self if no player selected
+     Player* targetPlayer = getSelectedPlayer();
+-
++	if(!targetPlayer)
++		targetPlayer = m_session->GetPlayer();
+     if(!targetPlayer)
+     {
++		//this should theoretically never be the case
+         SendSysMessage(LANG_PLAYER_NOT_FOUND);
+         return true;
+     }
+@@ -2223,9 +2230,13 @@
+ 
+ bool ChatHandler::HandleLookupSkillCommand(const char* args)
+ {
++	//Get selected player, default self if no player selected
+     Player* target = getSelectedPlayer();
++	if(!target)
++		target = m_session->GetPlayer();
+     if(!target)
+     {
++		//this should theoretically never be the case
+         SendSysMessage(LANG_PLAYER_NOT_FOUND);
+         return true;
+     }
+@@ -2267,9 +2278,13 @@
+ 
+ bool ChatHandler::HandleLookupSpellCommand(const char* args)
+ {
++	//Get selected player, default self if no player selected
+     Player* target = getSelectedPlayer();
+-    if( !target )
++	if(!target)
++		target = m_session->GetPlayer();
++    if(!target)
+     {
++		//this should theoretically never be the case
+         SendSysMessage(LANG_PLAYER_NOT_FOUND);
+         return true;
+     }
+@@ -2343,9 +2358,13 @@
+ 
+ bool ChatHandler::HandleLookupQuestCommand(const char* args)
+ {
++	//Get selected player, default self if no player selected
+     Player* target = getSelectedPlayer();
+-    if( !target )
++	if(!target)
++		target = m_session->GetPlayer();
++    if(!target)
+     {
++		//this should theoretically never be the case
+         SendSysMessage(LANG_PLAYER_NOT_FOUND);
+         return true;
+     }
+@@ -4023,7 +4042,10 @@
+ 
+ bool ChatHandler::HandleAddQuest(const char* args)
+ {
++	//Get selected player, default self if no player selected
+     Player* player = getSelectedPlayer();
++	if(!player)
++		player = m_session->GetPlayer();
+     if(!player)
+     {
+         SendSysMessage(LANG_NO_CHAR_SELECTED);
+@@ -4072,9 +4094,13 @@
+ 
+ bool ChatHandler::HandleRemoveQuest(const char* args)
+ {
++	//Get selected player, default self if no player selected
+     Player* player = getSelectedPlayer();
++	if(!player)
++		player = m_session->GetPlayer();
+     if(!player)
+     {
++		//this should theoretically never be the case
+         SendSysMessage(LANG_NO_CHAR_SELECTED);
+         return true;
+     }
+@@ -4641,7 +4667,448 @@
+ 
+     return true;
+ }
++//Add conjured item - may not work if added to stack (removes flag)
++/* bool ChatHandler::HandleConjureItemCommand(const char* args)
++{
++    if (!*args)
++        return false;
+ 
++    uint32 itemId = 0;
++
++    if(args[0]=='[')                                        // [name] manual form
++    {
++        char* citemName = citemName = strtok((char*)args, "]");
++
++        if(citemName && citemName[0])
++        {
++            std::string itemName = citemName+1;
++            WorldDatabase.escape_string(itemName);
++            QueryResult *result = WorldDatabase.PQuery("SELECT entry FROM item_template WHERE name = '%s'", itemName.c_str());
++            if (!result)
++            {
++                PSendSysMessage(LANG_COMMAND_COULDNOTFIND, citemName+1);
++                return true;
++            }
++            itemId = result->Fetch()->GetUInt16();
++            delete result;
++        }
++        else
++            return false;
++    }
++    else                                                    // item_id or [name] Shift-click form |color|Hitem:item_id:0:0:0|h[name]|h|r
++    {
++        char* cId = extractKeyFromLink((char*)args,"Hitem");
++        if(!cId)
++            return false;
++        itemId = atol(cId);
++    }
++
++	char* parg2 = strtok(NULL, " ");
++	char* parg3 = strtok(NULL, " ");
++
++	std::string arg2;
++	std::string arg3;
++
++	if (parg2)
++		arg2 = parg2;
++	if (parg3)
++		arg3 = parg3;
++
++	bool make_soulbound = false;
++    char* ccount;
++
++	if (parg2 && arg2 == "s")
++	{
++		make_soulbound = true;
++		if (parg3)
++			ccount = parg3;
++	}
++	else if (parg3 && arg3 == "s")
++	{
++		make_soulbound = true;
++		ccount = parg2;
++	}
++	else
++		ccount = parg2;
++
++    int32 count = 1;
++
++    if (ccount) { count = atol(ccount); }
++    if (count < 1) { count = 1; }
++
++    Player* pl = m_session->GetPlayer();
++    Player* plTarget = getSelectedPlayer();
++    if(!plTarget)
++        plTarget = pl;
++
++    sLog.outDetail(GetMangosString(LANG_ADDITEM), itemId, count);
++
++    ItemPrototype const *pProto = objmgr.GetItemPrototype(itemId);
++    if(!pProto)
++    {
++        PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
++        return true;
++    }
++
++    uint32 countForStore = count;
++
++    // item used in local operations and in add item notifier
++    Item* item = NULL;
++
++    // if possible create full stacks for better performance
++    while(countForStore >= pProto->Stackable)
++    {
++        uint16 dest;
++        uint8 msg = plTarget->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemId, pProto->Stackable, false );
++        if( msg == EQUIP_ERR_OK )
++        {
++            item = plTarget->StoreNewItem( dest, itemId, pProto->Stackable, true, Item::GenerateItemRandomPropertyId(itemId));
++
++            countForStore-= pProto->Stackable;
++
++            // allow soulbound-on-command
++			if (make_soulbound)
++			{
++                // make original stack soulbound
++                Item* item1 = plTarget->GetItemByPos(dest);
++                if(item1!=item)
++                    item1->SetBinding( true );
++                // and new stack
++                item->SetBinding( true );
++			}
++			// remove binding (let GM give it to another player later)
++            else if(pl==plTarget)
++            {
++                // remove binding from original stack
++                Item* item1 = pl->GetItemByPos(dest);
++                if(item1!=item)
++                    item1->SetBinding( false );
++                // and new stack
++                item->SetBinding( false );
++            }
++        }
++        else
++            break;
++    }
++
++    // create remaining items
++    if(countForStore > 0 && countForStore < pProto->Stackable)
++    {
++        uint16 dest;
++        uint8 msg = plTarget->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemId, countForStore, false );
++
++        // if can add all countForStore items
++        if( msg == EQUIP_ERR_OK )
++        {
++            item = plTarget->StoreNewItem( dest, itemId, countForStore, true, Item::GenerateItemRandomPropertyId(itemId));
++            countForStore = 0;
++
++			// allow soulbound-on-command
++			if (make_soulbound)
++			{
++                // make original stack soulbound
++                Item* item1 = plTarget->GetItemByPos(dest);
++                if(item1!=item)
++                    item1->SetBinding( true );
++                // and new stack
++                item->SetBinding( true );
++			}
++			// remove binding (let GM give it to another player later)
++            else if(pl==plTarget)
++            {
++                // remove binding from original stack
++                Item* item1 = pl->GetItemByPos(dest);
++                if(item1!=item)
++                    item1->SetBinding( false );
++                // and new stack
++                item->SetBinding( false );
++            }
++        }
++    }
++
++    // ok search place for add only part from countForStore items in not full stacks
++    while(countForStore > 0)
++    {
++        // find not full stack (last possable place for times after prev. checks)
++        uint16 dest;
++        uint8 msg = plTarget->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemId, 1, false );
++        if( msg == EQUIP_ERR_OK )                           // found
++        {
++            // we can fill this stack to max stack size
++            Item* itemStack = pl->GetItemByPos(dest);
++            if(itemStack)
++            {
++                uint32 countForStack = pProto->Stackable - itemStack->GetCount();
++                // recheck with real item amount
++                uint8 msg2 = plTarget->CanStoreNewItem( itemStack->GetBagSlot(), itemStack->GetSlot(), dest, itemId, countForStack, false );
++                if( msg2 == EQUIP_ERR_OK )
++                {
++                    item = plTarget->StoreNewItem( dest, itemId, countForStack, true, Item::GenerateItemRandomPropertyId(itemId));
++                    countForStore-= countForStack;
++
++					// allow soulbound-on-command
++					if (make_soulbound)
++					{
++						// make soulbound
++						item->SetBinding( true );
++					}
++					// remove binding (let GM give it to another player later)
++					else if(pl==plTarget)
++                        item->SetBinding( false );
++                }
++                else
++                    break;                                  // not possible with correct work
++            }
++            else
++                break;                                      // not possible with correct work
++        }
++        else
++            break;
++    }
++
++    if(uint32(count) > countForStore && item)
++    {
++		item->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_CONJURED);
++        pl->SendNewItem(item,count - countForStore,false,true);
++        if(pl!=plTarget)
++            plTarget->SendNewItem(item,count - countForStore,true,false);
++    }
++
++    if(countForStore > 0)
++        PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, countForStore);
++
++    return true;
++}
++//Complete quest command - set as completed or rewarded (if specified)
++bool ChatHandler::HandleCompleteQuest(const char* args)
++{
++	// .completequest #entry [0/1 - 1 means set rewarded status]
++    if(!*args)
++        return false;
++
++    char* qentry = strtok((char*)args, " ");
++    char* psetrewarded = strtok(NULL, " ");
++
++    //Get selected player, default self if no player selected
++	Player* player = getSelectedPlayer();
++	if(!player)
++		player = m_session->GetPlayer();
++    if(!player)
++    {
++        //this should theoretically never be the case
++		SendSysMessage(LANG_NO_CHAR_SELECTED);
++        return true;
++    }
++
++    // number or [name] Shift-click form |color|Hquest:quest_id|h[name]|h|r
++    char* cId = extractKeyFromLink(qentry,"Hquest");
++    if(!cId)
++        return false;
++
++    uint32 entry = atol(cId);
++
++    Quest const* pQuest = objmgr.GetQuestTemplate(entry);
++    if(!pQuest)
++    {
++        PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
++        return true;
++    }
++
++	//if indicated to set rewarded status
++	std::string setrewarded;
++	if (psetrewarded)
++		setrewarded = psetrewarded;
++	if (psetrewarded && setrewarded == "1")
++	{
++		// make rewarded (quest complete & turned in)
++		// remove all quest entries for 'entry' from quest log
++		for(uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot )
++		{
++			uint32 quest = player->GetUInt32Value(PLAYER_QUEST_LOG_1_1 + 3*slot + 0);
++			if(quest==entry)
++			{
++				player->SetUInt32Value(PLAYER_QUEST_LOG_1_1 + 3*slot + 0, 0);
++				player->SetUInt32Value(PLAYER_QUEST_LOG_1_1 + 3*slot + 1, 0);
++				player->SetUInt32Value(PLAYER_QUEST_LOG_1_1 + 3*slot + 2, 0);
++
++				// we ignore unequippable quest items in this case, its' still be equipped
++				player->TakeQuestSourceItem( quest, false );
++			}
++		}
++
++		//set completed status
++	    player->CompleteQuest( entry );
++
++		// set quest as rewarded
++		player->getQuestStatusMap()[entry].m_rewarded = true;
++
++		SendSysMessage(LANG_COMMAND_QUEST_REWARDED);
++	}
++	else
++	{
++		//make completed, not rewarded
++
++		//remove rewarded status, in case it is set
++		player->getQuestStatusMap()[entry].m_rewarded = false;
++
++		//add quest if player does not have active
++		if (!player->IsActiveQuest(entry))
++		{
++			// check item starting quest (it can work incorrectly if added without item in inventory)
++			QueryResult *result = WorldDatabase.PQuery("SELECT entry FROM item_template WHERE startquest = '%u' LIMIT 1",entry);
++			if(result)
++			{
++				Field* fields = result->Fetch();
++				uint32 item_id = fields[0].GetUInt32();
++				delete result;
++
++				PSendSysMessage(LANG_COMMAND_QUEST_STARTFROMITEM, entry,item_id);
++				return true;
++			}
++
++			// ok, normal (creature/GO starting) quest
++			if( player->CanAddQuest( pQuest, true ) )
++			{
++				player->AddQuest( pQuest, NULL );
++			}
++			else
++				return true; //return true if quest is not addable - we do not want to complete
++		}
++
++		// add items when not there
++		if ( pQuest->HasFlag( QUEST_MANGOS_FLAGS_DELIVER ) )
++		{
++			for(int i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
++			{
++				if ( pQuest->ReqItemCount[i]!= 0 &&	player->GetItemCount(pQuest->ReqItemId[i]) < pQuest->ReqItemCount[i] )
++				{
++					//add items to player
++					AdditemCount(player,pQuest->ReqItemId[i],pQuest->ReqItemCount[i] - player->GetItemCount(pQuest->ReqItemId[i]));
++				}
++			}
++		}
++
++		//make complete: explored
++		if ( pQuest->HasFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT) )
++			player->getQuestStatusMap()[entry].m_explored = true;
++
++		//make complete: creatures killed, spells cast, gameobjects used
++		if ( pQuest->HasFlag(QUEST_MANGOS_FLAGS_KILL_OR_CAST | QUEST_MANGOS_FLAGS_SPEAKTO) )
++		{
++			for(int i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
++			{
++				if ( player->getQuestStatusMap()[entry].m_creatureOrGOcount[i] < pQuest->ReqCreatureOrGOCount[i] )
++				{
++					uint32 old_count = player->getQuestStatusMap()[entry].m_creatureOrGOcount[i];
++					player->getQuestStatusMap()[entry].m_creatureOrGOcount[i] = pQuest->ReqCreatureOrGOCount[i];
++					player->SendQuestUpdateAddCreatureOrGo( pQuest, player->GetGUID(), i, old_count, pQuest->ReqCreatureOrGOCount[i] - old_count );
++				}
++			}
++		}
++
++		// mark quest as changed if not new
++		if (player->getQuestStatusMap()[entry].uState != QUEST_NEW)
++			player->getQuestStatusMap()[entry].uState = QUEST_CHANGED;
++
++		//set completed status
++	    player->CompleteQuest( entry );
++		SendSysMessage(LANG_COMMAND_QUEST_COMPLETE);
++	}
++    return true;
++}
++//Helper function to add items to player (for code readability) - NOTE: not a chat command - returns false if item didn't add
++bool ChatHandler::AdditemCount(Player* player, uint32 itemId, int32 count)
++{
++    sLog.outDetail(GetMangosString(LANG_ADDITEM), itemId, count);
++
++    ItemPrototype const *pProto = objmgr.GetItemPrototype(itemId);
++    if(!pProto)
++    {
++        PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
++        return true;
++    }
++
++    uint32 countForStore = count;
++
++    // item used in local operations and in add item notifier
++    Item* item = NULL;
++
++    // if possible create full stacks for better performance
++    while(countForStore >= pProto->Stackable)
++    {
++        uint16 dest;
++        uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemId, pProto->Stackable, false );
++        if( msg == EQUIP_ERR_OK )
++        {
++            item = player->StoreNewItem( dest, itemId, pProto->Stackable, true, Item::GenerateItemRandomPropertyId(itemId));
++
++            countForStore-= pProto->Stackable;
++        }
++        else
++            break;
++    }
++
++    // create remaining items
++    if(countForStore > 0 && countForStore < pProto->Stackable)
++    {
++        uint16 dest;
++        uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemId, countForStore, false );
++
++        // if can add all countForStore items
++        if( msg == EQUIP_ERR_OK )
++        {
++            item = player->StoreNewItem( dest, itemId, countForStore, true, Item::GenerateItemRandomPropertyId(itemId));
++            countForStore = 0;
++        }
++    }
++
++    // ok search place for add only part from countForStore items in not full stacks
++    while(countForStore > 0)
++    {
++        // find not full stack (last possible place for times after prev. checks)
++        uint16 dest;
++        uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemId, 1, false );
++        if( msg == EQUIP_ERR_OK )                           // found
++        {
++            // we can fill this stack to max stack size
++            Item* itemStack = player->GetItemByPos(dest);
++            if(itemStack)
++            {
++                uint32 countForStack = pProto->Stackable - itemStack->GetCount();
++                // recheck with real item amount
++                uint8 msg2 = player->CanStoreNewItem( itemStack->GetBagSlot(), itemStack->GetSlot(), dest, itemId, countForStack, false );
++                if( msg2 == EQUIP_ERR_OK )
++                {
++                    item = player->StoreNewItem( dest, itemId, countForStack, true, Item::GenerateItemRandomPropertyId(itemId));
++                    countForStore-= countForStack;
++                }
++                else
++                    break;                                  // not possible with correct work
++            }
++            else
++                break;                                      // not possible with correct work
++        }
++        else
++            break;
++    }
++
++    if(uint32(count) > countForStore && item)
++    {
++        player->SendNewItem(item,count - countForStore,false,false);
++    }
++
++	if(countForStore > 0) {
++		PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, countForStore);
++		return false;
++	}
++
++    return true;
++} */
++
++
++
++
++
+ bool ChatHandler::HandleCastTargetCommand(const char* args)
+ {
+     Unit* caster = getSelectedUnit();
+Index: src/game/Mail.cpp
+===================================================================
+--- src/game/Mail.cpp	(revision 5772)
++++ src/game/Mail.cpp	(working copy)
+@@ -510,7 +510,11 @@
+     //GameObject* obj = ObjectAccessor::GetGameObject(_player, mailbox);
+     //if(!obj || !obj->IsMailBox())
+     //    return;
+-
++	SendShowMail();
++}
++//test command to show mail - may cause client crash
++void WorldSession::SendShowMail()
++{
+     Player* pl = _player;
+ 
+     //load players mails, and mailed items
+Index: src/game/MapManager.h
+===================================================================
+--- src/game/MapManager.h	(revision 5772)
++++ src/game/MapManager.h	(working copy)
+@@ -76,6 +76,20 @@
+         static bool IsValidMAP(uint32 mapid);
+         static bool IsValidMapCoord(uint32 mapid, float x,float y);
+ 
++		//this is a really poor way of doing this
++		static bool IsMapidBattleground(uint32 mapid)
++		{
++			switch(mapid){
++				case 529:
++				case 489:
++				case 566:
++				case 30:
++					return true;
++					break;
++			}
++			return false;
++		}
++
+         void MoveAllCreaturesInMoveList();
+ 
+         void LoadTransports();
+Index: src/game/WorldSession.h
+===================================================================
+--- src/game/WorldSession.h	(revision 5772)
++++ src/game/WorldSession.h	(working copy)
+@@ -123,6 +123,7 @@
+         void SendTrainerList( uint64 guid,std::string strTitle );
+         void SendListInventory( uint64 guid );
+         void SendShowBank( uint64 guid );
++		void SendShowMail();
+         void SendTabardVendorActivate( uint64 guid );
+         void SendSpiritResurrect();
+         void SendBindPoint(Creature* npc);

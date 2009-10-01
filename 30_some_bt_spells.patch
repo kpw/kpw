@@ -1,0 +1,94 @@
+diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
+index 26e77c8..184ecea 100644
+--- a/src/game/SpellAuras.cpp
++++ b/src/game/SpellAuras.cpp
+@@ -1646,8 +1646,21 @@ void Aura::TriggerSpell()
+ //                    case 40867: break;
+ //                    // Prismatic Shield
+ //                    case 40879: break;
+-//                    // Aura of Desire
+-//                    case 41350: break;
++//                  // Aura of Desire
++                    case 41350:
++                    {
++                        Unit::AuraList const& mMod = m_target->GetAurasByType(SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT);
++                        for(Unit::AuraList::const_iterator i = mMod.begin(); i != mMod.end(); ++i)
++                        {
++                            if ((*i)->GetId() == 41350)
++                            {
++                                (*i)->ApplyModifier(false);
++                                (*i)->GetModifier()->m_amount -= 5;
++                                (*i)->ApplyModifier(true);
++                                break;
++                            }
++                        }                        
++                    }break;
+ //                    // Dementia
+ //                    case 41404: break;
+ //                    // Chaos Form
+@@ -3201,6 +3214,24 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
+         else
+             m_target->SetUnitMovementFlags(0);    //Clear movement flags
+ 
++        // Summon the Naj'entus Spine GameObject on target if spell is Impaling Spine
++        if(GetSpellProto()->Id == 39837)
++        {
++            GameObject* pObj = new GameObject;
++            float x, y, z;
++            m_target->GetPosition(x, y, z);
++ 
++            if(!pObj->Create(objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), 185584, m_target->GetMap(), x, y, z, 0, 0, 0, 0, 0, 100, 1))
++            {
++                delete pObj;
++                return;
++            }
++ 
++            pObj->SetRespawnTime(GetSpellDuration(GetSpellProto())/1000);
++            m_target->AddGameObject(pObj);
++            MapManager::Instance().GetMap(pObj->GetMapId(), pObj)->Add(pObj);
++        }
++
+         WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8);
+ 
+         data.append(m_target->GetPackGUID());
+@@ -4142,6 +4173,7 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
+                     m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 3 / 100);
+                 return;
+             }
++            
+             break;
+         }
+         case SPELLFAMILY_HUNTER:
+@@ -4193,6 +4225,10 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
+             break;
+         }
+         default:
++           // Parasitic Shadowfiend - handle summoning of two Shadowfiends on DoT expire
++           if((m_spellProto->Id == 41917) && !apply && Real)
++                 m_target->CastSpell(m_target, 41915, true);
++            
+             break;
+     }
+ }
+@@ -5587,6 +5623,21 @@ void Aura::PeriodicTick()
+                         }
+                         break;
+                     }
++                    case 41337:// aura of anger
++                    {                        
++                        Unit::AuraList const& mMod = m_target->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
++                        for(Unit::AuraList::const_iterator i = mMod.begin(); i != mMod.end(); ++i)
++                        {
++                            if ((*i)->GetId() == 41337)
++                            {
++                                (*i)->ApplyModifier(false);
++                                (*i)->GetModifier()->m_amount += 5;
++                                (*i)->ApplyModifier(true);
++                                break;
++                            }
++                        }                        
++                        m_modifier.m_amount += 100;
++                    }break;
+                     default:
+                         break;
+                 }

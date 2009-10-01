@@ -1,0 +1,152 @@
+diff --git a/src/game/SharedDefines.h b/src/game/SharedDefines.h
+index 6c2ab2a..481e440 100644
+--- a/src/game/SharedDefines.h
++++ b/src/game/SharedDefines.h
+@@ -798,14 +798,16 @@ enum Targets
+     TARGET_AREAEFFECT_PARTY            = 37,
+     TARGET_SCRIPT                      = 38,
+     TARGET_SELF_FISHING                = 39,
+-    TARGET_TOTEM_EARTH                 = 41,
+-    TARGET_TOTEM_WATER                 = 42,
+-    TARGET_TOTEM_AIR                   = 43,
+-    TARGET_TOTEM_FIRE                  = 44,
++    TARGET_LOCATION_FRONT_LEFT         = 41,
++    TARGET_LOCATION_BACK_LEFT          = 42,
++    TARGET_LOCATION_BACK_RIGHT         = 43,
++    TARGET_LOCATION_FRONT_RIGHT        = 44,
+     TARGET_CHAIN_HEAL                  = 45,
+     TARGET_SCRIPT_COORDINATES          = 46,
+-    TARGET_DYNAMIC_OBJECT              = 47,
+-    TARGET_SUMMON                      = 48,
++    TARGET_LOCATION_FRONT              = 47,
++    TARGET_LOCATION_BACK               = 48,
++    TARGET_LOCATION_LEFT               = 49,
++    TARGET_LOCATION_RIGHT              = 50,
+     TARGET_AREAEFFECT_CUSTOM_2         = 52,
+     TARGET_CURRENT_ENEMY_COORDINATES   = 53,                // set unit coordinates as dest, only 16 target B imlemented
+     TARGET_RANDOM_RAID_MEMBER          = 56,
+@@ -813,8 +815,12 @@ enum Targets
+     TARGET_AREAEFFECT_PARTY_AND_CLASS  = 61,
+     TARGET_DUELVSPLAYER_COORDINATES    = 63,
+     TARGET_BEHIND_VICTIM               = 65,                // uses in teleport behind spells
++    TARGET_LOCATION_RANDOM_AROUND_CASTER    = 72,
++    TARGET_LOCATION_RADIUS_AROUND_CASTER    = 73,
++    TARGET_LOCATION_RANDOM_IN_AREA     = 74,
+     TARGET_SINGLE_ENEMY                = 77,
+-    TARGET_SELF2                       = 87,
++    TARGET_LOCATION_AROUND_DEST        = 86,
++    TARGET_LOCATION_AT_DEST            = 87,
+     TARGET_NONCOMBAT_PET               = 90,
+ };
+ 
+diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
+index 544432d..d983a92 100644
+--- a/src/game/Spell.cpp
++++ b/src/game/Spell.cpp
+@@ -1172,16 +1172,99 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+     uint32 unMaxTargets = m_spellInfo->MaxAffectedTargets;
+     switch(cur)
+     {
+-        case TARGET_TOTEM_EARTH:
+-        case TARGET_TOTEM_WATER:
+-        case TARGET_TOTEM_AIR:
+-        case TARGET_TOTEM_FIRE:
++        case TARGET_LOCATION_FRONT_LEFT:
++        case TARGET_LOCATION_BACK_LEFT:
++        case TARGET_LOCATION_BACK_RIGHT:
++        case TARGET_LOCATION_FRONT_RIGHT:
++        case TARGET_LOCATION_FRONT:
++        case TARGET_LOCATION_BACK:
++        case TARGET_LOCATION_LEFT:
++        case TARGET_LOCATION_RIGHT:
++        case TARGET_LOCATION_RANDOM_AROUND_CASTER:
++        case TARGET_LOCATION_RADIUS_AROUND_CASTER:
++        {
++            float x, y, z, angle, dist;
++
++            if (m_spellInfo->EffectRadiusIndex[i])
++                dist = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
++            else
++                dist = 3.0f;
++            if (cur == TARGET_LOCATION_RANDOM_AROUND_CASTER)
++                dist *= rand_norm(); // This case we need to consider caster size
++            else
++                dist -= m_caster->GetObjectSize(); // Size is calculated in GetNearPoint(), but we do not need it 
++
++            switch(cur)
++            {
++                case TARGET_LOCATION_FRONT_LEFT:
++                    angle = -M_PI/4;
++                    break;
++                case TARGET_LOCATION_BACK_LEFT:
++                    angle = -3*M_PI/4;
++                    break;
++                case TARGET_LOCATION_BACK_RIGHT:
++                    angle = 3*M_PI/4;
++                    break;
++                case TARGET_LOCATION_FRONT_RIGHT:
++                    angle = M_PI/4;
++                    break;
++                case TARGET_LOCATION_FRONT:
++                    angle = 0.0f;
++                    break;
++                case TARGET_LOCATION_BACK:
++                    angle = M_PI;
++                    break;
++                case TARGET_LOCATION_LEFT:
++                    angle = -M_PI/2;
++                    break;
++                case TARGET_LOCATION_RIGHT:
++                    angle = M_PI/2;
++                    break;
++                default:
++                    angle = rand_norm()*2*M_PI;
++                    break;
++            }
++
++            m_caster->GetClosePoint(x, y, z, 0, dist, angle);
++            m_targets.setDestination(x, y, z);
++            if (m_targets.getUnitTarget())
++                TagUnitMap.push_back(m_targets.getUnitTarget());
++            else
++                TagUnitMap.push_back(m_caster); 
++        }break;
++        case TARGET_LOCATION_RANDOM_IN_AREA:
++        case TARGET_LOCATION_AROUND_DEST:
++        {
++            float x, y, z, dist, px, py, pz;
++            dist = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
++            if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
++            {
++                x = m_targets.m_destX;
++                y = m_targets.m_destY;
++                z = m_targets.m_destZ;
++            }
++            else if (m_targets.getUnitTarget()) // Do not know if possible
++                m_targets.getUnitTarget()->GetPosition(x, y, z);
++            else
++                m_caster->GetPosition(x, y, z);
++
++            m_caster->GetRandomPoint(x, y, z, dist, px, py, pz);
++            m_targets.setDestination(px, py, pz);
++            if (m_targets.getUnitTarget())
++                TagUnitMap.push_back(m_targets.getUnitTarget());
++            else
++                TagUnitMap.push_back(m_caster);
++        }break;
++        case TARGET_LOCATION_AT_DEST:
++        {
++            if (m_targets.getUnitTarget())
++                TagUnitMap.push_back(m_targets.getUnitTarget());
++            else
++                TagUnitMap.push_back(m_caster);
++        }break;
+         case TARGET_SELF:
+-        case TARGET_SELF2:
+-        case TARGET_DYNAMIC_OBJECT:
+         case TARGET_AREAEFFECT_CUSTOM:
+         case TARGET_AREAEFFECT_CUSTOM_2:
+-        case TARGET_SUMMON:
+         {
+             TagUnitMap.push_back(m_caster);
+             break;

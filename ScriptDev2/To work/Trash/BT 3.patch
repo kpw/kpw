@@ -1,0 +1,48 @@
+Index: src/bindings/ScriptDev2/scripts/zone/black_temple/boss_shade_of_akama.cpp
+===================================================================
+--- src/bindings/ScriptDev2/scripts/zone/black_temple/boss_shade_of_akama.cpp	(revision 569)
++++ src/bindings/ScriptDev2/scripts/zone/black_temple/boss_shade_of_akama.cpp	(working copy)
+@@ -376,6 +376,10 @@
+                     }else move = false;
+                     if(!move)
+                         Defender->GetMotionMaster()->MovePoint(0, AKAMA_X, AKAMA_Y, AKAMA_Z);
++					
++					Unit* Akama = Unit::GetUnit((*m_creature), AkamaGUID);
++					if(Akama && Akama->isAlive())
++						Defender->Attack(Akama, true);
+                 }
+                 DefenderTimer = 15000;
+             }else DefenderTimer -= diff;
+@@ -518,8 +522,7 @@
+     bool EventBegun;
+     bool ShadeHasDied;
+     bool StartCombat;
+-    bool HasYelledOnce;
+-    bool HasYelledTwice;
++    bool HasYelled;
+ 
+     void Reset()
+     {
+@@ -535,8 +538,7 @@
+         BrokenList.clear();
+ 
+         EventBegun = false;
+-        HasYelledOnce = false;
+-        HasYelledTwice = false;
++        HasYelled = false;
+         
+         m_creature->SetUInt32Value(UNIT_NPC_FLAGS, 0); // Database sometimes has very very strange values
+         m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+@@ -606,10 +608,11 @@
+         if(!EventBegun)
+             return;
+ 
+-        if ((m_creature->GetHealth()*100 / m_creature->GetMaxHealth()) < 15)
++        if (((m_creature->GetHealth()*100 / m_creature->GetMaxHealth()) < 15) && !HasYelled)
+         {
+             DoYell(SAY_LOW_HEALTH, LANG_UNIVERSAL, NULL);
+             DoPlaySoundToSet(m_creature, SOUND_LOW_HEALTH);
++			HasYelled = true;
+         }
+ 
+         if(ShadeGUID && !StartCombat)

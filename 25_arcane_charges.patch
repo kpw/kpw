@@ -1,0 +1,18 @@
+diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
+index 614d6d2..1e47c22 100644
+--- a/src/game/SpellEffects.cpp
++++ b/src/game/SpellEffects.cpp
+@@ -335,6 +335,13 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
+                             damage = 200;
+                         break;
+                     }
++                    // must only affect demons
++                    case 45072:
++                    {
++                        if(unitTarget->GetCreatureType() != CREATURE_TYPE_DEMON)
++                            return;
++                        break;
++                    }
+                 }
+                 break;
+             }

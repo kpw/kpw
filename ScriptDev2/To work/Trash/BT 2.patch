@@ -1,0 +1,48 @@
+Index: src/bindings/ScriptDev2/scripts/zone/black_temple/instance_black_temple.cpp
+===================================================================
+--- src/bindings/ScriptDev2/scripts/zone/black_temple/instance_black_temple.cpp	(revision 562)
++++ src/bindings/ScriptDev2/scripts/zone/black_temple/instance_black_temple.cpp	(working copy)
+@@ -27,6 +27,8 @@
+ 
+ #define ENCOUNTERS     9
+ 
++#define MAIN_TEMPLE_DOORS	185882 // Main Temple Doors, doors after Supremus
++
+ /* Black Temple encounters:
+ 0 - High Warlord Naj'entus event
+ 1 - Supremus Event
+@@ -60,9 +62,13 @@
+     uint64 IllidanDoor[2];
+ 
+     uint32 Encounters[ENCOUNTERS];
++	
++	GameObject *Main_Temple_Doors;
+ 
+     void Initialize()
+     {
++		Main_Temple_Doors = NULL;
++		
+         Najentus = 0;
+         Akama = 0;
+         Akama_Shade = 0;
+@@ -161,6 +167,10 @@
+             case 186262: // Left door at Temple Summit
+                 IllidanDoor[1] = go->GetGUID();
+                 break;
++			
++			case 185882:
++				Main_Temple_Doors = go;
++				break;
+         }
+     }
+ 
+@@ -226,6 +236,9 @@
+                 break;
+ 
+             case DATA_SUPREMUSEVENT:
++				if( data == DONE )
++					if( Main_Temple_Doors )
++						Main_Temple_Doors->UseDoorOrButton();
+                 Encounters[1] = data;
+                 break;
+ 

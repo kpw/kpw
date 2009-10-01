@@ -1,0 +1,173 @@
+Index: src/game/PetAI.cpp
+===================================================================
+--- src/game/PetAI.cpp	(revision 6099)
++++ src/game/PetAI.cpp	(working copy)
+@@ -68,11 +68,11 @@
+ 
+     if(i_pet.Attack(u,true))
+     {
+-        i_pet.clearUnitState(UNIT_STAT_FOLLOW);
+         // TMGs call CreatureRelocation which via MoveInLineOfSight can call this function
+         // thus with the following clear the original TMG gets invalidated and crash, doh
+         // hope it doesn't start to leak memory without this :-/
+         //i_pet->Clear();
++		i_pet.clearUnitState(UNIT_STAT_FOLLOW); //clear follow manually
+         i_victimGuid = u->GetGUID();
+         i_pet.GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*u));
+     }
+@@ -148,13 +148,11 @@
+ 
+     if(owner && i_pet.GetCharmInfo() && i_pet.GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
+     {
+-        i_pet.addUnitState(UNIT_STAT_FOLLOW);
+         i_pet.GetMotionMaster()->Clear();
+         i_pet.GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
+     }
+     else
+     {
+-        i_pet.clearUnitState(UNIT_STAT_FOLLOW);
+         i_pet.addUnitState(UNIT_STAT_STOPPED);
+         i_pet.GetMotionMaster()->Clear();
+         i_pet.GetMotionMaster()->Idle();
+@@ -224,7 +222,6 @@
+         {
+             if (!i_pet.hasUnitState(UNIT_STAT_FOLLOW) )
+             {
+-                i_pet.addUnitState(UNIT_STAT_FOLLOW);
+                 i_pet.GetMotionMaster()->Clear();
+                 i_pet.GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
+             }
+@@ -248,7 +245,7 @@
+ 
+         Spell *spell = new Spell(&i_pet, spellInfo, false, 0);
+ 
+-        if(!IsPositiveSpell(spellInfo->Id) && i_pet.getVictim() && !_needToStop() && !i_pet.hasUnitState(UNIT_STAT_FOLLOW) && spell->CanAutoCast(i_pet.getVictim()))
++        if(!IsPositiveSpell(spellInfo->Id) && i_pet.getVictim() && !_needToStop() && i_pet.hasUnitState(UNIT_STAT_CHASE) && spell->CanAutoCast(i_pet.getVictim()))
+             targetMap[spellID] = i_pet.getVictim();
+         else
+         {
+Index: src/game/PetHandler.cpp
+===================================================================
+--- src/game/PetHandler.cpp	(revision 6099)
++++ src/game/PetHandler.cpp	(working copy)
+@@ -86,7 +86,6 @@
+                     break;
+                 case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
+                     pet->AttackStop();
+-                    pet->addUnitState(UNIT_STAT_FOLLOW);
+                     pet->GetMotionMaster()->Clear();
+                     pet->GetMotionMaster()->Mutate(new TargetedMovementGenerator<Creature>(*_player,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
+                     charmInfo->SetCommandState( COMMAND_FOLLOW );
+@@ -94,7 +93,6 @@
+                 case COMMAND_ATTACK:                        //spellid=1792  //ATTACK
+                 {
+                     // only place where pet can be player
+-                    pet->clearUnitState(UNIT_STAT_FOLLOW);
+                     uint64 selguid = _player->GetSelection();
+                     Unit *TargetUnit = ObjectAccessor::GetUnit(*_player, selguid);
+                     if(TargetUnit == NULL) return;
+@@ -183,13 +181,11 @@
+             if(!pet->HasSpell(spellid) || IsPassiveSpell(spellid))
+                 return;
+ 
+-            pet->clearUnitState(UNIT_STAT_FOLLOW);
+-
+             Spell *spell = new Spell(pet, spellInfo, false);
+ 
+             int16 result = spell->PetCanCast(unit_target);
+ 
+-                                                            //auto turn to target unless possessed
++            //auto turn to target unless possessed
+             if(result == SPELL_FAILED_UNIT_NOT_INFRONT && !pet->HasAuraType(SPELL_AURA_MOD_POSSESS))
+             {
+                 pet->SetInFront(unit_target);
+@@ -219,7 +215,6 @@
+ 
+                 if( unit_target && !GetPlayer()->IsFriendlyTo(unit_target) && !pet->HasAuraType(SPELL_AURA_MOD_POSSESS))
+                 {
+-                    pet->clearUnitState(UNIT_STAT_FOLLOW);
+                     if(pet->getVictim())
+                         pet->AttackStop();
+                     pet->GetMotionMaster()->Clear();
+@@ -571,8 +566,6 @@
+     if(!targets.read(&recvPacket,pet))
+         return;
+ 
+-    pet->clearUnitState(UNIT_STAT_FOLLOW);
+-
+     Spell *spell = new Spell(pet, spellInfo, false);
+     spell->m_targets = targets;
+ 
+Index: src/game/TargetedMovementGenerator.cpp
+===================================================================
+--- src/game/TargetedMovementGenerator.cpp	(revision 6099)
++++ src/game/TargetedMovementGenerator.cpp	(working copy)
+@@ -83,7 +83,7 @@
+     */
+     Traveller<T> traveller(owner);
+     i_destinationHolder.SetDestination(traveller, x, y, z);
+-    owner.addUnitState(UNIT_STAT_CHASE);
++    owner.addUnitState(i_angle ? UNIT_STAT_FOLLOW : UNIT_STAT_CHASE);
+ }
+ 
+ template<class T>
+@@ -100,7 +100,7 @@
+ void
+ TargetedMovementGenerator<T>::Finalize(T &owner)
+ {
+-    owner.clearUnitState(UNIT_STAT_CHASE);
++	owner.clearUnitState(i_angle ? UNIT_STAT_FOLLOW : UNIT_STAT_CHASE);
+ }
+ 
+ template<class T>
+@@ -121,7 +121,7 @@
+         return true;
+     if( owner.hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNDED | UNIT_STAT_FLEEING) )
+         return true;
+-    if( !owner.isInCombat() && !owner.hasUnitState(UNIT_STAT_FOLLOW) )
++    if( !owner.isInCombat() && !i_angle )
+     {
+         //owner.AIM_Initialize();   This case must be the one, when a creature aggroed you. By Initalized a new AI, we prevented to Ai::_stopAttack() to be executed properly.
+         return false;
+@@ -136,7 +136,7 @@
+     }
+ 
+     // prevent crash after creature killed pet
+-    if (!owner.hasUnitState(UNIT_STAT_FOLLOW) && owner.getVictim() != i_target.getTarget())
++    if (!i_angle && owner.getVictim() != i_target.getTarget())
+         return true;
+ 
+     Traveller<T> traveller(owner);
+@@ -145,7 +145,7 @@
+         _setTargetLocation(owner);
+     if( owner.IsStopped() && !i_destinationHolder.HasArrived() )
+     {
+-        owner.addUnitState(UNIT_STAT_CHASE);
++        owner.addUnitState(i_angle ? UNIT_STAT_FOLLOW : UNIT_STAT_CHASE);
+         i_destinationHolder.StartTravel(traveller);
+         return true;
+     }
+@@ -175,7 +175,7 @@
+             owner.SetInFront(i_target.getTarget());
+ 
+             owner.StopMoving();
+-            if(owner.canReachWithAttack(i_target.getTarget()) && !owner.hasUnitState(UNIT_STAT_FOLLOW))
++            if(owner.canReachWithAttack(i_target.getTarget()) && !i_angle)
+                 owner.Attack(i_target.getTarget(),true);
+         }
+     }
+Index: src/game/Unit.h
+===================================================================
+--- src/game/Unit.h	(revision 6099)
++++ src/game/Unit.h	(working copy)
+@@ -310,9 +310,9 @@
+     UNIT_STAT_CHASE           = 32,
+     UNIT_STAT_SEARCHING       = 64,
+     UNIT_STAT_FLEEING         = 128,
+-    UNIT_STAT_MOVING          = (UNIT_STAT_ROAMING | UNIT_STAT_CHASE | UNIT_STAT_SEARCHING | UNIT_STAT_FLEEING),
+     UNIT_STAT_IN_FLIGHT       = 256,                        // player is in flight mode
+     UNIT_STAT_FOLLOW          = 512,
++	UNIT_STAT_MOVING          = (UNIT_STAT_ROAMING | UNIT_STAT_CHASE | UNIT_STAT_SEARCHING | UNIT_STAT_FLEEING | UNIT_STAT_FOLLOW),
+     UNIT_STAT_ROOT            = 1024,
+     UNIT_STAT_CONFUSED        = 2048,
+     UNIT_STAT_ALL_STATE       = 0xffff                      //(UNIT_STAT_STOPPED | UNIT_STAT_MOVING | UNIT_STAT_IN_COMBAT | UNIT_STAT_IN_FLIGHT)

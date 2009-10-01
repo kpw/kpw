@@ -1,0 +1,23 @@
+diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
+index 26e77c8..3320042 100644
+--- a/src/game/SpellAuras.cpp
++++ b/src/game/SpellAuras.cpp
+@@ -4555,6 +4555,18 @@ void Aura::HandleModRegen(bool apply, bool Real)            // eating
+ 
+ void Aura::HandleModPowerRegen(bool apply, bool Real)       // drinking
+ {
++    // remove old auras from drinking
++    if (apply && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED))
++    {
++        Unit::AuraList const& m_ModPowerRegen = m_target->GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
++        for(Unit::AuraList::const_iterator i = m_ModPowerRegen.begin(); i != m_ModPowerRegen.end(); ++i)
++            if ( ((*i)->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && GetSpellProto() != (*i)->GetSpellProto() )
++            {
++                m_target->RemoveAurasDueToSpell( (*i)->GetSpellProto()->Id );
++                break;
++            }
++    }
++
+     if ((GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && apply && !m_target->IsSitState())
+         m_target->SetStandState(PLAYER_STATE_SIT);
+ 

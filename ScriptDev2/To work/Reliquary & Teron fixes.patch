@@ -1,0 +1,2222 @@
+Index: scripts/zone/black_temple/boss_reliquary_of_souls.cpp
+===================================================================
+--- scripts/zone/black_temple/boss_reliquary_of_souls.cpp	(revision 668)
++++ scripts/zone/black_temple/boss_reliquary_of_souls.cpp	(working copy)
+@@ -1,28 +1,29 @@
+ /* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+- */
++* This program is free software; you can redistribute it and/or modify
++* it under the terms of the GNU General Public License as published by
++* the Free Software Foundation; either version 2 of the License, or
++* (at your option) any later version.
++*
++* This program is distributed in the hope that it will be useful,
++* but WITHOUT ANY WARRANTY; without even the implied warranty of
++* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++* GNU General Public License for more details.
++*
++* You should have received a copy of the GNU General Public License
++* along with this program; if not, write to the Free Software
++* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
+ 
+ /* ScriptData
+ SDName: Boss_Reliquary_of_Souls
+ SD%Complete: 90
+-SDComment: Persistent Area Auras for each Essence (Aura of Suffering, Aura of Desire, Aura of Anger) requires core support.
++SDComment:
+ SDCategory: Black Temple
+ EndScriptData */
+ 
+ #include "precompiled.h"
+ #include "def_black_temple.h"
++#include "Spell.h"
+ 
+ //Sound'n'speech
+ //Suffering
+@@ -34,8 +35,8 @@
+ #define SUFF_SOUND_SLAY1    11417
+ #define SUFF_SAY_SLAY2      "I didn't ask for this!"
+ #define SUFF_SOUND_SLAY2    11418
+-#define SUFF_SAY_SLAY3      "The pain is only beginning!"
+-#define SUFF_SOUND_SLAY3    11419
++#define SUFF_SAY_ENRAGE     "The pain is only beginning!"
++#define SUFF_SOUND_ENRAGE   11419
+ #define SUFF_SAY_RECAP      "I don't want to go back!"
+ #define SUFF_SOUND_RECAP    11420
+ #define SUFF_SAY_AFTER      "Now what do I do?"
+@@ -60,8 +61,8 @@
+ //Anger
+ #define ANGER_SAY_FREED     "Beware... I live."
+ #define ANGER_SOUND_FREED   11399
+-#define ANGER_SAY_FREED2    "So... foolish."
+-#define ANGER_SOUND_FREED2  11400
++#define ANGER_SAY_SCREAM    "So... foolish."
++#define ANGER_SOUND_SCREAM  11400
+ #define ANGER_SOUND_SLAY1   11401
+ #define ANGER_SAY_SLAY2     "Enough. No more."
+ #define ANGER_SOUND_SLAY2   11402
+@@ -74,29 +75,32 @@
+ 
+ //Spells
+ #define AURA_OF_SUFFERING               41292
+-#define AURA_OF_SUFFERING_ARMOR         42017
+-#define ESSENCE_OF_SUFFERING_PASSIVE    41296
++#define AURA_OF_SUFFERING_ARMOR         42017 // linked aura, need core support
++#define ESSENCE_OF_SUFFERING_PASSIVE    41296 // periodic trigger 41294
++#define ESSENCE_OF_SUFFERING_PASSIVE2   41623 
++#define SPELL_FIXATE_TARGET             41294 // dummy, select target
++#define SPELL_FIXATE_TAUNT              41295 // force taunt
+ #define SPELL_ENRAGE                    41305
+ #define SPELL_SOUL_DRAIN                41303
+-#define SPELL_FIXATE                    41295
+ 
+ #define AURA_OF_DESIRE                  41350
++#define AURA_OF_DESIRE_DAMAGE           41352
+ #define SPELL_RUNE_SHIELD               41431
+ #define SPELL_DEADEN                    41410
+ #define SPELL_SOUL_SHOCK                41426
+ 
+ #define AURA_OF_ANGER                   41337
+-#define SPELL_SELF_SEETHE               41364
++#define SPELL_SELF_SEETHE               41364 // force cast 41520
+ #define SPELL_ENEMY_SEETHE              41520
+ #define SPELL_SOUL_SCREAM               41545
+-#define SPELL_SPITE                     41377
++#define SPELL_SPITE_TARGET              41376 // cast 41377 after 6 sec
++#define SPELL_SPITE_DAMAGE              41377
+ 
+ #define ENSLAVED_SOUL_PASSIVE           41535
+ #define SPELL_SOUL_RELEASE              41542
+-#define SPELL_RESTORE_MANA              32848
+-#define SPELL_RESTORE_HEALTH            25329
+ 
+ #define CREATURE_ENSLAVED_SOUL          23469
++#define NUMBER_ENSLAVED_SOUL            8
+ 
+ struct Position
+ {
+@@ -119,31 +123,12 @@
+ 
+     uint64 ReliquaryGUID;
+ 
+-    void Reset()
+-    {
+-        ReliquaryGUID = 0;
+-    }
++    void Reset() {ReliquaryGUID = 0;}
+ 
+-    void Aggro(Unit* who) {}
+-
+-    void DamageTaken(Unit *done_by, uint32 &damage)
++    void Aggro(Unit* who)
+     {
+-        if(damage >= m_creature->GetHealth())
+-        {
+-            if(done_by->GetTypeId() == TYPEID_PLAYER)
+-            {
+-                done_by->CastSpell(done_by, SPELL_RESTORE_HEALTH, true);
+-                if(done_by->GetMaxPower(POWER_MANA) > 0)
+-                {
+-                    if((done_by->GetPower(POWER_MANA) / done_by->GetMaxPower(POWER_MANA)) < 70)
+-                    {
+-                        uint32 mana = done_by->GetPower(POWER_MANA) + (uint32)(done_by->GetMaxPower(POWER_MANA)*0.3);
+-                        done_by->SetPower(POWER_MANA, mana);
+-                    }else done_by->SetPower(POWER_MANA, done_by->GetMaxPower(POWER_MANA));
+-                }
+-            }
+-            DoCast(done_by, SPELL_SOUL_RELEASE);
+-        }
++        m_creature->CastSpell(m_creature, ENSLAVED_SOUL_PASSIVE, true);
++        DoZoneInCombat();
+     }
+ 
+     void JustDied(Unit *killer);
+@@ -151,139 +136,95 @@
+ 
+ struct MANGOS_DLL_DECL boss_reliquary_of_soulsAI : public ScriptedAI
+ {
+-    boss_reliquary_of_soulsAI(Creature *c) : ScriptedAI(c)
++    boss_reliquary_of_soulsAI(Creature *c) : ScriptedAI(c) 
+     {
+         pInstance = ((ScriptedInstance*)c->GetInstanceData());
++        EssenceGUID = 0;
+         Reset();
+     }
+ 
+     ScriptedInstance* pInstance;
+ 
+-    uint64 SufferingGUID;
+-    uint64 DesireGUID;
+-    uint64 AngerGUID;
++    uint64 EssenceGUID;
+ 
+-    uint32 SoulDeathCount;
+-    // 0 = Out of Combat, 1 = Not started, 2 = Suffering, 3 = Souls, 4 = Desire, 5 = Souls, 6 = Anger
+     uint32 Phase;
+-    uint32 SummonEssenceTimer;
+-    uint32 DespawnEssenceTimer;
++    uint32 Counter;
++    uint32 Timer;
++
+     uint32 SoulCount;
+-    uint32 SummonSoulTimer;
+-    uint32 AnimationTimer;
++    uint32 SoulDeathCount;
+ 
+-    bool IsDead;
+-    bool EndingPhase;
+-
+     void Reset()
+     {
+         if(pInstance)
+             pInstance->SetData(DATA_RELIQUARYOFSOULSEVENT, NOT_STARTED);
+ 
+-        DespawnEssences();
++        if(EssenceGUID)
++        {
++            if(Unit* Essence = Unit::GetUnit(*m_creature, EssenceGUID))
++            {
++                Essence->SetVisibility(VISIBILITY_OFF);
++                Essence->setDeathState(DEAD);
++            }
++            EssenceGUID = 0;
++        }
+ 
+-        SufferingGUID = 0;
+-        DesireGUID = 0;
+-        AngerGUID = 0;
+-
+-        SoulDeathCount = 0;
+         Phase = 0;
+-        SummonEssenceTimer = 8000;
+-        DespawnEssenceTimer = 2000;
+-        SoulCount = 0;
+-        SummonSoulTimer = 1000;
+-        AnimationTimer = 8000;
+ 
+-        IsDead = false;
+-        EndingPhase = false;
+-
+-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+         m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,0);
+-        m_creature->GetMotionMaster()->Clear(false);
+     }
+ 
+-    void Aggro(Unit* who) { }
++    void Aggro(Unit* who)
++    {
++        m_creature->AddThreat(who, 10000.0f);
++        DoZoneInCombat();
++        if(pInstance)
++            pInstance->SetData(DATA_RELIQUARYOFSOULSEVENT, IN_PROGRESS);
+ 
+-    void AttackStart(Unit* who) { }
++        Phase = 1;
++        Counter = 0;
++        Timer = 0;
++    }
+ 
+     void MoveInLineOfSight(Unit *who)
+     {
+-        if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
++        if( !m_creature->getVictim() && who->isTargetableForAttack() && ( m_creature->IsHostileTo( who )) && who->isInAccessablePlaceFor(m_creature) )
+         {
++            if (m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
++                return;
++
+             float attackRadius = m_creature->GetAttackDistance(who);
+-            if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= CREATURE_Z_ATTACK_RANGE && m_creature->IsWithinLOSInMap(who))
++            if( m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsWithinLOSInMap(who) )
+             {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
++                who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+ 
+-                if(!InCombat)
++                if (!InCombat)
+                 {
+-                    if(pInstance)
+-                        pInstance->SetData(DATA_RELIQUARYOFSOULSEVENT, IN_PROGRESS);
+-
+-                    Phase = 1;
+-                                                            // I R ANNNGRRRY!
+-                    m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,375);
+-                    SummonEssenceTimer = 8000;
+-                    AnimationTimer = 5100;
+-                    m_creature->AddThreat(who, 1.0f);
+-
++                    Aggro(who);
+                     InCombat = true;
+                 }
+             }
+         }
+     }
+ 
+-    void SummonSoul()
++    void AttackStart(Unit*) {}
++
++    bool SummonSoul()
+     {
+         uint32 random = rand()%6;
+         float x = Coords[random].x;
+         float y = Coords[random].y;
+-        Creature* Soul = m_creature->SummonCreature(CREATURE_ENSLAVED_SOUL, x, y, m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 45000);
+-        Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+-        if (target && Soul)
++        Creature* Soul = m_creature->SummonCreature(CREATURE_ENSLAVED_SOUL, x, y, m_creature->GetPositionZ(), m_creature->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0);
++        if(!Soul) return false;
++        if(Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 0))
+         {
+             ((npc_enslaved_soulAI*)Soul->AI())->ReliquaryGUID = m_creature->GetGUID();
+-            Soul->CastSpell(Soul, ENSLAVED_SOUL_PASSIVE, true);
+-            Soul->AddThreat(target, 1.0f);
+-            SoulCount++;
+-        }
++            Soul->AI()->AttackStart(target);
++        }else EnterEvadeMode();
++        return true;
+     }
+ 
+-    void MergeThreatList(Creature* target)
+-    {
+-        if(!target) return;
+-
+-        std::list<HostilReference*>& m_threatlist = target->getThreatManager().getThreatList();
+-        std::list<HostilReference*>::iterator itr = m_threatlist.begin();
+-        for( ; itr != m_threatlist.end(); itr++)
+-        {
+-            Unit* pUnit = Unit::GetUnit((*m_creature), (*itr)->getUnitGuid());
+-            if(pUnit)
+-            {
+-                m_creature->AddThreat(pUnit, 1.0f);         // This is so that we make sure the unit is in Reliquary's threat list before we reset the unit's threat.
+-                m_creature->getThreatManager().modifyThreatPercent(pUnit, -100);
+-                float threat = target->getThreatManager().getThreat(pUnit);
+-                m_creature->AddThreat(pUnit, threat);       // This makes it so that the unit has the same amount of threat in Reliquary's threatlist as in the target creature's (One of the Essences).
+-            }
+-        }
+-    }
+-
+-    void DespawnEssences()
+-    {
+-        // Despawn Essences
+-        Unit* Essence = NULL;
+-        if(SufferingGUID)
+-            Essence = ((Creature*)Unit::GetUnit((*m_creature), SufferingGUID));
+-        else if(DesireGUID)
+-            Essence = ((Creature*)Unit::GetUnit((*m_creature), DesireGUID));
+-        else if(AngerGUID)
+-            Essence = ((Creature*)Unit::GetUnit((*m_creature), AngerGUID));
+-        if(Essence && Essence->isAlive())
+-            Essence->setDeathState(JUST_DIED);
+-    }
+-
+     void JustDied(Unit* killer)
+     {
+         if(pInstance)
+@@ -297,277 +238,108 @@
+         if(!Phase)
+             return;
+ 
+-        // Reset if event is begun and we don't have a threatlist
+-        if(Phase && m_creature->getThreatManager().getThreatList().empty())
+-            EnterEvadeMode();
+-
+-        if(Phase == 1)
++        if(m_creature->getThreatManager().getThreatList().empty()) // Reset if event is begun and we don't have a threatlist
+         {
+-            if(AnimationTimer < diff)
+-            {
+-                // Release the cube
+-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,374);
+-                AnimationTimer = 8300;
+-            }else AnimationTimer -= diff;
+-
+-            if(SummonEssenceTimer < diff)
+-            {
+-                // Ribs: open
+-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,373);
+-                Creature* EssenceSuffering = NULL;
+-                EssenceSuffering = m_creature->SummonCreature(23418, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 1.57, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10000);
+-
+-                if(EssenceSuffering)
+-                {
+-                    EssenceSuffering->Yell(SUFF_SAY_FREED, LANG_UNIVERSAL, 0);
+-                    DoPlaySoundToSet(m_creature, SUFF_SOUND_FREED);
+-                    Unit* target = SelectUnit(SELECT_TARGET_TOPAGGRO, 0);
+-                    if(target)
+-                    {
+-                        EssenceSuffering->AddThreat(target, 1.0f);
+-                        EssenceSuffering->AI()->AttackStart(target);
+-                    }
+-                    SufferingGUID = EssenceSuffering->GetGUID();
+-                }
+-
+-                EndingPhase = false;
+-                Phase = 2;
+-            }else SummonEssenceTimer -= diff;
++            EnterEvadeMode();
++            return;
+         }
+ 
+-        if(Phase == 2)
++        Creature* Essence;
++        if(EssenceGUID)
+         {
+-            if(SufferingGUID)
++            Essence = (Creature*)Unit::GetUnit(*m_creature, EssenceGUID);
++            if(!Essence)
+             {
+-                Creature* EssenceSuffering = NULL;
+-                EssenceSuffering = ((Creature*)Unit::GetUnit((*m_creature), SufferingGUID));
+-
+-                if(!EssenceSuffering || (!EssenceSuffering->isAlive()))
+-                    EnterEvadeMode();
+-
+-                if(!EndingPhase)
+-                {
+-                    if(EssenceSuffering)
+-                    {
+-                        if(EssenceSuffering->GetHealth() < (EssenceSuffering->GetMaxHealth()*0.1))
+-                        {
+-                            MergeThreatList(EssenceSuffering);
+-                            EssenceSuffering->RemoveAllAuras();
+-                            EssenceSuffering->DeleteThreatList();
+-                            EssenceSuffering->GetMotionMaster()->MoveFollow(m_creature,0.0f,0.0f);
+-                            EssenceSuffering->Yell(SUFF_SAY_RECAP,LANG_UNIVERSAL,0);
+-                            DoPlaySoundToSet(m_creature, SUFF_SOUND_RECAP);
+-                            EssenceSuffering->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+-                            DespawnEssenceTimer = 4000;
+-                            AnimationTimer = 2200;
+-                            EndingPhase = true;
+-                        }
+-                    }
+-                }
+-
+-                if((EndingPhase) && (EssenceSuffering) && (EssenceSuffering->isAlive()))
+-                {
+-                    if(AnimationTimer < diff)
+-                    {
+-                        // Return
+-                        EssenceSuffering->SetUInt32Value(UNIT_NPC_EMOTESTATE,374);
+-                        AnimationTimer = 10000;
+-                    }else AnimationTimer -= diff;
+-
+-                    if(DespawnEssenceTimer < diff)
+-                    {
+-                        EssenceSuffering->DeleteThreatList();
+-                        EssenceSuffering->Yell(SUFF_SAY_AFTER,LANG_UNIVERSAL,0);
+-                        DoPlaySoundToSet(m_creature, SUFF_SOUND_AFTER);
+-                        EssenceSuffering->SetUInt32Value(UNIT_FIELD_DISPLAYID, 11686);
+-                        EssenceSuffering->setFaction(35);
+-                        m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,0);
+-                        SummonEssenceTimer = 20000;         //60000;
+-                        AnimationTimer = 18200;             //58100;
+-                        SoulDeathCount = 0;
+-                        SoulCount = 0;
+-                        SummonSoulTimer = 1000;
+-                        EndingPhase = false;
+-                        Phase = 3;
+-                        SufferingGUID = 0;
+-                    }else DespawnEssenceTimer -= diff;
+-                }
++                EnterEvadeMode();
++                return;
+             }
+         }
+ 
+-        if(Phase == 3)
++        if(Timer < diff)
+         {
+-            if(SoulCount < 36)
++            switch(Counter)
+             {
+-                if(SummonSoulTimer < diff)
++            case 0:
++                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,375);  // I R ANNNGRRRY!
++                Timer = 3000;
++                break;
++            case 1:
++                Timer = 2800;
++                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,374);  // Release the cube
++                break;
++            case 2:
++                Timer = 5000;
++                if(Creature* Summon = DoSpawnCreature(23417+Phase, 0, 0, 0, 0, TEMPSUMMON_DEAD_DESPAWN, 0))
+                 {
+-                    SummonSoul();
+-                    SummonSoulTimer = 500;
+-                }else SummonSoulTimer -= diff;
+-            }
+-
+-            if(SoulDeathCount >= SoulCount)
+-            {
+-                if(AnimationTimer < diff)
++                    m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,373);  // Ribs: open
++                    Summon->AI()->AttackStart(SelectUnit(SELECT_TARGET_TOPAGGRO, 0));
++                    EssenceGUID = Summon->GetGUID();
++                }else EnterEvadeMode();
++                break;
++            case 3:
++                Timer = 1000;
++                if(Phase == 3)
+                 {
+-                    // Release the cube
+-                    m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,374);
+-                    AnimationTimer = 10000;
+-                }else AnimationTimer -= diff;
+-
+-                if(SummonEssenceTimer < diff)
++                    if(!Essence->isAlive())
++                        m_creature->CastSpell(m_creature, 7, true);
++                    else return;
++                }
++                else
+                 {
+-                    // Ribs: open
+-                    m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,373);
+-                    Creature* EssenceDesire = NULL;
+-                    EssenceDesire = m_creature->SummonCreature(23419, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 1.57, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10000);
+-
+-                    if(EssenceDesire)
++                    if(Essence->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                     {
+-                        EssenceDesire->Yell(DESI_SAY_FREED, LANG_UNIVERSAL, NULL);
+-                        DoPlaySoundToSet(m_creature, DESI_SOUND_FREED);
+-                        Unit* target = NULL;
+-                        target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+-                        if(target)
+-                        {
+-                            EssenceDesire->AddThreat(target, 1.0f);
+-                            EssenceDesire->AI()->AttackStart(target);
+-                        }
+-                        DesireGUID = EssenceDesire->GetGUID();
+-                        SoulDeathCount = 0;
+-                    }
+-
+-                    Phase = 4;
+-                }else SummonEssenceTimer -= diff;
+-            }
+-        }
+-
+-        if(Phase == 4)
+-        {
+-            if(DesireGUID)
+-            {
+-                Creature* EssenceDesire = NULL;
+-                EssenceDesire = ((Creature*)Unit::GetUnit((*m_creature), DesireGUID));
+-
+-                if(!EssenceDesire || !EssenceDesire->isAlive())
+-                    EnterEvadeMode();
+-
+-                if(!EndingPhase && EssenceDesire)
++                        Essence->AI()->EnterEvadeMode();
++                        Essence->GetMotionMaster()->MoveFollow(m_creature, 0, 0);
++                    }else return;
++                }
++                break;
++            case 4:
++                Timer = 1500;
++                if(Essence->IsWithinDistInMap(m_creature, 10))
++                    Essence->SetUInt32Value(UNIT_NPC_EMOTESTATE, 374); //rotate and disappear
++                else
++                    return;
++                break;
++            case 5:
++                if(Phase == 1)
+                 {
+-                    if(EssenceDesire->GetHealth() < (EssenceDesire->GetMaxHealth()*0.1))
+-                    {
+-                        MergeThreatList(EssenceDesire);
+-                        EssenceDesire->GetMotionMaster()->MoveFollow(m_creature,0.0f,0.0f);
+-                        EssenceDesire->RemoveAllAuras();
+-                        EssenceDesire->DeleteThreatList();
+-                        EssenceDesire->Yell(DESI_SAY_RECAP,LANG_UNIVERSAL,0);
+-                        DoPlaySoundToSet(m_creature, DESI_SOUND_RECAP);
+-                        EssenceDesire->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+-                        DespawnEssenceTimer = 4000;
+-                        AnimationTimer = 2200;
+-                        EndingPhase = true;
+-                    }
++                    Essence->Yell(SUFF_SAY_AFTER,LANG_UNIVERSAL,0);
++                    DoPlaySoundToSet(Essence, SUFF_SOUND_AFTER);
+                 }
+-
+-                if(EndingPhase && EssenceDesire)
++                else
+                 {
+-                    if(EssenceDesire->isAlive())
+-                    {
+-                        if(AnimationTimer < diff)
+-                        {
+-                            // Return
+-                            EssenceDesire->SetUInt32Value(UNIT_NPC_EMOTESTATE,374);
+-                            AnimationTimer = 10000;
+-                        }else AnimationTimer -= diff;
+-
+-                        if(DespawnEssenceTimer < diff)
+-                        {
+-                            EssenceDesire->DeleteThreatList();
+-                            EssenceDesire->setFaction(35);
+-                            EssenceDesire->Yell(DESI_SAY_AFTER, LANG_UNIVERSAL, 0);
+-                            DoPlaySoundToSet(m_creature, DESI_SOUND_AFTER);
+-                            EssenceDesire->SetUInt32Value(UNIT_FIELD_DISPLAYID, 11686);
+-                            m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,0);
+-                            SummonEssenceTimer = 20000;
+-                            AnimationTimer = 18200;
+-                            SoulDeathCount = 0;
+-                            SoulCount = 0;
+-                            SummonSoulTimer = 1000;
+-                            EndingPhase = false;
+-                            Phase = 5;
+-                            DesireGUID = 0;
+-                        }else DespawnEssenceTimer -= diff;
+-                    }
++                    Essence->Yell(DESI_SAY_AFTER,LANG_UNIVERSAL,0);
++                    DoPlaySoundToSet(Essence, DESI_SOUND_AFTER);
+                 }
+-            }
+-        }
+-
+-        if(Phase == 5)
+-        {
+-            if(SoulCount < 36)
+-            {
+-                if(SummonSoulTimer < diff)
++                Essence->SetVisibility(VISIBILITY_OFF);
++                Essence->setDeathState(DEAD);
++                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,0);
++                EssenceGUID = 0;
++                SoulCount = 0;
++                SoulDeathCount = 0;
++                Timer = 3000;            
++                break;
++            case 6:
++                if(SoulCount < NUMBER_ENSLAVED_SOUL)
+                 {
+-                    SummonSoul();
+-                    SummonSoulTimer = 500;
+-                }else SummonSoulTimer -= diff;
+-            }
+-
+-            if(SoulDeathCount >= SoulCount)
+-            {
+-                if(AnimationTimer < diff)
++                    if(SummonSoul())
++                        SoulCount++;
++                    Timer = 500;
++                    return;
++                }break;
++            case 7:
++                if(SoulDeathCount >= SoulCount)
+                 {
+-                    // Release the cube
+-                    m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,374);
+-                    AnimationTimer = 10000;
+-                }else AnimationTimer -= diff;
+-
+-                if(SummonEssenceTimer < diff)
+-                {
+-                    // Ribs: open
+-                    m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,373);
+-                    Creature* EssenceAnger = NULL;
+-                    EssenceAnger = m_creature->SummonCreature(23420, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 1.57, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 45000);
+-
+-                    if(EssenceAnger)
+-                    {
+-                        Unit* target = SelectUnit(SELECT_TARGET_TOPAGGRO, 0);
+-                        if(target)
+-                        {
+-                            EssenceAnger->AddThreat(target, 1.0f);
+-                            EssenceAnger->AI()->AttackStart(target);
+-                        }
+-                        AngerGUID = EssenceAnger->GetGUID();
+-                        DoPlaySoundToSet(m_creature, ANGER_SOUND_FREED);
+-                        EssenceAnger->Yell(ANGER_SAY_FREED, LANG_UNIVERSAL, 0);
+-                        SoulDeathCount = 0;
+-                    }
+-
+-                    Phase = 6;
+-                }else SummonEssenceTimer -= diff;
+-            }
+-        }
+-
+-        if(Phase == 6)
+-        {
+-            if(AngerGUID)
+-            {
+-                Creature* EssenceAnger = NULL;
+-                EssenceAnger = ((Creature*)Unit::GetUnit((*m_creature), AngerGUID));
+-
+-                if(!EssenceAnger)
+-                    EnterEvadeMode();
+-
+-                if(m_creature->isAlive() && EssenceAnger)
+-                {
+-                    if(!EssenceAnger->isAlive())
+-                    {
+-                        AngerGUID = 0;
+-                        m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+-                    }
++                    Counter = 1;
++                    Phase++;
++                    Timer = 5000;
+                 }
++                return;
++            default:
++                break;
+             }
+-        }
++            Counter++;
++        }else Timer -= diff;
+     }
+ };
+ 
+@@ -593,260 +365,216 @@
+     uint32 FixateTimer;
+     uint32 EnrageTimer;
+     uint32 SoulDrainTimer;
++    uint32 AuraTimer;
+ 
+     void Reset()
+     {
+         StatAuraGUID = 0;
+ 
+         AggroYellTimer = 5000;
+-        FixateTimer = 5000;
++        FixateTimer = 8000;
+         EnrageTimer = 30000;
+-        SoulDrainTimer = 150000;
++        SoulDrainTimer = 45000;
++        AuraTimer = 5000;
+     }
+ 
+     void DamageTaken(Unit *done_by, uint32 &damage)
+     {
+-        if((damage >= m_creature->GetHealth()) && (done_by != m_creature))
++        if(damage >= m_creature->GetHealth())
+         {
+             damage = 0;
+-            // 10% of total health, signalling time to return
+-            m_creature->SetHealth(m_creature->GetMaxHealth()/10);
+-            if(StatAuraGUID)
+-            {
+-                Unit* pUnit = Unit::GetUnit((*m_creature), StatAuraGUID);
+-                if(pUnit)
+-                    pUnit->RemoveAurasDueToSpell(AURA_OF_SUFFERING_ARMOR);
+-            }
++            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++            m_creature->Yell(SUFF_SAY_RECAP,LANG_UNIVERSAL,0);
++            DoPlaySoundToSet(m_creature, SUFF_SOUND_RECAP);
+         }
+     }
+ 
+     void Aggro(Unit *who)
+     {
++        m_creature->Yell(SUFF_SAY_FREED, LANG_UNIVERSAL, 0);
++        DoPlaySoundToSet(m_creature, SUFF_SOUND_FREED);
+         DoZoneInCombat();
+-        DoCast(who, AURA_OF_SUFFERING, true);
+-        DoCast(m_creature, ESSENCE_OF_SUFFERING_PASSIVE, true);
++        m_creature->CastSpell(m_creature, AURA_OF_SUFFERING, true); // linked aura need core support
++        m_creature->CastSpell(m_creature, ESSENCE_OF_SUFFERING_PASSIVE, true);
++        m_creature->CastSpell(m_creature, ESSENCE_OF_SUFFERING_PASSIVE2, true);
+     }
+ 
+     void KilledUnit(Unit *victim)
+     {
+-        switch(rand()%3)
++        switch(rand()%2)
+         {
+-            case 0:
+-                DoYell(SUFF_SAY_SLAY1,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, SUFF_SOUND_SLAY1);
+-                break;
+-            case 1:
+-                DoYell(SUFF_SAY_SLAY2,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, SUFF_SOUND_SLAY2);
+-                break;
+-            case 2:
+-                DoYell(SUFF_SAY_SLAY3,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, SUFF_SOUND_SLAY3);
+-                break;
++        case 0:
++            DoYell(SUFF_SAY_SLAY1,LANG_UNIVERSAL,NULL);
++            DoPlaySoundToSet(m_creature, SUFF_SOUND_SLAY1);
++            break;
++        case 1:
++            DoYell(SUFF_SAY_SLAY2,LANG_UNIVERSAL,NULL);
++            DoPlaySoundToSet(m_creature, SUFF_SOUND_SLAY2);
++            break;
+         }
+     }
+ 
+-    void JustDied(Unit* killer)
+-    {
+-    }
+-
+     void CastFixate()
+     {
+         std::list<HostilReference*>& m_threatlist = m_creature->getThreatManager().getThreatList();
+         if(m_threatlist.empty())
+-            return;                                         // No point continuing if empty threatlist.
++            return; // No point continuing if empty threatlist.
+         std::list<Unit*> targets;
+         std::list<HostilReference*>::iterator itr = m_threatlist.begin();
+         for( ; itr != m_threatlist.end(); ++itr)
+         {
+             Unit* pUnit = Unit::GetUnit((*m_creature), (*itr)->getUnitGuid());
+-                                                            // Only alive players
+-            if(pUnit && pUnit->isAlive() && (pUnit->GetTypeId() == TYPEID_PLAYER))
++            if(pUnit && pUnit->isAlive() && (pUnit->GetTypeId() == TYPEID_PLAYER)) // Only alive players
+                 targets.push_back(pUnit);
+         }
+         if(targets.empty())
+-            return;                                         // No targets added for some reason. No point continuing.
+-        targets.sort(TargetDistanceOrder(m_creature));      // Sort players by distance.
+-        targets.resize(1);                                  // Only need closest target.
+-        Unit* target = targets.front();                     // Get the first target.
+-                                                            // Add threat equivalent to threat on victim.
+-        m_creature->AddThreat(target, m_creature->getThreatManager().getThreat(m_creature->getVictim()));
+-        DoCast(target, SPELL_FIXATE);
++            return; // No targets added for some reason. No point continuing.
++        targets.sort(TargetDistanceOrder(m_creature)); // Sort players by distance.
++        targets.resize(1); // Only need closest target.
++        Unit* target = targets.front(); // Get the first target.
++        target->CastSpell(m_creature, SPELL_FIXATE_TAUNT, true);
+     }
+ 
+     void UpdateAI(const uint32 diff)
+     {
+         //Return since we have no target
+-        if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
++        if (!m_creature->SelectHostilTarget() && !m_creature->getVictim())
+             return;
+ 
+-        if(m_creature->GetHealth() <= (m_creature->GetMaxHealth()*0.1))
+-        {
+-            if(StatAuraGUID)
+-            {
+-                Unit* pUnit = NULL;
+-                pUnit = Unit::GetUnit((*m_creature), StatAuraGUID);
+-                if(pUnit)
+-                    pUnit->RemoveAurasDueToSpell(AURA_OF_SUFFERING_ARMOR);
+-            }
+-        }
+-
+-        if(m_creature->GetHealth() <= (m_creature->GetMaxHealth()*0.1))
+-        {
+-            if(m_creature->getVictim())
+-                m_creature->DeleteThreatList();             // Delete our threatlist if below 10% as we should no longer attack.
+-            return;
+-        }
+-
+-        // Prevent overlapping yells
+-        if(AggroYellTimer)
+-            if(AggroYellTimer < diff)
+-        {
+-            DoYell(SUFF_SAY_AGGRO, LANG_UNIVERSAL, NULL);
+-            DoPlaySoundToSet(m_creature, SUFF_SOUND_AGGRO);
+-            AggroYellTimer = 0;
+-        }else AggroYellTimer -= diff;
+-
+         //Supposed to be cast on nearest target
+         if(FixateTimer < diff)
+         {
+             CastFixate();
+             FixateTimer = 5000;
++            if(!(rand()%16))
++            {
++                DoYell(SUFF_SAY_AGGRO,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, SUFF_SOUND_AGGRO);
++            }
+         }else FixateTimer -= diff;
+ 
+         if(EnrageTimer < diff)
+         {
+             DoCast(m_creature, SPELL_ENRAGE);
+             EnrageTimer = 60000;
++            DoYell(SUFF_SAY_ENRAGE,LANG_UNIVERSAL,NULL);
++            DoPlaySoundToSet(m_creature, SUFF_SOUND_ENRAGE);
+         }else EnrageTimer -= diff;
+ 
+         if(SoulDrainTimer < diff)
+         {
+-            Unit* target = NULL;
+-            target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+-
+-            if(target)
+-                DoCast(target, SPELL_SOUL_DRAIN);
++            DoCast(m_creature, SPELL_SOUL_DRAIN);
+             SoulDrainTimer = 60000;
+         }else SoulDrainTimer -= diff;
+ 
+         DoMeleeAttackIfReady();
+     }
+ };
++
+ struct MANGOS_DLL_DECL boss_essence_of_desireAI : public ScriptedAI
+ {
+     boss_essence_of_desireAI(Creature *c) : ScriptedAI(c) {Reset();}
+ 
+-    uint32 AggroYellTimer;
+     uint32 RuneShieldTimer;
+     uint32 DeadenTimer;
+     uint32 SoulShockTimer;
+ 
+     void Reset()
+     {
+-        AggroYellTimer = 5000;
+         RuneShieldTimer = 60000;
+-        DeadenTimer = 15000;
+-        SoulShockTimer = 40000;
++        DeadenTimer = 30000;
++        SoulShockTimer = 5000;
++        m_creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+     }
+ 
+     void DamageTaken(Unit *done_by, uint32 &damage)
+     {
+-        if((damage >= m_creature->GetHealth()) && (done_by != m_creature))
++        if(done_by == m_creature)
++            return;
++
++        if(damage >= m_creature->GetHealth())
+         {
+             damage = 0;
+-            // 10% of total health, signalling time to return
+-            m_creature->SetHealth(m_creature->GetMaxHealth()/10);
++            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++            m_creature->Yell(DESI_SAY_RECAP,LANG_UNIVERSAL,0);
++            DoPlaySoundToSet(m_creature, DESI_SOUND_RECAP);
+         }
+         else
+         {
+-            if(done_by && (done_by->GetTypeId() == TYPEID_PLAYER) && done_by->isAlive())
+-                done_by->DealDamage(done_by, damage/2, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
++            int32 bp0 = damage / 2;
++            m_creature->CastCustomSpell(done_by, AURA_OF_DESIRE_DAMAGE, &bp0, NULL, NULL, true);
+         }
+     }
+ 
+-    void Aggro(Unit *who) { DoZoneInCombat(); }
+-
+-    void KilledUnit(Unit *victim)
++    void SpellHit(Unit *caster, const SpellEntry *spell)
+     {
+-        switch(rand()%3)
+-        {
+-            case 0:
+-                DoYell(DESI_SAY_SLAY1,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, DESI_SOUND_SLAY1);
+-                break;
+-            case 1:
+-                DoYell(DESI_SAY_SLAY2,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, DESI_SOUND_SLAY2);
+-                break;
+-            case 2:
+-                DoYell(DESI_SAY_SLAY3,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, DESI_SOUND_SLAY3);
+-                break;
+-        }
++        if(m_creature->m_currentSpells[CURRENT_GENERIC_SPELL])
++            for(uint8 i = 0; i < 3; ++i)
++                if(spell->Effect[i] == SPELL_EFFECT_INTERRUPT_CAST)
++                    if(m_creature->m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->Id == SPELL_SOUL_SHOCK 
++                        || m_creature->m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->Id == SPELL_DEADEN)
++                        m_creature->InterruptSpell(CURRENT_GENERIC_SPELL, false);
+     }
+ 
+-    void MoveInLineOfSight(Unit *who)
++    void Aggro(Unit *who)
+     {
+-        if (!who || m_creature->getVictim())
+-            return;
++        m_creature->Yell(DESI_SAY_FREED, LANG_UNIVERSAL, 0);
++        DoPlaySoundToSet(m_creature, DESI_SOUND_FREED);
++        DoZoneInCombat();
++        DoCast(m_creature, AURA_OF_DESIRE, true);
++    }
+ 
+-        if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
++    void KilledUnit(Unit *victim)
++    {
++        switch(rand()%3)
+         {
+-            float attackRadius = m_creature->GetAttackDistance(who);
+-            if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= CREATURE_Z_ATTACK_RANGE && m_creature->IsWithinLOSInMap(who))
+-            {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                //Begin melee attack if we are within range
+-                DoStartAttackAndMovement(who);
+-
+-                if (!InCombat)
+-                {
+-                    DoCast(who, AURA_OF_DESIRE);
+-                }
+-            }
++        case 0:
++            DoYell(DESI_SAY_SLAY1,LANG_UNIVERSAL,NULL);
++            DoPlaySoundToSet(m_creature, DESI_SOUND_SLAY1);
++            break;
++        case 1:
++            DoYell(DESI_SAY_SLAY2,LANG_UNIVERSAL,NULL);
++            DoPlaySoundToSet(m_creature, DESI_SOUND_SLAY2);
++            break;
++        case 2:
++            DoYell(DESI_SAY_SLAY3,LANG_UNIVERSAL,NULL);
++            DoPlaySoundToSet(m_creature, DESI_SOUND_SLAY3);
++            break;
+         }
+     }
+ 
+     void UpdateAI(const uint32 diff)
+     {
+-        //Return since we have no target
+-        if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
++        if (!m_creature->SelectHostilTarget() && !m_creature->getVictim())
+             return;
+ 
+-        if(m_creature->GetHealth() <= (m_creature->GetMaxHealth()*0.1))
+-        {
+-            if(m_creature->getVictim())
+-                m_creature->DeleteThreatList();             // Delete our threatlist if below 10% as we should no longer attack.
+-            return;
+-        }
+-
+         if(RuneShieldTimer < diff)
+         {
+-            DoCast(m_creature, SPELL_RUNE_SHIELD);
++            m_creature->InterruptNonMeleeSpells(false);
++            m_creature->CastSpell(m_creature, SPELL_RUNE_SHIELD, true);
++            SoulShockTimer += 2000;
++            DeadenTimer += 2000;
+             RuneShieldTimer = 60000;
+         }else RuneShieldTimer -= diff;
+ 
+-        if(DeadenTimer < diff)
+-        {
+-            DoCast(m_creature->getVictim(), SPELL_DEADEN);
+-            DeadenTimer = 30000 + rand()%30001;
+-        }else DeadenTimer -= diff;
+-
+         if(SoulShockTimer < diff)
+         {
+             DoCast(m_creature->getVictim(), SPELL_SOUL_SHOCK);
+-            SoulShockTimer = 40000;
+-            if(rand()%2 == 0)
++            SoulShockTimer = 5000;
++        }else SoulShockTimer -= diff;
++
++        if(DeadenTimer < diff)
++        {
++            m_creature->InterruptNonMeleeSpells(false);
++            DoCast(m_creature->getVictim(), SPELL_DEADEN);
++            DeadenTimer = 25000 + rand()%10000;
++            if(!(rand()%2))
+             {
+                 DoYell(DESI_SAY_SPEC,LANG_UNIVERSAL,NULL);
+                 DoPlaySoundToSet(m_creature, DESI_SOUND_SPEC);
+             }
++        }else DeadenTimer -= diff;
+ 
+-        }else SoulShockTimer -= diff;
+-
+         DoMeleeAttackIfReady();
+     }
+ };
+@@ -857,55 +585,35 @@
+ 
+     uint64 AggroTargetGUID;
+ 
+-    uint32 AggroYellTimer;
+     uint32 CheckTankTimer;
+     uint32 SoulScreamTimer;
+     uint32 SpiteTimer;
+ 
++    std::list<uint64> SpiteTargetGUID;
++
+     bool CheckedAggro;
+ 
+     void Reset()
+     {
+         AggroTargetGUID = 0;
+ 
+-        AggroYellTimer = 5000;
+         CheckTankTimer = 5000;
+         SoulScreamTimer = 10000;
+         SpiteTimer = 30000;
+ 
++        SpiteTargetGUID.clear();
++
+         CheckedAggro = false;
+     }
+ 
+     void Aggro(Unit *who)
+     {
++        m_creature->Yell(ANGER_SAY_FREED, LANG_UNIVERSAL, 0);
++        DoPlaySoundToSet(m_creature, ANGER_SOUND_FREED);
+         DoZoneInCombat();
+-        DoCast(m_creature->getVictim(), AURA_OF_ANGER, true);
++        DoCast(m_creature, AURA_OF_ANGER, true);
+     }
+ 
+-    void MoveInLineOfSight(Unit *who)
+-    {
+-        if (!who || m_creature->getVictim())
+-            return;
+-
+-        if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
+-        {
+-            float attackRadius = m_creature->GetAttackDistance(who);
+-            if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= CREATURE_Z_ATTACK_RANGE && m_creature->IsWithinLOSInMap(who))
+-            {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                //Begin melee attack if we are within range
+-                DoStartAttackAndMovement(who);
+-
+-                if (!InCombat)
+-                {
+-                    DoCast(who, AURA_OF_ANGER);
+-                }
+-            }
+-        }
+-    }
+-
+     void JustDied(Unit *victim)
+     {
+         DoYell(ANGER_SAY_DEATH, LANG_UNIVERSAL, NULL);
+@@ -916,20 +624,59 @@
+     {
+         switch(rand()%2)
+         {
+-            case 0:
+-                DoPlaySoundToSet(m_creature, ANGER_SOUND_SLAY1);
+-                break;
+-            case 1:
+-                DoYell(ANGER_SAY_SLAY2,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, ANGER_SOUND_SLAY2);
+-                break;
++        case 0:
++            DoPlaySoundToSet(m_creature, ANGER_SOUND_SLAY1);
++            break;
++        case 1:
++            DoYell(ANGER_SAY_SLAY2,LANG_UNIVERSAL,NULL);
++            DoPlaySoundToSet(m_creature, ANGER_SOUND_SLAY2);
++            break;
+         }
+     }
+ 
++    void SelectSpiteTarget(uint32 num, float max_range = 999)
++    {
++        if(!num) return;
++
++        CellPair p(MaNGOS::ComputeCellPair(m_creature->GetPositionX(), m_creature->GetPositionY()));
++        Cell cell(p);
++        cell.data.Part.reserved = ALL_DISTRICT;
++        cell.SetNoCreate();
++
++        std::list<Unit *> tempUnitMap;
++
++        {
++            MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(m_creature, m_creature, max_range);
++            MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(tempUnitMap, u_check);
++
++            TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
++            TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
++
++            CellLock<GridReadGuard> cell_lock(cell, p);
++            cell_lock->Visit(cell_lock, world_unit_searcher, *(m_creature->GetMap()));
++            cell_lock->Visit(cell_lock, grid_unit_searcher, *(m_creature->GetMap()));
++        }
++
++        std::list<Unit*>::iterator itr;
++        while(tempUnitMap.size() && SpiteTargetGUID.size() < num)
++        {
++            itr = tempUnitMap.begin();
++            advance(itr, rand()%tempUnitMap.size());
++            SpiteTargetGUID.push_back((*itr)->GetGUID());
++            tempUnitMap.erase(itr);
++        }
++
++        for(itr = tempUnitMap.begin(); itr != tempUnitMap.end(); ++itr)
++            (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++        m_creature->CastSpell(m_creature, SPELL_SPITE_TARGET, true); // must true
++        for(itr = tempUnitMap.begin(); itr != tempUnitMap.end(); ++itr)
++            (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++    }
++
+     void UpdateAI(const uint32 diff)
+     {
+         //Return since we have no target
+-        if (!m_creature->SelectHostilTarget() || !m_creature->getVictim())
++        if (!m_creature->SelectHostilTarget() && !m_creature->getVictim())
+             return;
+ 
+         if(!CheckedAggro)
+@@ -938,22 +685,13 @@
+             CheckedAggro = true;
+         }
+ 
+-        if(AggroYellTimer)
+-            if(AggroYellTimer < diff)
+-        {
+-            DoYell(ANGER_SAY_FREED2,LANG_UNIVERSAL,NULL);
+-            DoPlaySoundToSet(m_creature, ANGER_SOUND_FREED2);
+-            AggroYellTimer = 0;
+-        }else AggroYellTimer -= diff;
+-
+         if(CheckTankTimer < diff)
+         {
+             if(m_creature->getVictim()->GetGUID() != AggroTargetGUID)
+-            {
++            {     
+                 DoYell(ANGER_SAY_BEFORE,LANG_UNIVERSAL,NULL);
+                 DoPlaySoundToSet(m_creature, ANGER_SOUND_BEFORE);
+-                DoCast(m_creature, SPELL_SELF_SEETHE);
+-                DoCast(m_creature->getVictim(), SPELL_ENEMY_SEETHE, true);
++                DoCast(m_creature, SPELL_SELF_SEETHE, true);
+                 AggroTargetGUID = m_creature->getVictim()->GetGUID();
+             }
+             CheckTankTimer = 2000;
+@@ -963,23 +701,35 @@
+         {
+             DoCast(m_creature->getVictim(), SPELL_SOUL_SCREAM);
+             SoulScreamTimer = 10000;
++            if(!(rand()%3))
++            {
++                DoYell(ANGER_SAY_SCREAM,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, ANGER_SOUND_SCREAM);
++            }
+         }else SoulScreamTimer -= diff;
+ 
+         if(SpiteTimer < diff)
+         {
+-            for(uint8 i = 0; i < 4; i++)
++            if(!SpiteTargetGUID.empty())
+             {
+-                Unit* target = NULL;
+-                target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+-
+-                if(target)
+-                    DoCast(target, SPELL_SPITE);
+-
++                for (std::list<uint64>::iterator itr = SpiteTargetGUID.begin(); itr != SpiteTargetGUID.end(); ++itr)
++                {
++                    if(Unit* target = Unit::GetUnit(*m_creature, *itr))
++                    {
++                        target->RemoveAurasDueToSpell(SPELL_SPITE_TARGET);
++                        m_creature->CastSpell(target, SPELL_SPITE_DAMAGE, true);
++                    }
++                }
++                SpiteTargetGUID.clear();
++                SpiteTimer = 24000;
+             }
+-
+-            SpiteTimer = 30000;
+-            DoYell(ANGER_SAY_SPEC,LANG_UNIVERSAL,NULL);
+-            DoPlaySoundToSet(m_creature, ANGER_SOUND_SPEC);
++            else
++            {
++                SelectSpiteTarget(3);
++                SpiteTimer = 6000;
++                DoYell(ANGER_SAY_SPEC,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, ANGER_SOUND_SPEC);
++            }
+         }else SpiteTimer -= diff;
+ 
+         DoMeleeAttackIfReady();
+@@ -994,6 +744,7 @@
+         if(Reliquary)
+             ((boss_reliquary_of_soulsAI*)Reliquary->AI())->SoulDeathCount++;
+     }
++    DoCast(m_creature, SPELL_SOUL_RELEASE, true);
+ }
+ 
+ CreatureAI* GetAI_boss_reliquary_of_souls(Creature *_Creature)
+Index: scripts/zone/black_temple/boss_teron_gorefiend.cpp
+===================================================================
+--- scripts/zone/black_temple/boss_teron_gorefiend.cpp	(revision 668)
++++ scripts/zone/black_temple/boss_teron_gorefiend.cpp	(working copy)
+@@ -1,18 +1,18 @@
+ /* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+- */
++* This program is free software; you can redistribute it and/or modify
++* it under the terms of the GNU General Public License as published by
++* the Free Software Foundation; either version 2 of the License, or
++* (at your option) any later version.
++*
++* This program is distributed in the hope that it will be useful,
++* but WITHOUT ANY WARRANTY; without even the implied warranty of
++* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++* GNU General Public License for more details.
++*
++* You should have received a copy of the GNU General Public License
++* along with this program; if not, write to the Free Software
++* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
+ 
+ /* ScriptData
+ SDName: Boss_Teron_Gorefiend
+@@ -23,211 +23,274 @@
+ 
+ #include "precompiled.h"
+ #include "def_black_temple.h"
++#include "Spell.h"
+ 
+ //Spells
+ #define SPELL_INCINERATE                40239
+ #define SPELL_CRUSHING_SHADOWS          40243
+-#define SPELL_SHADOWBOLT                40185
+-#define SPELL_PASSIVE_SHADOWFORM        40326
+-#define SPELL_SHADOW_OF_DEATH           40251
+ #define SPELL_BERSERK                   45078
+ 
+-#define SPELL_ATROPHY                   40327               // Shadowy Constructs use this when they get within melee range of a player
++#define AURA_SHADOW_OF_DEATH            40251 // 1; 0 is bugged
++#define AURA_GHOST_POSSESS              40268 // 0 buff
++#define AURA_GHOST_PASSIVE              40282 // 0, 2 is unattackable, but core bug
++#define AURA_GHOST_CHARM                260   // possess is bugged, so we use charm
+ 
++#define SPELL_SUMMON_BLOSSOM            40188
++#define SPELL_SHADOWBOLT                40185 
++
++#define SPELL_ATROPHY                   40327
++#define SPELL_PASSIVE_SHADOWFORM        40326
++
+ //Speech'n'sound
+-#define SAY_INTRO          "I was the first, you know. For me, the wheel of death has spun many times. So much time has passed. I have a lot of catching up to do..."
++#define SAY_INTRO           "I was the first, you know. For me, the wheel of death has spun many times. So much time has passed. I have a lot of catching up to do..." 
+ #define SOUND_INTRO         11512
++#define SAY_AGGRO           "Vengeance is mine!"
++#define SOUND_AGGRO         11513
++#define SAY_SLAY1           "I have use for you!"
++#define SOUND_SLAY1         11514
++#define SAY_SLAY2           "It gets worse..."
++#define SOUND_SLAY2         11515
++#define SAY_CRUSHING_SHADOWS        "Give in!"
++#define SOUND_CRUSHING_SHADOWS      11519
++#define SAY_DOOM_BLOSSOM1           "I have something for you..."
++#define SOUND_DOOM_BLOSSOM1         11518
++#define SAY_DOOM_BLOSSOM2           "Death... really isn't so bad."
++#define SOUND_DOOM_BLOSSOM2         11516
++#define SAY_INCINERATE              "What are you afraid of?"
++#define SOUND_INCINERATE            11517
++#define SAY_INCINERATE2             "YOU WILL SHOW THE PROPER RESPECT!"
++#define SOUND_INCINERATE2           11520
++#define SAY_DEATH                   "The wheel...spins...again...."
++#define SOUND_DEATH                 11521
+ 
+-#define SAY_AGGRO          "Vengeance is mine!"
+-#define SOUND_AGGRO        11513
+-
+-#define SAY_SLAY1          "I have use for you!"
+-#define SOUND_SLAY1        11514
+-
+-#define SAY_SLAY2          "It gets worse..."
+-#define SOUND_SLAY2        11515
+-
+-#define SAY_SPELL1          "What are you afraid of?"
+-#define SOUND_SPELL1        11517
+-
+-#define SAY_SPELL2          "Death... really isn't so bad."
+-#define SOUND_SPELL2        11516
+-
+-#define SAY_SPECIAL1        "Give in!"
+-#define SOUND_SPECIAL1      11518
+-
+-#define SAY_SPECIAL2        "I have something for you..."
+-#define SOUND_SPECIAL2      11519
+-
+-#define SAY_ENRAGE          "YOU WILL SHOW THE PROPER RESPECT!"
+-#define SOUND_ENRAGE        11520
+-
+-#define SAY_DEATH           "The wheel...spins...again...."
+-#define SOUND_DEATH         11521
+-
+ #define CREATURE_DOOM_BLOSSOM       23123
+ #define CREATURE_SHADOWY_CONSTRUCT  23111
++#define CREATURE_GHOST              23109
+ 
+ struct MANGOS_DLL_DECL mob_doom_blossomAI : public ScriptedAI
+ {
+-    mob_doom_blossomAI(Creature *c) : ScriptedAI(c)
+-    {
+-        Reset();
+-    }
++    mob_doom_blossomAI(Creature *c) : ScriptedAI(c) {Reset();}
+ 
+-    uint32 CheckTeronTimer;
+     uint32 ShadowBoltTimer;
+-    uint64 TeronGUID;
+ 
+     void Reset()
+     {
+-        CheckTeronTimer = 5000;
+-        ShadowBoltTimer = 12000;
+-        TeronGUID = 0;
++        ShadowBoltTimer = 3000;
++        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++        m_creature->SetUnitMovementFlags(MOVEMENTFLAG_LEVITATING);
++        float x, y, z;
++        m_creature->GetPosition(x, y, z);
++        m_creature->GetMotionMaster()->MovePoint(0, x+0.01, y, z+10);
+     }
+ 
+-    void Aggro(Unit *who) { }
+-    void AttackStart(Unit* who) { }
+-    void MoveInLineOfSight(Unit* who) { }
++    void Aggro(Unit *who) {DoZoneInCombat();}
++    void MoveInLineOfSight(Unit *) {}
++    void AttackStart(Unit* who)
++    {
++        m_creature->AddThreat(who, 0.0f);
++        if (!InCombat)
++        {
++            Aggro(who);
++            InCombat = true;
++        }
++    }
+ 
+     void UpdateAI(const uint32 diff)
+     {
+-        if(CheckTeronTimer < diff)
+-        {
+-            if(TeronGUID)
+-            {
+-                DoZoneInCombat();
+-
+-                Creature* Teron = ((Creature*)Unit::GetUnit((*m_creature), TeronGUID));
+-                if((Teron) && (!Teron->isAlive() || Teron->IsInEvadeMode()))
+-                    m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+-            }
+-            else
+-                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+-
+-            CheckTeronTimer = 5000;
+-        }else CheckTeronTimer -= diff;
+-
+-        if(!m_creature->getVictim() || !m_creature->SelectHostilTarget())
+-            return;
+-
+         if(ShadowBoltTimer < diff)
+         {
+             DoCast(SelectUnit(SELECT_TARGET_RANDOM, 0), SPELL_SHADOWBOLT);
+-            ShadowBoltTimer = 10000;
++            ShadowBoltTimer = 1000 + rand()%2000;
+         }else ShadowBoltTimer -= diff;
+     }
+-
+-    void SetTeronGUID(uint64 guid){ TeronGUID = guid; }
+ };
+ 
+-//This is used to sort the players by distance for Constructs to see who to cast Atrophy on
+-struct TargetDistanceOrder : public std::binary_function<const Unit, const Unit, bool>
++struct MANGOS_DLL_DECL mob_shadowy_constructAI : public ScriptedAI
+ {
+-    const Unit* MainTarget;
+-    TargetDistanceOrder(const Unit* Target) : MainTarget(Target) {};
+-    // functor for operator "<"
+-    bool operator()(const Unit* _Left, const Unit* _Right) const
+-    {
+-        return (MainTarget->GetDistance(_Left) < MainTarget->GetDistance(_Right));
+-    }
+-};
++    mob_shadowy_constructAI(Creature* c) : ScriptedAI(c) {Reset();}
+ 
+-struct MANGOS_DLL_DECL mob_shadowy_constructAI : public ScriptedAI
+-{
+-    mob_shadowy_constructAI(Creature* c) : ScriptedAI(c)
++    void Reset()
+     {
+-        Reset();
++        m_creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
++        m_creature->ApplySpellImmune(0, IMMUNITY_EFFECT,SPELL_EFFECT_ATTACK_ME, true);
++        m_creature->CastSpell(m_creature, SPELL_PASSIVE_SHADOWFORM, true);
+     }
+ 
+-    uint64 GhostGUID;
+-    uint64 TeronGUID;
++    void Aggro(Unit* who) {DoZoneInCombat();}
+ 
+-    uint32 CheckPlayerTimer;
+-    uint32 CheckTeronTimer;
+-
+-    void Reset()
++    void DamageTaken(Unit* done_by, uint32 &damage)
+     {
+-        GhostGUID = 0;
+-        TeronGUID = 0;
+-
+-        CheckPlayerTimer = 2000;
+-        CheckTeronTimer = 5000;
++        if(!done_by->HasAura(AURA_GHOST_POSSESS, 2))
++            damage = 0; // Only the ghost can deal damage. 
+     }
+ 
+-    void Aggro(Unit* who) { }
+-
+-    void MoveInLineOfSight(Unit *who)
++    void UpdateAI(const uint32 diff)
+     {
+-        if(!who || (!who->isAlive()) || (who->GetGUID() == GhostGUID))
++        if(!m_creature->SelectHostilTarget() && !m_creature->getVictim())
+             return;
+ 
+-        if(who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
++        /*if(!m_creature->getVictim() || !m_creature->getVictim()->isTargetableForAttack())
+         {
+-            float attackRadius = m_creature->GetAttackDistance(who);
++            AttackStart(SelectUnit(SELECT_TARGET_RANDOM, 0));
++            return;
++        } */           
+ 
+-            if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= CREATURE_Z_ATTACK_RANGE && m_creature->IsWithinLOSInMap(who))
+-            {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                m_creature->AddThreat(who, 1.0f);
+-            }
++        if(m_creature->isAttackReady() && m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
++        {
++            m_creature->CastSpell(m_creature->getVictim(), SPELL_ATROPHY, false);
++            m_creature->AttackerStateUpdate(m_creature->getVictim());
++            m_creature->resetAttackTimer();
+         }
+     }
++};
+ 
+-/* Comment it out for now. NOTE TO FUTURE DEV: UNCOMMENT THIS OUT ONLY AFTER MIND CONTROL IS IMPLEMENTED
+-    void DamageTaken(Unit* done_by, uint32 &damage)
++class MANGOS_DLL_DECL ghostAura : public Aura
++{
++public:
++    ghostAura(const SpellEntry *spellproto, uint32 eff, Unit *target, Unit *caster) : Aura(spellproto, eff, NULL, target, caster)
+     {
+-        if(done_by->GetGUID() != GhostGUID)
+-        damage = 0;                                         // Only the ghost can deal damage.
++        finish = false;
+     }
+- */
++    ~ghostAura() {}
+ 
+-    void CheckPlayers()
++    void Update(uint32 diff)
+     {
+-        std::list<HostilReference*>& m_threatlist = m_creature->getThreatManager().getThreatList();
+-        if(m_threatlist.empty())
+-            return;                                         // No threat list. Don't continue.
+-        std::list<HostilReference*>::iterator itr = m_threatlist.begin();
+-        std::list<Unit*> targets;
+-        for( ; itr != m_threatlist.end(); ++itr)
+-        {
+-            Unit* pUnit = Unit::GetUnit((*m_creature), (*itr)->getUnitGuid());
+-            if(pUnit && pUnit->isAlive())
+-                targets.push_back(pUnit);
+-        }
+-        targets.sort(TargetDistanceOrder(m_creature));
+-        Unit* target = targets.front();
+-        if(target && m_creature->IsWithinDistInMap(target, m_creature->GetAttackDistance(target)))
+-        {
+-            DoCast(target, SPELL_ATROPHY);
+-            m_creature->AI()->AttackStart(target);
+-        }
++        if(m_target->GetPositionX() < 510 || m_target->GetMapId() != 564) // do not go outside the room
++            m_duration = 0;
++        if(m_duration <= diff)
++            finish = true;
++        Aura::Update(diff);
+     }
++protected:
++    bool finish;
++};
+ 
+-    void UpdateAI(const uint32 diff)
++class MANGOS_DLL_DECL ghost_controllerAura : public ghostAura
++{
++public:
++    ghost_controllerAura(const SpellEntry *spellproto, uint32 eff, Unit *target, Unit *caster) : ghostAura(spellproto, eff, target, caster)
+     {
+-        if(CheckPlayerTimer < diff)
++        // due to core bug, non_attackable aura is removed when attacking
++        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
++        Creature *Ghost = m_target->SummonCreature(CREATURE_GHOST, m_target->GetPositionX(), m_target->GetPositionY(), m_target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 62000);
++        if(!Ghost) {error_log("SD2: Teron Gorefiend bug: cannot summon ghost."); return;}
++        GhostGUID = Ghost->GetGUID();
++        m_target->SetDisplayId(Ghost->GetNativeDisplayId());
++        Ghost->SetDisplayId(11686);
++        Ghost->m_spells[0] = 40175;
++        Ghost->m_spells[1] = 40157;
++        Ghost->m_spells[2] = 40314;
++        Ghost->m_spells[3] = 40325;
++        DoCast(Ghost, AURA_GHOST_CHARM); // if it is magic school, due to core bug, may be resisted
++        /*SpellEntry const *spellInfo = GetSpellStore()->LookupEntry(AURA_GHOST_CHARM);
++        Aura *Aur = new ghost_Aura(spellInfo, 0, Ghost, m_target);
++        Ghost->AddAura(Aur);*/
++        Ghost->SetVisibility(VISIBILITY_OFF);
++        Ghost->GetMotionMaster()->MoveFollow(m_target, 0, 0);
++        Ghost->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
++        Ghost->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++        Ghost->SetSpeed(MOVE_RUN, 5);
++    }
++    ~ghost_controllerAura()
++    {
++        if(Unit* Ghost = Unit::GetUnit(*m_target, GhostGUID))
++            Ghost->setDeathState(JUST_DIED);
++        m_target->SetDisplayId(m_target->GetNativeDisplayId());
++        m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
++        m_target->DealDamage(m_target, m_target->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, GetSpellProto(), false);
++    }
++    void Update(uint32 diff)
++    {
++        if(Unit* Ghost = Unit::GetUnit(*m_target, GhostGUID))
+         {
+-            CheckPlayers();
+-            CheckPlayerTimer = 3000;
+-        }else CheckPlayerTimer -= diff;
++            if(Ghost->m_currentSpells[CURRENT_GENERIC_SPELL])
++            {
++                uint32 spell = Ghost->m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->Id;
++                if(spell == 40175 || spell == 40314)  // AOE
++                    DoCast(m_target, spell);
++                else if(spell == 40157 || spell == 40325)
++                {
++                    if(m_target->GetTypeId()==TYPEID_PLAYER)
++                    {
++                        Unit* target = Unit::GetUnit(*m_target, ((Player*)m_target)->GetSelection());
++                        if(target)
++                        {
++                            if(spell == 40157)
++                            {
++                                if(target->GetEntry() == CREATURE_SHADOWY_CONSTRUCT)
++                                {
++                                    uint32 stacks = 0;
++                                    Unit::AuraList const& auras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
++                                    for(Unit::AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
++                                        if((*itr)->GetId() == 40157)
++                                            ++stacks;
++                                    if(stacks > 0 && stacks < 3)
++                                    {
++                                        int32 bp1 = -30 * (stacks + 1);
++                                        m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
++                                        m_target->CastCustomSpell(target, spell, NULL, &bp1, NULL, true);
++                                        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
++                                    }
++                                    else
++                                        DoCast(target, spell);
++                                }
++                            }
++                            else DoCast(target, spell);
++                        }
++                    }
++                }
++                Ghost->InterruptSpell(CURRENT_GENERIC_SPELL, true);
++                //Ghost->AttackStop();
++                //Ghost->GetMotionMaster()->MoveFollow(m_target, 0, 0);
++            }
++        }else error_log("SD2: Teron Gorefiend bug: cannot find ghost.");
++        ghostAura::Update(diff);
++    }
++private:
++    void DoCast(Unit* target, uint32 spell)
++    {
++        m_target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
++        m_target->CastSpell(target, spell, true);
++        m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
++    }
++    uint64 GhostGUID;
++};
+ 
+-        if(CheckTeronTimer < diff)
++class MANGOS_DLL_DECL shadow_of_deathAura : public ghostAura
++{
++public:
++    shadow_of_deathAura(const SpellEntry *spellproto, uint32 eff, Unit *target, Unit *caster) : ghostAura(spellproto, eff, target, caster) {}
++    // wowwiki: Do not try to exploit this encounter by disconnecting or hearthing out.
++    // removed when teleport because of AURA_INTERRUPT_FLAG_CHANGE_MAP
++    // removed when log out
++    ~shadow_of_deathAura()
++    {
++        Unit* caster = GetCaster();
++        if(caster && caster->isAlive())
+         {
+-            Creature* Teron = ((Creature*)Unit::GetUnit((*m_creature), TeronGUID));
+-            if(!Teron || !Teron->isAlive() || Teron->IsInEvadeMode())
+-                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
++            if(m_target->IsInMap(caster))
++            {
++                float x, y, z;
++                m_target->GetPosition(x, y, z);
++                for(uint8 i = 0; i < 4; i++)
++                    caster->SummonCreature(CREATURE_SHADOWY_CONSTRUCT, x, y, z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+ 
+-            CheckTeronTimer = 5000;
+-        }else CheckTeronTimer -= diff;
+-    }
++                if(finish) // not removed due to teleport or log out
++                {
++                    m_target->RemoveAllAurasOnDeath();
++                    // possess buff, pacify and silence
++                    SpellEntry const *spellInfo = GetSpellStore()->LookupEntry(AURA_GHOST_POSSESS);
++                    Aura *Aur = new ghost_controllerAura(spellInfo, 2, m_target, m_target);
++                    m_target->AddAura(Aur);
++                }
++            }else error_log("SD2: Teron Gorefiend bug: caster and target are not in the same map.");
++        }
++    } 
+ };
+ 
+ struct MANGOS_DLL_DECL boss_teron_gorefiendAI : public ScriptedAI
+ {
+-    boss_teron_gorefiendAI(Creature *c) : ScriptedAI(c)
++    boss_teron_gorefiendAI(Creature *c) : ScriptedAI(c) 
+     {
+         pInstance = ((ScriptedInstance*)c->GetInstanceData());
+         Reset();
+@@ -237,86 +300,48 @@
+ 
+     uint32 IncinerateTimer;
+     uint32 SummonDoomBlossomTimer;
+-    uint32 EnrageTimer;
++    uint32 BerserkTimer;
+     uint32 CrushingShadowsTimer;
+     uint32 ShadowOfDeathTimer;
+-    uint32 SummonShadowsTimer;
+-    uint32 RandomYellTimer;
+-    uint32 AggroTimer;
++    uint32 YellCooldown;
+ 
+-    uint64 AggroTargetGUID;
+-    uint64 GhostGUID;                                       // Player that gets killed by Shadow of Death and gets turned into a ghost
++    uint32 YellNumber;
+ 
+-    bool Intro;
+-
+     void Reset()
+     {
+         if(pInstance)
+             pInstance->SetData(DATA_TERONGOREFIENDEVENT, NOT_STARTED);
+ 
+-        IncinerateTimer = 20000 + rand()%11000;
+-        SummonDoomBlossomTimer = 12000;
+-        EnrageTimer = 600000;
+-        CrushingShadowsTimer = 22000;
+-        SummonShadowsTimer = 60000;
+-        RandomYellTimer = 50000;
++        IncinerateTimer = 20000 + rand()%10000;
++        SummonDoomBlossomTimer = 10000 + rand()%10000;
++        BerserkTimer = 600000;
++        CrushingShadowsTimer = 10000 + rand()%5000;
++        ShadowOfDeathTimer = 30000;
+ 
+-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+-        // Start off unattackable so that the intro is done properly
+-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
++        YellCooldown = 20000; // intro
++        YellNumber = 1;  // aggro
+ 
+-        AggroTimer = 20000;
+-        AggroTargetGUID = 0;
+-        Intro = false;
++        m_creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
++        m_creature->ApplySpellImmune(0, IMMUNITY_EFFECT,SPELL_EFFECT_ATTACK_ME, true);
++
++        KillAllGhosts();
++        DespawnSummons(CREATURE_DOOM_BLOSSOM);
++        DespawnSummons(CREATURE_SHADOWY_CONSTRUCT);
+     }
+ 
+-    void Aggro(Unit *who) {}
+-
+-    void MoveInLineOfSight(Unit *who)
++    void Aggro(Unit *who)
+     {
+-        if(!who || (!who->isAlive())) return;
++        if(pInstance)
++            pInstance->SetData(DATA_TERONGOREFIENDEVENT, IN_PROGRESS);
+ 
+-        if(who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
+-        {
+-            float attackRadius = m_creature->GetAttackDistance(who);
+-
+-            if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= CREATURE_Z_ATTACK_RANGE && m_creature->IsWithinLOSInMap(who))
+-            {
+-                if(who->HasStealthAura())
+-                    who->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+-
+-                m_creature->AddThreat(who, 1.0f);
+-            }
+-
+-            if(!InCombat && !Intro && m_creature->IsWithinDistInMap(who, 200.0f) && (who->GetTypeId() == TYPEID_PLAYER))
+-            {
+-                if(pInstance)
+-                    pInstance->SetData(DATA_TERONGOREFIENDEVENT, IN_PROGRESS);
+-
+-                m_creature->GetMotionMaster()->Clear(false);
+-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+-                DoYell(SAY_INTRO,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_INTRO);
+-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
+-                AggroTargetGUID = who->GetGUID();
+-                Intro = true;
+-            }
+-        }
++        DoYell(SAY_INTRO,LANG_UNIVERSAL,NULL);
++        DoPlaySoundToSet(m_creature, SOUND_INTRO);
+     }
+ 
+     void KilledUnit(Unit *victim)
+     {
+-        switch(rand()%2)
+-        {
+-            case 0:
+-                DoYell(SAY_SLAY1,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY1);
+-                break;
+-            case 1:
+-                DoYell(SAY_SLAY2,LANG_UNIVERSAL,NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_SLAY2);
+-                break;
+-        }
++        if(!YellCooldown && !YellNumber)
++            YellNumber = 2 + rand()%2;
+     }
+ 
+     void JustDied(Unit *victim)
+@@ -326,231 +351,217 @@
+ 
+         DoYell(SAY_DEATH,LANG_UNIVERSAL,NULL);
+         DoPlaySoundToSet(m_creature,SOUND_DEATH);
++        KillAllGhosts();
++        DespawnSummons(CREATURE_DOOM_BLOSSOM);
++        DespawnSummons(CREATURE_SHADOWY_CONSTRUCT);
+     }
+ 
+-    float CalculateRandomLocation(float Loc, uint32 radius)
++    void JustSummoned(Creature *summon)
+     {
+-        float coord = Loc;
+-        switch(rand()%2)
++        summon->AI()->AttackStart(SelectUnit(SELECT_TARGET_RANDOM, 0));
++    }
++
++    void UpdateAI(const uint32 diff)
++    {
++        if(!m_creature->SelectHostilTarget() && !m_creature->getVictim())
++            return;
++
++        if(YellNumber && !YellCooldown)
+         {
+-            case 0:
+-                coord += rand()%radius;
++            switch(YellNumber)
++            {
++            case 1: // aggro
++                DoYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
++                DoPlaySoundToSet(m_creature, SOUND_AGGRO);
+                 break;
+-            case 1:
+-                coord -= rand()%radius;
++            case 2: // kill
++                DoYell(SAY_SLAY1,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, SOUND_SLAY1);
+                 break;
++            case 3:
++                DoYell(SAY_SLAY2,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, SOUND_SLAY2);
++                break;
++            case 4: // doom blossom
++                DoYell(SAY_DOOM_BLOSSOM1,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, SOUND_DOOM_BLOSSOM1);
++                break;
++            case 5:
++                DoYell(SAY_DOOM_BLOSSOM2,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, SOUND_DOOM_BLOSSOM2);
++                break;
++            case 6: // crushing shadows
++                DoYell(SAY_CRUSHING_SHADOWS,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, SOUND_CRUSHING_SHADOWS);                
++                break;
++            case 7: // incinerate
++                DoYell(SAY_INCINERATE,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, SOUND_INCINERATE);
++                break;
++            case 8:
++                DoYell(SAY_INCINERATE2,LANG_UNIVERSAL,NULL);
++                DoPlaySoundToSet(m_creature, SOUND_INCINERATE2);
++                break;
++            default:
++                break;
++            }
++            YellNumber = 0;
++            YellCooldown = 5000;
+         }
+-        return coord;
+-    }
+ 
+-    void SetThreatList(Creature* Blossom)
+-    {
+-        if(!Blossom) return;
++        if(YellCooldown)
++        {
++            if(YellCooldown < diff)
++                YellCooldown = 0;
++            else YellCooldown -= diff;
++        }
+ 
+-        std::list<HostilReference*>& m_threatlist = m_creature->getThreatManager().getThreatList();
+-        std::list<HostilReference*>::iterator i = m_threatlist.begin();
+-        for(i = m_threatlist.begin(); i != m_threatlist.end(); i++)
++        if(BerserkTimer < diff)
+         {
+-            Unit* pUnit = Unit::GetUnit((*m_creature), (*i)->getUnitGuid());
+-            if(pUnit && pUnit->isAlive())
++            m_creature->CastSpell(m_creature, SPELL_BERSERK, true);
++            BerserkTimer = 60000;
++        }else BerserkTimer -= diff;
++
++        if(IncinerateTimer < diff)
++        {
++            DoCast(SelectUnit(SELECT_TARGET_RANDOM, 0), SPELL_INCINERATE);
++            IncinerateTimer = 15000 + rand()%10000;
++            if(!YellCooldown && !YellNumber && rand()%3) YellNumber = 7 + rand()%2;
++        }else IncinerateTimer -= diff;
++
++        if(CrushingShadowsTimer < diff)
++        {
++            CastCrushingShadows(5);
++            CrushingShadowsTimer = 15000;
++            if(!YellCooldown && !YellNumber && rand()%3) YellNumber = 6;
++        }else CrushingShadowsTimer -= diff;
++
++        if(SummonDoomBlossomTimer < diff)
++        {
++            float x, y, z;
++            m_creature->GetPosition(x, y, z);
++            m_creature->GetRandomPoint(x, y, z, 15 + rand()%5, x, y, z); // spell 40188, exact 8 yards
++            m_creature->SummonCreature(CREATURE_DOOM_BLOSSOM, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 135000); // timer in dbc
++            if(!YellCooldown && !YellNumber) YellNumber = 4 + rand()%2;
++            SummonDoomBlossomTimer = 15000 + rand()%30000;
++        }else SummonDoomBlossomTimer -= diff;
++
++        if(ShadowOfDeathTimer < diff)
++        {
++            if(Unit* target = SelectRandomPlayer(99))
+             {
+-                float threat = m_creature->getThreatManager().getThreat(pUnit);
+-                Blossom->AddThreat(pUnit, threat);
++                SpellEntry const *spellInfo = GetSpellStore()->LookupEntry(AURA_SHADOW_OF_DEATH);
++                Aura *Aur = new shadow_of_deathAura(spellInfo, 1, target, m_creature);
++                target->AddAura(Aur);
+             }
+-        }
++            ShadowOfDeathTimer = 30000;
++        }else ShadowOfDeathTimer -= diff;
++
++        DoMeleeAttackIfReady();
+     }
+ 
+-    void MindControlGhost()
++    void KillAllGhosts()
+     {
+-        /************************************************************************/
+-        /** NOTE FOR FUTURE DEVELOPER: PROPERLY IMPLEMENT THE GHOST PORTION *****/
+-        /**  ONLY AFTER MaNGOS FULLY IMPLEMENTS MIND CONTROL ABILITIES      *****/
+-        /**   THE CURRENT CODE IN THIS FUNCTION IS ONLY THE BEGINNING OF    *****/
+-        /**    WHAT IS FULLY NECESSARY FOR GOREFIEND TO BE 100% COMPLETE    *****/
+-        /************************************************************************/
++        Map *map = m_creature->GetMap();
++        if (!map->IsDungeon()) return;
+ 
+-        Unit* Ghost = NULL;
+-        if(GhostGUID)
+-            Ghost = Unit::GetUnit((*m_creature), GhostGUID);
+-        if(Ghost && Ghost->isAlive() && Ghost->HasAura(SPELL_SHADOW_OF_DEATH, 0))
++        InstanceMap::PlayerList const &PlayerList = ((InstanceMap*)map)->GetPlayers();
++        InstanceMap::PlayerList::const_iterator i;
++        for (i = PlayerList.begin(); i != PlayerList.end(); ++i)
++            if((*i)->HasAura(AURA_GHOST_POSSESS, 2))
++                (*i)->RemoveAurasDueToSpell(AURA_GHOST_POSSESS);
++                //m_creature->DealDamage(*i, (*i)->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
++    }
++
++    Player* SelectRandomPlayer(float range = 0.0f)
++    {
++        Map *map = m_creature->GetMap();
++        if (!map->IsDungeon()) return NULL;
++
++        InstanceMap::PlayerList PlayerList = ((InstanceMap*)map)->GetPlayers();
++        InstanceMap::PlayerList::iterator i;
++        while(PlayerList.size())
+         {
+-            /*float x,y,z;
+-            Ghost->GetPosition(x,y,z);
+-            Creature* control = m_creature->SummonCreature(CREATURE_GHOST, x, y, z, 0, TEMPSUMMON_TIMED_DESAWN, 30000);
+-            if(control)
+-            {
+-                ((Player*)Ghost)->Possess(control);
+-                Ghost->DealDamage(Ghost, Ghost->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL,
+-            false);
+-            }*/
+-            for(uint8 i = 0; i < 4; ++i)
+-            {
+-                Creature* Construct = NULL;
+-                float X = CalculateRandomLocation(Ghost->GetPositionX(), 10);
+-                float Y = CalculateRandomLocation(Ghost->GetPositionY(), 10);
+-                Construct = m_creature->SummonCreature(CREATURE_SHADOWY_CONSTRUCT, X, Y, Ghost->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 45000);
+-                if(Construct)
+-                {
+-                    Construct->CastSpell(Construct, SPELL_PASSIVE_SHADOWFORM, true);
+-                    SetThreatList(Construct);               // Use same function as Doom Blossom to set Threat List.
+-                    ((mob_shadowy_constructAI*)Construct->AI())->GhostGUID = GhostGUID;
+-                    Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 1);
+-                    if(!target)                             // someone's trying to solo.
+-                        target = m_creature->getVictim();
+-
+-                    if(target)
+-                        Construct->GetMotionMaster()->MoveChase(target);
+-                }
+-            }
++            i = PlayerList.begin();
++            advance(i, rand()%PlayerList.size());
++            if((range == 0.0f || m_creature->IsWithinDistInMap(*i, range))
++                && (*i)->isTargetableForAttack() // do not cast on gm or ghost
++                && !(*i)->HasAura(AURA_SHADOW_OF_DEATH, 1) // do not cast debuff twice
++                && (*i) != m_creature->getVictim()) // do not cast on tank
++                return *i;
++            else
++                PlayerList.erase(i);
+         }
++        return NULL;
+     }
+ 
+-    void UpdateAI(const uint32 diff)
++    void CastCrushingShadows(uint32 num, float max_range = 999)
+     {
+-        if(Intro)
+-        {
+-            if(AggroTimer < diff)
+-            {
+-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+-                DoYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
+-                DoPlaySoundToSet(m_creature, SOUND_AGGRO);
+-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+-                Intro = false;
+-                if(AggroTargetGUID)
+-                {
+-                    Unit* pUnit = Unit::GetUnit((*m_creature), AggroTargetGUID);
+-                    if(pUnit)
+-                    {
+-                        m_creature->GetMotionMaster()->MoveChase(pUnit);
+-                        AttackStart(pUnit);
+-                    }
+-                    DoZoneInCombat();
+-                }else EnterEvadeMode();
++        if(!num) return;
+ 
+-            }else AggroTimer -= diff;
+-        }
++        CellPair p(MaNGOS::ComputeCellPair(m_creature->GetPositionX(), m_creature->GetPositionY()));
++        Cell cell(p);
++        cell.data.Part.reserved = ALL_DISTRICT;
++        cell.SetNoCreate();
+ 
+-        if(!m_creature->SelectHostilTarget() || !m_creature->getVictim() || Intro)
+-            return;
++        std::list<Unit *> tempUnitMap;
+ 
+-        if(SummonShadowsTimer < diff)
+         {
+-            //MindControlGhost();
++            MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(m_creature, m_creature, max_range);
++            MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(tempUnitMap, u_check);
+ 
+-            for(uint8 i = 0; i < 2; ++i)
+-            {
+-                Creature* Shadow = NULL;
+-                float X = CalculateRandomLocation(m_creature->GetPositionX(), 10);
+-                Shadow = m_creature->SummonCreature(CREATURE_SHADOWY_CONSTRUCT, X, m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 0);
+-                if(Shadow)
+-                {
+-                    Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 1);
+-                    if(!target)
+-                        target = m_creature->getVictim();
++            TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
++            TypeContainerVisitor<MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+ 
+-                    if(target)
+-                        Shadow->AI()->AttackStart(target);
+-                }
+-            }
+-            SummonShadowsTimer = 60000;
+-        }else SummonShadowsTimer -= diff;
++            CellLock<GridReadGuard> cell_lock(cell, p);
++            cell_lock->Visit(cell_lock, world_unit_searcher, *(m_creature->GetMap()));
++            cell_lock->Visit(cell_lock, grid_unit_searcher, *(m_creature->GetMap()));
++        }
+ 
+-        if(SummonDoomBlossomTimer < diff)
++        uint32 targetNum = 0;
++        std::list<Unit*>::iterator itr;
++        while(tempUnitMap.size() && targetNum < num)
+         {
+-            Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+-            if(target)
+-            {
+-                float X = CalculateRandomLocation(target->GetPositionX(), 20);
+-                float Y = CalculateRandomLocation(target->GetPositionY(), 20);
+-                Creature* DoomBlossom = m_creature->SummonCreature(CREATURE_DOOM_BLOSSOM, X, Y, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
+-                if(DoomBlossom)
+-                {
+-                    DoomBlossom->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+-                    DoomBlossom->setFaction(m_creature->getFaction());
+-                    DoomBlossom->AddThreat(target, 1.0f);
+-                    ((mob_doom_blossomAI*)DoomBlossom->AI())->SetTeronGUID(m_creature->GetGUID());
+-                    ((mob_doom_blossomAI*)DoomBlossom->AI())->InCombat = true;
+-                    SetThreatList(DoomBlossom);
+-                    SummonDoomBlossomTimer = 35000;
+-                }
+-            }
+-        }else SummonDoomBlossomTimer -= diff;
++            itr = tempUnitMap.begin();
++            advance(itr, rand()%tempUnitMap.size());
++            if((*itr)->GetTypeId() == TYPEID_PLAYER)
++                targetNum++;
++            tempUnitMap.erase(itr);
++        }
+ 
+-        if(IncinerateTimer < diff)
+-        {
+-            Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 1);
+-            if(!target)
+-                target = m_creature->getVictim();
++        for(itr = tempUnitMap.begin(); itr != tempUnitMap.end(); ++itr)
++            (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++        m_creature->CastSpell(m_creature, SPELL_CRUSHING_SHADOWS, true); // must true
++        for(itr = tempUnitMap.begin(); itr != tempUnitMap.end(); ++itr)
++            (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
++    }
+ 
+-            if(target)
+-            {
+-                switch(rand()%2)
+-                {
+-                    case 0:
+-                        DoYell(SAY_SPECIAL1,LANG_UNIVERSAL,NULL);
+-                        DoPlaySoundToSet(m_creature, SOUND_SPECIAL1);
+-                        break;
+-                    case 1:
+-                        DoYell(SAY_SPECIAL2,LANG_UNIVERSAL,NULL);
+-                        DoPlaySoundToSet(m_creature, SOUND_SPECIAL2);
+-                        break;
+-                }
+-                DoCast(target, SPELL_INCINERATE);
+-                IncinerateTimer = 20000 + rand()%31 * 1000;
+-            }
+-        }else IncinerateTimer -= diff;
++    void DespawnSummons(uint32 entry)
++    {
++        std::list<Creature*> templist;
++        float x, y, z;
++        m_creature->GetPosition(x, y, z);
+ 
+-        if(CrushingShadowsTimer < diff)
+         {
+-            Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 0);
+-            if(target && target->isAlive())
+-                DoCast(target, SPELL_CRUSHING_SHADOWS);
+-            CrushingShadowsTimer = 10000 + rand()%16 * 1000;
+-        }else CrushingShadowsTimer -= diff;
++            CellPair pair(MaNGOS::ComputeCellPair(x, y));
++            Cell cell(pair);
++            cell.data.Part.reserved = ALL_DISTRICT;
++            cell.SetNoCreate();
+ 
+-        /*** NOTE FOR FUTURE DEV: UNCOMMENT BELOW ONLY IF MIND CONTROL IS FULLY IMPLEMENTED **/
+-        /*if(ShadowOfDeathTimer < diff)
+-        {
+-            Unit* target = SelectUnit(SELECT_TARGET_RANDOM, 1);
++            AllCreaturesOfEntryInRange check(m_creature, entry, 100);
++            MaNGOS::CreatureListSearcher<AllCreaturesOfEntryInRange> searcher(templist, check);
+ 
+-            if(!target)
+-               target = m_creature->getVictim();
++            TypeContainerVisitor<MaNGOS::CreatureListSearcher<AllCreaturesOfEntryInRange>, GridTypeMapContainer> cSearcher(searcher);
+ 
+-            if(target && target->isAlive() && target->GetTypeId() == TYPEID_PLAYER)
+-            {
+-                DoCast(target, SPELL_SHADOW_OF_DEATH);
+-                GhostGUID = target->GetGUID();
+-                ShadowOfDeathTimer = 30000;
+-                SummonShadowsTimer = 53000; // Make it VERY close but slightly less so that we can check if the aura is still on the player
+-            }
+-        }else ShadowOfDeathTimer -= diff;*/
++            CellLock<GridReadGuard> cell_lock(cell, pair);
++            cell_lock->Visit(cell_lock, cSearcher, *(m_creature->GetMap()));
++        }
+ 
+-        if(RandomYellTimer < diff)
++        for(std::list<Creature*>::iterator i = templist.begin(); i != templist.end(); ++i)
+         {
+-            switch(rand()%2)
+-            {
+-                case 0:
+-                    DoYell(SAY_SPELL1,LANG_UNIVERSAL,NULL);
+-                    DoPlaySoundToSet(m_creature, SOUND_SPELL1);
+-                    break;
+-                case 1:
+-                    DoYell(SAY_SPELL2,LANG_UNIVERSAL,NULL);
+-                    DoPlaySoundToSet(m_creature, SOUND_SPELL2);
+-                    break;
+-            }
+-            RandomYellTimer = 50000 + rand()%51 * 1000;
+-        }else RandomYellTimer -= diff;
+-
+-        if(!m_creature->HasAura(SPELL_BERSERK, 0))
+-            if(EnrageTimer < diff)
+-        {
+-            DoCast(m_creature, SPELL_BERSERK);
+-            DoYell(SAY_ENRAGE,LANG_UNIVERSAL,NULL);
+-            DoPlaySoundToSet(m_creature, SOUND_ENRAGE);
+-        }else EnrageTimer -= diff;
+-
+-        DoMeleeAttackIfReady();
++            (*i)->SetVisibility(VISIBILITY_OFF);
++            (*i)->setDeathState(JUST_DIED);
++        }
+     }
+ };
+ 

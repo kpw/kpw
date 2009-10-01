@@ -1,0 +1,2219 @@
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/mangos.sql
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/mangos.sql	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/mangos.sql	(revision 6748)
+@@ -15105,7 +15105,7 @@
+ (45482,0,0,0,0,0x0000000000000000,0x00080001,0,45),
+ (45483,0,0,0,0,0x0000000000000000,0x00080001,0,45),
+ (45484,0,0,0,0,0x0000000000000000,0x08000000,0,45),
+-(46046,0,0,0,0,0x0000000000000000,0x00000001,0,5), 
++(46046,0,0,0,0,0x0000000000000000,0x00000001,0,5),
+ (46098,0,0,0,11,0x0000000000000080,0x08000000,0,0),
+ (46364,0,0,0,0,0x0000000000000000,0x00100402,0,0),
+ (46569,0,0,0,0,0x0000000000000000,0x00004000,0,45),
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/Makefile.am
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/Makefile.am	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/Makefile.am	(revision 6748)
+@@ -211,6 +211,7 @@
+ 	6740_mangos_mangos_string.sql \
+ 	6742_mangos_command.sql \
+ 	6742_mangos_mangos_string.sql \
++	6748_mangos_mangos_string.sql \
+ 	README
+ 
+ ## Additional files to include when running 'make dist'
+@@ -403,4 +404,5 @@
+ 	6740_mangos_mangos_string.sql \
+ 	6742_mangos_command.sql \
+ 	6742_mangos_mangos_string.sql \
++	6748_mangos_mangos_string.sql \
+ 	README
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6748_mangos_mangos_string.sql
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6748_mangos_mangos_string.sql	(revision 0)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/sql/updates/6748_mangos_mangos_string.sql	(revision 6748)
+@@ -0,0 +1 @@
++DELETE FROM mangos_string WHERE entry IN (800);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/contrib/extractor/adt.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/contrib/extractor/adt.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/contrib/extractor/adt.cpp	(revision 6748)
+@@ -85,7 +85,6 @@
+                         WMOInstance inst(wmo, mf);
+                         wmois.push_back(inst);
+                     }
+-
+                 }*/
+                 break;
+             }
+@@ -120,6 +119,7 @@
+             case 0x4d444446:                                // MDDF
+             case 0x4d46424f:                                // MFBO new in BC
+             case 0x4d48324f:                                // MH2O new in WotLK
++            case 0x4D545846:                                // MTXF new in WotLK
+                 break;
+             default:
+             {
+@@ -295,7 +295,6 @@
+                     _chunk->flag |=1;
+                 if(chunkflags & 16)
+                     _chunk->flag |=2;
+-
+             }
+             break;
+         }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/contrib/extractor/adt.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/contrib/extractor/adt.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/contrib/extractor/adt.h	(revision 6748)
+@@ -51,4 +51,3 @@
+ void LoadMapChunk(MPQFile &,chunk*);
+ bool LoadWMO(char* filename);
+ #endif
+-
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/tools/gensvnrevision/gensvnrevision.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/tools/gensvnrevision/gensvnrevision.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/tools/gensvnrevision/gensvnrevision.cpp	(revision 6748)
+@@ -32,7 +32,6 @@
+             path += '/';
+     }
+ 
+-
+     FILE* EntriesFile = fopen((path+".svn/entries").c_str(), "r");
+     if(!EntriesFile)
+         EntriesFile = fopen((path+"_svn/entries").c_str(), "r");
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/realmd/Main.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/realmd/Main.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/realmd/Main.cpp	(revision 6748)
+@@ -328,7 +328,6 @@
+     #ifdef _WIN32
+     signal(SIGBREAK, 0);
+     #endif
+-
+ }
+ 
+ /// @}
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/WheatyExceptionReport.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/WheatyExceptionReport.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/WheatyExceptionReport.cpp	(revision 6748)
+@@ -374,7 +374,6 @@
+   CloseHandle( hThreadSnap );
+ }
+ 
+-
+ //===========================================================================
+ // Open the report file, and write the desired information to it.  Called by
+ // WheatyUnhandledExceptionFilter
+@@ -601,7 +600,7 @@
+ //============================================================
+ void WheatyExceptionReport::WriteStackDetails(
+ PCONTEXT pContext,
+-bool bWriteVariables, HANDLE pThreadHandle)                                      // true if local/params should be output
++bool bWriteVariables, HANDLE pThreadHandle)                 // true if local/params should be output
+ {
+     _tprintf( _T("\r\nCall stack:\r\n") );
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStores.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStores.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStores.cpp	(revision 6748)
+@@ -119,21 +119,9 @@
+ 
+ // DBC used only for initialization sTaxiPathSetBySource at startup.
+ TaxiPathNodesByPath sTaxiPathNodesByPath;
+-struct TaxiPathNodeEntry
+-{
+-    uint32    path;
+-    uint32    index;
+-    uint32    mapid;
+-    float     x;
+-    float     y;
+-    float     z;
+-    uint32    actionFlag;
+-    uint32    delay;
+-};
+-static DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
+ 
++static DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
+ DBCStorage <TotemCategoryEntry> sTotemCategoryStore(TotemCategoryEntryfmt);
+-
+ DBCStorage <WorldMapAreaEntry>  sWorldMapAreaStore(WorldMapAreaEntryfmt);
+ DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
+ 
+@@ -233,7 +221,7 @@
+             flist.push_back(i);
+         }
+     }
+-    
++
+     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sFactionTemplateStore,     dbcPath,"FactionTemplate.dbc");
+     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGemPropertiesStore,       dbcPath,"GemProperties.dbc");
+ 
+@@ -295,7 +283,7 @@
+                 if(!cFamily)
+                     continue;
+ 
+-                if(skillLine->skillId != cFamily->skillLine && skillLine->skillId != cFamily->skillLine2)
++                if(skillLine->skillId != cFamily->skillLine[0] && skillLine->skillId != cFamily->skillLine[1])
+                     continue;
+ 
+                 sPetFamilySpellsStore[i].insert(spellInfo->Id);
+@@ -307,7 +295,6 @@
+     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellDurationStore,       dbcPath,"SpellDuration.dbc");
+     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellFocusObjectStore,    dbcPath,"SpellFocusObject.dbc");
+     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellItemEnchantmentStore,dbcPath,"SpellItemEnchantment.dbc");
+-    
+     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellItemEnchantmentConditionStore,dbcPath,"SpellItemEnchantmentCondition.dbc");
+     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellRadiusStore,         dbcPath,"SpellRadius.dbc");
+     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellRangeStore,          dbcPath,"SpellRange.dbc");
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCEnums.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCEnums.h	(revision 0)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCEnums.h	(revision 6748)
+@@ -0,0 +1,104 @@
++/*
++* Copyright (C) 2005-2008 MaNGOS <http://www.mangosproject.org/>
++*
++* This program is free software; you can redistribute it and/or modify
++* it under the terms of the GNU General Public License as published by
++* the Free Software Foundation; either version 2 of the License, or
++* (at your option) any later version.
++*
++* This program is distributed in the hope that it will be useful,
++* but WITHOUT ANY WARRANTY; without even the implied warranty of
++* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++* GNU General Public License for more details.
++*
++* You should have received a copy of the GNU General Public License
++* along with this program; if not, write to the Free Software
++* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++*/
++
++#ifndef DBCENUMS_H
++#define DBCENUMS_H
++
++enum AreaTeams
++{
++    AREATEAM_NONE  = 0,
++    AREATEAM_ALLY  = 2,
++    AREATEAM_HORDE = 4
++};
++
++enum AreaFlags
++{
++    AREA_FLAG_SNOW             = 0x00000001,                // snow (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
++    AREA_FLAG_UNK1             = 0x00000002,                // unknown, (only Naxxramas and Razorfen Downs)
++    AREA_FLAG_UNK2             = 0x00000004,                // Only used on development map
++    AREA_FLAG_SLAVE_CAPITAL    = 0x00000008,                // slave capital city flag?
++    AREA_FLAG_UNK3             = 0x00000010,                // unknown
++    AREA_FLAG_SLAVE_CAPITAL2   = 0x00000020,                // slave capital city flag?
++    AREA_FLAG_UNK4             = 0x00000040,                // many zones have this flag
++    AREA_FLAG_ARENA            = 0x00000080,                // arena, both instanced and world arenas
++    AREA_FLAG_CAPITAL          = 0x00000100,                // main capital city flag
++    AREA_FLAG_CITY             = 0x00000200,                // only for one zone named "City" (where it located?)
++    AREA_FLAG_OUTLAND          = 0x00000400,                // outland zones? (only Eye of the Storm not have this flag, but have 0x00004000 flag)
++    AREA_FLAG_SANCTUARY        = 0x00000800,                // sanctuary area (PvP disabled)
++    AREA_FLAG_NEED_FLY         = 0x00001000,                // only Netherwing Ledge, Socrethar's Seat, Tempest Keep, The Arcatraz, The Botanica, The Mechanar, Sorrow Wing Point, Dragonspine Ridge, Netherwing Mines, Dragonmaw Base Camp, Dragonmaw Skyway
++    AREA_FLAG_UNUSED1          = 0x00002000,                // not used now (no area/zones with this flag set in 2.4.2)
++    AREA_FLAG_OUTLAND2         = 0x00004000,                // outland zones? (only Circle of Blood Arena not have this flag, but have 0x00000400 flag)
++    AREA_FLAG_PVP              = 0x00008000,                // pvp objective area? (Death's Door also has this flag although it's no pvp object area)
++    AREA_FLAG_ARENA_INSTANCE   = 0x00010000,                // used by instanced arenas only
++    AREA_FLAG_UNUSED2          = 0x00020000,                // not used now (no area/zones with this flag set in 2.4.2)
++    AREA_FLAG_UNK5             = 0x00040000,                // just used for Amani Pass, Hatchet Hills
++    AREA_FLAG_LOWLEVEL         = 0x00100000                 // used for some starting areas with area_level <=15
++};
++
++enum FactionTemplateFlags
++{
++    FACTION_TEMPLATE_FLAG_CONTESTED_GUARD   =   0x00001000, // faction will attack players that were involved in PvP combats
++};
++
++enum FactionMasks
++{
++    FACTION_MASK_PLAYER   = 1,                              // any player
++    FACTION_MASK_ALLIANCE = 2,                              // player or creature from alliance team
++    FACTION_MASK_HORDE    = 4,                              // player or creature from horde team
++    FACTION_MASK_MONSTER  = 8                               // aggressive creature from monster team
++    // if none flags set then non-aggressive creature
++};
++
++enum MapTypes
++{
++    MAP_COMMON          = 0,
++    MAP_INSTANCE        = 1,
++    MAP_RAID            = 2,
++    MAP_BATTLEGROUND    = 3,
++    MAP_ARENA           = 4
++};
++
++enum AbilytyLearnType
++{
++    ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,
++    ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2
++};
++
++enum ItemEnchantmentType
++{
++    ITEM_ENCHANTMENT_TYPE_NONE         = 0,
++    ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL = 1,
++    ITEM_ENCHANTMENT_TYPE_DAMAGE       = 2,
++    ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL  = 3,
++    ITEM_ENCHANTMENT_TYPE_RESISTANCE   = 4,
++    ITEM_ENCHANTMENT_TYPE_STAT         = 5,
++    ITEM_ENCHANTMENT_TYPE_TOTEM        = 6
++};
++
++enum TotemCategoryType
++{
++    TOTEM_CATEGORY_TYPE_KNIFE   = 1,
++    TOTEM_CATEGORY_TYPE_TOTEM   = 2,
++    TOTEM_CATEGORY_TYPE_ROD     = 3,
++    TOTEM_CATEGORY_TYPE_PICK    = 21,
++    TOTEM_CATEGORY_TYPE_STONE   = 22,
++    TOTEM_CATEGORY_TYPE_HAMMER  = 23,
++    TOTEM_CATEGORY_TYPE_SPANNER = 24
++};
++
++#endif
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStructure.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStructure.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStructure.h	(revision 6748)
+@@ -19,6 +19,7 @@
+ #ifndef DBCSTRUCTURE_H
+ #define DBCSTRUCTURE_H
+ 
++#include "DBCEnums.h"
+ #include "Platform/Define.h"
+ 
+ #include <map>
+@@ -34,42 +35,6 @@
+ #pragma pack(push,1)
+ #endif
+ 
+-enum AreaTeams
+-{
+-    AREATEAM_NONE  = 0,
+-    AREATEAM_ALLY  = 2,
+-    AREATEAM_HORDE = 4
+-};
+-
+-enum AreaFlags
+-{
+-    AREA_FLAG_SNOW             = 0x00000001,                // snow (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
+-    AREA_FLAG_UNK1             = 0x00000002,                // unknown, (only Naxxramas and Razorfen Downs)
+-    AREA_FLAG_UNK2             = 0x00000004,                // Only used on development map
+-    AREA_FLAG_SLAVE_CAPITAL    = 0x00000008,                // slave capital city flag?
+-    AREA_FLAG_UNK3             = 0x00000010,                // unknown
+-    AREA_FLAG_SLAVE_CAPITAL2   = 0x00000020,                // slave capital city flag?
+-    AREA_FLAG_UNK4             = 0x00000040,                // many zones have this flag
+-    AREA_FLAG_ARENA            = 0x00000080,                // arena, both instanced and world arenas
+-    AREA_FLAG_CAPITAL          = 0x00000100,                // main capital city flag
+-    AREA_FLAG_CITY             = 0x00000200,                // only for one zone named "City" (where it located?)
+-    AREA_FLAG_OUTLAND          = 0x00000400,                // outland zones? (only Eye of the Storm not have this flag, but have 0x00004000 flag)
+-    AREA_FLAG_SANCTUARY        = 0x00000800,                // sanctuary area (PvP disabled)
+-    AREA_FLAG_NEED_FLY         = 0x00001000,                // only Netherwing Ledge, Socrethar's Seat, Tempest Keep, The Arcatraz, The Botanica, The Mechanar, Sorrow Wing Point, Dragonspine Ridge, Netherwing Mines, Dragonmaw Base Camp, Dragonmaw Skyway
+-    AREA_FLAG_UNUSED1          = 0x00002000,                // not used now (no area/zones with this flag set in 2.4.2)
+-    AREA_FLAG_OUTLAND2         = 0x00004000,                // outland zones? (only Circle of Blood Arena not have this flag, but have 0x00000400 flag)
+-    AREA_FLAG_PVP              = 0x00008000,                // pvp objective area? (Death's Door also has this flag although it's no pvp object area)
+-    AREA_FLAG_ARENA_INSTANCE   = 0x00010000,                // used by instanced arenas only
+-    AREA_FLAG_UNUSED2          = 0x00020000,                // not used now (no area/zones with this flag set in 2.4.2)
+-    AREA_FLAG_UNK5             = 0x00040000,                // just used for Amani Pass, Hatchet Hills
+-    AREA_FLAG_LOWLEVEL         = 0x00100000                 // used for some starting areas with area_level <=15
+-};
+-
+-enum FactionTemplateFlags
+-{
+-    FACTION_TEMPLATE_FLAG_CONTESTED_GUARD   =   0x00001000, // faction will attack players that were involved in PvP combats
+-};
+-
+ struct AreaTableEntry
+ {
+     uint32    ID;                                           // 0
+@@ -194,8 +159,7 @@
+     uint32    minScaleLevel;                                // 2 0/1      
+     float     maxScale;                                     // 3
+     uint32    maxScaleLevel;                                // 4 0/60
+-    uint32    skillLine;                                    // 5
+-    uint32    skillLine2;                                   // 6
++    uint32    skillLine[2];                                 // 5-6
+     uint32    petFoodMask;                                  // 7
+     char*     Name[16];                                     // 8-23
+                                                             // 24 string flags, unused
+@@ -241,15 +205,6 @@
+                                                             // 52 string flags, unused
+ };
+ 
+-enum FactionMasks
+-{
+-    FACTION_MASK_PLAYER   = 1,                              // any player
+-    FACTION_MASK_ALLIANCE = 2,                              // player or creature from alliance team
+-    FACTION_MASK_HORDE    = 4,                              // player or creature from horde team
+-    FACTION_MASK_MONSTER  = 8                               // aggressive creature from monster team
+-                                                            // if none flags set then non-aggressive creature
+-};
+-
+ struct FactionTemplateEntry
+ {
+     uint32      ID;                                         // 0
+@@ -298,6 +253,7 @@
+ };
+ 
+ #define GT_MAX_LEVEL    100
++
+ struct GtCombatRatingsEntry
+ {
+     float    ratio;
+@@ -428,15 +384,6 @@
+     //char*       content[16];                              // 18-33
+ };
+ 
+-enum MapTypes
+-{
+-    MAP_COMMON          = 0,
+-    MAP_INSTANCE        = 1,
+-    MAP_RAID            = 2,
+-    MAP_BATTLEGROUND    = 3,
+-    MAP_ARENA           = 4
+-};
+-
+ struct MapEntry
+ {
+     uint32      MapID;                                      // 0
+@@ -541,12 +488,6 @@
+     uint32    spellIcon;                                    // 37
+ };
+ 
+-enum AbilytyLearnType
+-{
+-    ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,
+-    ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2
+-};
+-
+ struct SkillLineAbilityEntry
+ {
+     uint32    id;                                           // 0, INDEX
+@@ -754,17 +695,6 @@
+     int32     Duration[3];
+ };
+ 
+-enum ItemEnchantmentType
+-{
+-    ITEM_ENCHANTMENT_TYPE_NONE         = 0,
+-    ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL = 1,
+-    ITEM_ENCHANTMENT_TYPE_DAMAGE       = 2,
+-    ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL  = 3,
+-    ITEM_ENCHANTMENT_TYPE_RESISTANCE   = 4,
+-    ITEM_ENCHANTMENT_TYPE_STAT         = 5,
+-    ITEM_ENCHANTMENT_TYPE_TOTEM        = 6
+-};
+-
+ struct SpellItemEnchantmentEntry
+ {
+     uint32      ID;                                         // 0
+@@ -822,14 +752,6 @@
+     //char*   internalname;                                 // 22
+ };
+ 
+-struct TaxiPathEntry
+-{
+-    uint32    ID;
+-    uint32    from;
+-    uint32    to;
+-    uint32    price;
+-};
+-
+ struct TaxiNodesEntry
+ {
+     uint32    ID;                                           // 0
+@@ -843,17 +765,26 @@
+     uint32    alliance_mount_type;                          // 24
+ };
+ 
+-enum TotemCategoryType
++struct TaxiPathEntry
+ {
+-    TOTEM_CATEGORY_TYPE_KNIFE   = 1,
+-    TOTEM_CATEGORY_TYPE_TOTEM   = 2,
+-    TOTEM_CATEGORY_TYPE_ROD     = 3,
+-    TOTEM_CATEGORY_TYPE_PICK    = 21,
+-    TOTEM_CATEGORY_TYPE_STONE   = 22,
+-    TOTEM_CATEGORY_TYPE_HAMMER  = 23,
+-    TOTEM_CATEGORY_TYPE_SPANNER = 24
++    uint32    ID;
++    uint32    from;
++    uint32    to;
++    uint32    price;
+ };
+ 
++struct TaxiPathNodeEntry
++{
++    uint32    path;
++    uint32    index;
++    uint32    mapid;
++    float     x;
++    float     y;
++    float     z;
++    uint32    actionFlag;
++    uint32    delay;
++};
++
+ struct TotemCategoryEntry
+ {
+     uint32    ID;                                           // 0
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/SQLStorage.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/SQLStorage.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/SQLStorage.cpp	(revision 6748)
+@@ -113,7 +113,7 @@
+         RecordCount = 0;
+         sLog.outError("Error in %s table, probably sql file format was updated (there should be %d fields in sql).\n",table,iNumFields);
+         delete result;
+-        exit(1);                                            // Stop server at loading broken or non-compatiable table.
++        exit(1);                                            // Stop server at loading broken or non-compatible table.
+     }
+ 
+     //get struct size
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/Makefile.am
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/Makefile.am	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/Makefile.am	(revision 6748)
+@@ -41,6 +41,7 @@
+ 	DatabasePostgre.h \
+ 	DatabaseSqlite.cpp \
+ 	DatabaseSqlite.h \
++	DBCEnums.h \
+ 	Field.cpp \
+ 	Field.h \
+ 	MySQLDelayThread.h \
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DatabaseImpl.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DatabaseImpl.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DatabaseImpl.h	(revision 6748)
+@@ -120,7 +120,6 @@
+     return AsyncQuery(method, param1, szQuery);
+ }
+ 
+-
+ template<class Class>
+ bool
+ Database::DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder)
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStores.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStores.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/shared/Database/DBCStores.h	(revision 6748)
+@@ -72,7 +72,6 @@
+ 
+         bool Load(char const* fn)
+         {
+-
+             DBCFile dbc;
+             // Check if load was sucessful, only then continue
+             if(!dbc.Load(fn, fmt))
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/mangosd/CliRunnable.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/mangosd/CliRunnable.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/mangosd/CliRunnable.cpp	(revision 6748)
+@@ -926,7 +926,7 @@
+     std::string name = charName;
+     if(!consoleToUtf8(charName,name))                       // convert from console encoding to utf8
+         return;
+-    
++
+     if(!normalizePlayerName(name))
+         return;
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Guild.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Guild.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Guild.cpp	(revision 6748)
+@@ -1960,4 +1960,3 @@
+ 
+     return false;
+ }
+-
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Transports.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Transports.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Transports.cpp	(revision 6748)
+@@ -167,7 +167,7 @@
+     SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
+     SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+ 
+-    SetUInt32Value(OBJECT_FIELD_ENTRY, goinfo->id);
++    SetEntry(goinfo->id);
+ 
+     SetUInt32Value(GAMEOBJECT_DISPLAYID, goinfo->displayId);
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellEffects.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellEffects.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellEffects.cpp	(revision 6748)
+@@ -54,7 +54,6 @@
+ #include "Util.h"
+ #include "TemporarySummon.h"
+ 
+-
+ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
+ {
+     &Spell::EffectNULL,                                     //  0
+@@ -1075,7 +1074,7 @@
+                     //Converted Sentry Credit
+                     m_caster->CastSpell(m_caster, 45009, true);
+                     return;
+-                }                
++                }
+                 case 45030:                                 // Impale Emissary
+                 {
+                     // Emissary of Hate Credit
+@@ -4366,6 +4365,7 @@
+         if(m_caster->GetTypeId()==TYPEID_PLAYER)
+             ((Player*)m_caster)->AddComboPoints(unitTarget, 1);
+     }
++
+     // Mangle (Cat): CP
+     if(m_spellInfo->SpellFamilyName==SPELLFAMILY_DRUID && (m_spellInfo->SpellFamilyFlags==0x0000040000000000LL))
+     {
+@@ -4373,7 +4373,6 @@
+             ((Player*)m_caster)->AddComboPoints(unitTarget,1);
+     }
+ 
+-
+     // take ammo
+     if(m_attackType == RANGED_ATTACK && m_caster->GetTypeId() == TYPEID_PLAYER)
+     {
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetHandler.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PetHandler.cpp	(revision 6748)
+@@ -373,7 +373,7 @@
+ 
+ void WorldSession::HandlePetRename( WorldPacket & recv_data )
+ {
+-    CHECK_PACKET_SIZE(recv_data,8+1+1+1+1+1+1+1);
++    CHECK_PACKET_SIZE(recv_data, 8+1);
+ 
+     sLog.outDetail( "HandlePetRename. CMSG_PET_RENAME\n" );
+ 
+@@ -385,6 +385,7 @@
+ 
+     recv_data >> petguid;
+     recv_data >> name;
++    CHECK_PACKET_SIZE(recv_data, recv_data.rpos() + 1);
+     recv_data >> isdeclined;
+ 
+     Pet* pet = ObjectAccessor::GetPet(petguid);
+@@ -394,11 +395,18 @@
+         pet->GetOwnerGUID() != _player->GetGUID() || !pet->GetCharmInfo() )
+         return;
+ 
+-    if((!ObjectMgr::IsValidPetName(name)) || (objmgr.IsReservedName(name)))
++    if(!ObjectMgr::IsValidPetName(name))
+     {
+-        SendNotification(LANG_PET_INVALID_NAME);
++        SendPetNameInvalid(PET_NAME_INVALID, name, NULL);
+         return;
+     }
++
++    if(objmgr.IsReservedName(name))
++    {
++        SendPetNameInvalid(PET_NAME_RESERVED, name, NULL);
++        return;
++    }
++
+     pet->SetName(name);
+ 
+     Unit *owner = pet->GetOwner();
+@@ -410,13 +418,16 @@
+     if(isdeclined)
+     {
+         for(int i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
++        {
++            CHECK_PACKET_SIZE(recv_data, recv_data.rpos() + 1);
+             recv_data >> declinedname.name[i];
++        }
+ 
+         std::wstring wname;
+-        Utf8toWStr(name,wname);
++        Utf8toWStr(name, wname);
+         if(!ObjectMgr::CheckDeclinedNames(GetMainPartOfName(wname,0),declinedname))
+         {
+-            SendNotification(LANG_PET_INVALID_NAME);
++            SendPetNameInvalid(PET_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME, name, &declinedname);
+             return;
+         }
+     }
+@@ -428,11 +439,11 @@
+             CharacterDatabase.escape_string(declinedname.name[i]);
+         CharacterDatabase.PExecute("DELETE FROM character_pet_declinedname WHERE owner = '%u' AND id = '%u'", _player->GetGUIDLow(), pet->GetCharmInfo()->GetPetNumber());
+         CharacterDatabase.PExecute("INSERT INTO character_pet_declinedname (id, owner, genitive, dative, accusative, instrumental, prepositional) VALUES ('%u','%u','%s','%s','%s','%s','%s')",
+-            pet->GetCharmInfo()->GetPetNumber(), _player->GetGUIDLow(), declinedname.name[0].c_str(),declinedname.name[1].c_str(),declinedname.name[2].c_str(),declinedname.name[3].c_str(),declinedname.name[4].c_str());
++            pet->GetCharmInfo()->GetPetNumber(), _player->GetGUIDLow(), declinedname.name[0].c_str(), declinedname.name[1].c_str(), declinedname.name[2].c_str(), declinedname.name[3].c_str(), declinedname.name[4].c_str());
+     }
+ 
+     CharacterDatabase.escape_string(name);
+-    CharacterDatabase.PExecute("UPDATE character_pet SET name = '%s', renamed = '1' WHERE owner = '%u' AND id = '%u'", name.c_str(),_player->GetGUIDLow(),pet->GetCharmInfo()->GetPetNumber() );
++    CharacterDatabase.PExecute("UPDATE character_pet SET name = '%s', renamed = '1' WHERE owner = '%u' AND id = '%u'", name.c_str(), _player->GetGUIDLow(), pet->GetCharmInfo()->GetPetNumber());
+     CharacterDatabase.CommitTransaction();
+ 
+     pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
+@@ -440,14 +451,14 @@
+ 
+ void WorldSession::HandlePetAbandon( WorldPacket & recv_data )
+ {
+-    CHECK_PACKET_SIZE(recv_data,8);
++    CHECK_PACKET_SIZE(recv_data, 8);
+ 
+     uint64 guid;
+     recv_data >> guid;                                      //pet guid
+     sLog.outDetail( "HandlePetAbandon. CMSG_PET_ABANDON pet guid is %u", GUID_LOPART(guid) );
+ 
+     // pet/charmed
+-    Creature* pet=ObjectAccessor::GetCreatureOrPet(*_player, guid);
++    Creature* pet = ObjectAccessor::GetCreatureOrPet(*_player, guid);
+     if(pet)
+     {
+         if(pet->isPet())
+@@ -575,7 +586,7 @@
+     }
+ }
+ 
+-void WorldSession::HandleAddDynamicTargetObsoleteOpcode( WorldPacket& recvPacket )
++void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
+ {
+     sLog.outDetail("WORLD: CMSG_PET_CAST_SPELL");
+ 
+@@ -595,7 +606,7 @@
+ 
+     if(!pet || (pet != _player->GetPet() && pet!= _player->GetCharm()))
+     {
+-        sLog.outError( "HandleAddDynamicTargetObsoleteOpcode.Pet %u isn't pet of player %s .\n", uint32(GUID_LOPART(guid)),GetPlayer()->GetName() );
++        sLog.outError( "HandlePetCastSpellOpcode: Pet %u isn't pet of player %s .\n", uint32(GUID_LOPART(guid)),GetPlayer()->GetName() );
+         return;
+     }
+ 
+@@ -647,3 +658,19 @@
+         delete spell;
+     }
+ }
++
++void WorldSession::SendPetNameInvalid(uint32 error, std::string name, DeclinedName *declinedName)
++{
++    WorldPacket data(SMSG_PET_NAME_INVALID, 4 + name.size() + 1 + 1);
++    data << uint32(error);
++    data << name;
++    if(declinedName)
++    {
++        data << uint8(1);
++        for(uint32 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
++            data << declinedName->name[i];
++    }
++    else
++        data << uint8(0);
++    SendPacket(&data);
++}
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level1.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level1.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level1.cpp	(revision 6748)
+@@ -216,7 +216,6 @@
+     return false;
+ }
+ 
+-
+ //Enable\Dissable Invisible mode
+ bool ChatHandler::HandleVisibleCommand(const char* args)
+ {
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Bag.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Bag.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Bag.cpp	(revision 6748)
+@@ -74,7 +74,7 @@
+ 
+     Object::_Create( guidlow, 0, HIGHGUID_CONTAINER );
+ 
+-    SetUInt32Value(OBJECT_FIELD_ENTRY, itemid);
++    SetEntry(itemid);
+     SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
+ 
+     SetUInt64Value(ITEM_FIELD_OWNER, owner ? owner->GetGUID() : 0);
+@@ -88,7 +88,7 @@
+     // Setting the number of Slots the Container has
+     SetUInt32Value(CONTAINER_FIELD_NUM_SLOTS, itemProto->ContainerSlots);
+ 
+-    // Cleanning 20 slots
++    // Cleaning 20 slots
+     for (uint8 i = 0; i < MAX_BAG_SIZE; i++)
+     {
+         SetUInt64Value(CONTAINER_FIELD_SLOT_1 + (i*2), 0);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level3.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level3.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level3.cpp	(revision 6748)
+@@ -781,7 +781,6 @@
+     if (!*args)
+         return false;
+ 
+-
+     // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
+     uint32 min_id = extractSpellIdFromLink((char*)args);
+     if(!min_id)
+@@ -5191,7 +5190,6 @@
+     if(!*args)
+         return false;
+ 
+-
+     // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+     uint32 spell = extractSpellIdFromLink((char*)args);
+     if(!spell)
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ItemHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ItemHandler.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ItemHandler.cpp	(revision 6748)
+@@ -322,6 +322,8 @@
+             data << pProto->Damage[i].DamageMax;
+             data << pProto->Damage[i].DamageType;
+         }
++
++        // resistances (7)
+         data << pProto->Armor;
+         data << pProto->HolyRes;
+         data << pProto->FireRes;
+@@ -329,10 +331,11 @@
+         data << pProto->FrostRes;
+         data << pProto->ShadowRes;
+         data << pProto->ArcaneRes;
++
+         data << pProto->Delay;
+         data << pProto->Ammo_type;
++        data << pProto->RangedModRange;
+ 
+-        data << (float)pProto->RangedModRange;
+         for(int s = 0; s < 5; s++)
+         {
+             // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
+@@ -1028,16 +1031,16 @@
+ 
+     CharacterDatabase.BeginTransaction();
+     CharacterDatabase.PExecute("INSERT INTO character_gifts VALUES ('%u', '%u', '%u', '%u')", GUID_LOPART(item->GetOwnerGUID()), item->GetGUIDLow(), item->GetEntry(), item->GetUInt32Value(ITEM_FIELD_FLAGS));
+-    item->SetUInt32Value(OBJECT_FIELD_ENTRY, gift->GetUInt32Value(OBJECT_FIELD_ENTRY));
++    item->SetEntry(gift->GetEntry());
+ 
+     switch (item->GetEntry())
+     {
+-        case 5042:  item->SetUInt32Value(OBJECT_FIELD_ENTRY,  5043); break;
+-        case 5048:  item->SetUInt32Value(OBJECT_FIELD_ENTRY,  5044); break;
+-        case 17303: item->SetUInt32Value(OBJECT_FIELD_ENTRY, 17302); break;
+-        case 17304: item->SetUInt32Value(OBJECT_FIELD_ENTRY, 17305); break;
+-        case 17307: item->SetUInt32Value(OBJECT_FIELD_ENTRY, 17308); break;
+-        case 21830: item->SetUInt32Value(OBJECT_FIELD_ENTRY, 21831); break;
++        case 5042:  item->SetEntry( 5043); break;
++        case 5048:  item->SetEntry( 5044); break;
++        case 17303: item->SetEntry(17302); break;
++        case 17304: item->SetEntry(17305); break;
++        case 17307: item->SetEntry(17308); break;
++        case 21830: item->SetEntry(21831); break;
+     }
+     item->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, _player->GetGUID());
+     item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WaypointMovementGenerator.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WaypointMovementGenerator.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WaypointMovementGenerator.cpp	(revision 6748)
+@@ -158,7 +158,6 @@
+                                 break;
+ 
+                         creature.Say(behavior->text[rand() % i].c_str(), 0, 0);
+-
+                     }
+                     else
+                         creature.Say(behavior->text[0].c_str(), 0, 0);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/QueryHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/QueryHandler.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/QueryHandler.cpp	(revision 6748)
+@@ -249,6 +249,7 @@
+         data << CastBarCaption;                             // 2.0.3, string. Text will appear in Cast Bar when using GO (ex: "Collecting")
+         data << uint8(0);                                   // 2.0.3, probably string
+         data.append(info->raw.data,24);
++        data << float(info->size);                          // go size
+         SendPacket( &data );
+         sLog.outDebug(  "WORLD: Sent CMSG_GAMEOBJECT_QUERY " );
+     }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Object.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Object.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Object.h	(revision 6748)
+@@ -135,6 +135,7 @@
+         uint32 GetGUIDHigh() const { return GUID_HIPART(GetUInt64Value(0)); }
+         const ByteBuffer& GetPackGUID() const { return m_PackGUID; }
+         uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
++        void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
+ 
+         uint8 GetTypeId() const { return m_objectTypeId; }
+         bool isType(uint16 mask) const { return (mask & m_objectType); }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GuardAI.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GuardAI.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GuardAI.cpp	(revision 6748)
+@@ -151,4 +151,3 @@
+     if(Player* pkiller = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+         i_creature.SendZoneUnderAttackMessage(pkiller);
+ }
+-
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellHandler.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellHandler.cpp	(revision 6748)
+@@ -52,6 +52,12 @@
+         return;
+     }
+ 
++    if(pItem->GetGUID() != item_guid)
++    {
++        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
++        return;
++    }
++
+     sLog.outDetail("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, spell_count: %u , cast_count: %u, Item: %u, data length = %i", bagIndex, slot, spell_count, cast_count, pItem->GetEntry(), recvPacket.size());
+ 
+     ItemPrototype const *proto = pItem->GetProto();
+@@ -235,7 +241,7 @@
+             uint32 flags = fields[1].GetUInt32();
+ 
+             pItem->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, 0);
+-            pItem->SetUInt32Value(OBJECT_FIELD_ENTRY, entry);
++            pItem->SetEntry(entry);
+             pItem->SetUInt32Value(ITEM_FIELD_FLAGS, flags);
+             pItem->SetState(ITEM_CHANGED, pUser);
+             delete result;
+@@ -316,7 +322,7 @@
+     }
+ 
+     Spell *spell = new Spell(_player, spellInfo, false);
+-    spell->m_cast_count = cast_count;                       //set count of casts
++    spell->m_cast_count = cast_count;                       // set count of casts
+     spell->prepare(&targets);
+ }
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Chat.cpp	(revision 6748)
+@@ -1039,7 +1039,7 @@
+ uint32 ChatHandler::extractSpellIdFromLink(char* text)
+ {
+     // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
+-    // number or [name] Shift-click form |color|Htalent:telen_id,rank|h[name]|h|r
++    // number or [name] Shift-click form |color|Htalent:talent_id,rank|h[name]|h|r
+     int type = 0;
+     char* rankS = NULL;
+     char* idS = extractKeyFromLink(text,spellTalentKeys,&type,&rankS);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.h	(revision 6748)
+@@ -1759,7 +1759,7 @@
+         void _ApplyAllStatBonuses();
+         void _RemoveAllStatBonuses();
+ 
+-        void _ApplyWeaponDependentAuraMods(Item *item,WeaponAttackType attackType,bool apply);
++        void _ApplyWeaponDependentAuraMods(Item *item, WeaponAttackType attackType, bool apply);
+         void _ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attackType, Aura* aura, bool apply);
+         void _ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType attackType, Aura* aura, bool apply);
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellMgr.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellMgr.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellMgr.h	(revision 6748)
+@@ -222,7 +222,11 @@
+     SPELLFAMILY_PALADIN     = 10,
+     SPELLFAMILY_SHAMAN      = 11,
+     SPELLFAMILY_UNK2        = 12,
+-    SPELLFAMILY_POTION      = 13
++    SPELLFAMILY_POTION      = 13,
++    // 14 - unused
++    SPELLFAMILY_DEATHKNIGHT = 15,
++    // 16 - unused
++    SPELLFAMILY_UNK3        = 17
+ };
+ 
+ //Some SpellFamilyFlags
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Pet.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Pet.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Pet.h	(revision 6748)
+@@ -96,6 +96,23 @@
+     PET_TALK_ATTACK         = 1
+ };
+ 
++enum PetNameInvalidReason
++{
++    PET_NAME_INVALID                                        = 1,
++    PET_NAME_NO_NAME                                        = 2,
++    PET_NAME_TOO_SHORT                                      = 3,
++    PET_NAME_TOO_LONG                                       = 4,
++    PET_NAME_MIXED_LANGUAGES                                = 6,
++    PET_NAME_PROFANE                                        = 7,
++    PET_NAME_RESERVED                                       = 8,
++    PET_NAME_THREE_CONSECUTIVE                              = 11,
++    PET_NAME_INVALID_SPACE                                  = 12,
++    PET_NAME_CONSECUTIVE_SPACES                             = 13,
++    PET_NAME_RUSSIAN_CONSECUTIVE_SILENT_CHARACTERS          = 14,
++    PET_NAME_RUSSIAN_SILENT_CHARACTER_AT_BEGINNING_OR_END   = 15,
++    PET_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME              = 16
++};
++
+ typedef HM_NAMESPACE::hash_map<uint16, PetSpell*> PetSpellMap;
+ typedef std::map<uint32,uint32> TeachSpellMap;
+ typedef std::vector<uint32> AutoSpellList;
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSocket.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSocket.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSocket.cpp	(revision 6748)
+@@ -230,7 +230,7 @@
+     uint32 unk2;
+     uint32 BuiltNumberClient;
+     uint32 id, security;
+-    bool tbc = false;
++    uint8 expansion = 0;
+     std::string account;
+     Sha1Hash sha1;
+     BigNumber v, s, g, N, x, I;
+@@ -275,7 +275,7 @@
+ 
+     Field* fields = result->Fetch();
+ 
+-    tbc = fields[8].GetUInt8() && sWorld.getConfig(CONFIG_EXPANSION) > 0;
++    expansion = (sWorld.getConfig(CONFIG_EXPANSION) > 0) ? fields[8].GetUInt8() : 0;
+ 
+     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
+     g.SetDword(7);
+@@ -404,11 +404,11 @@
+     packet << uint32(0);                                    // unknown random value...
+     packet << uint8(0);                                     // can be 0 and 2
+     packet << uint32(0);                                    // const 0
+-    packet << uint8(tbc ? 1 : 0);                           // 0 - normal, 1 - TBC, must be set in database manually for each account
++    packet << uint8(expansion);                             // 0 - classic, 1 - TBC, 2 - WotLK, must be set in database manually for each account
+     SendPacket(&packet);
+ 
+     ///- Create a new WorldSession for the player and add it to the World
+-    _session = new WorldSession(id, this,security,tbc,mutetime,locale);
++    _session = new WorldSession(id, this,security,expansion,mutetime,locale);
+     sWorld.AddSession(_session);
+ 
+     if(sLog.IsOutDebug())                                   // optimize disabled debug output
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/AggressorAI.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/AggressorAI.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/AggressorAI.cpp	(revision 6748)
+@@ -46,7 +46,7 @@
+     // Ignore Z for flying creatures
+     if( !i_creature.canFly() && i_creature.GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE )
+         return;
+-    
++
+     if( !i_creature.getVictim() && !i_creature.hasUnitState(UNIT_STAT_STUNNED) && u->isTargetableForAttack() &&
+         ( i_creature.IsHostileTo( u ) /*|| u->getVictim() && i_creature.IsFriendlyTo( u->getVictim() )*/ ) &&
+         u->isInAccessablePlaceFor(&i_creature) )
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/DynamicObject.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/DynamicObject.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/DynamicObject.cpp	(revision 6748)
+@@ -68,7 +68,7 @@
+         return false;
+     }
+ 
+-    SetUInt32Value( OBJECT_FIELD_ENTRY, spellId );
++    SetEntry(spellId);
+     SetFloatValue( OBJECT_FIELD_SCALE_X, 1 );
+     SetUInt64Value( DYNAMICOBJECT_CASTER, caster->GetGUID() );
+     SetUInt32Value( DYNAMICOBJECT_BYTES, 0x00000001 );
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/TargetedMovementGenerator.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/TargetedMovementGenerator.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/TargetedMovementGenerator.cpp	(revision 6748)
+@@ -99,7 +99,7 @@
+ 
+     if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->canFly())
+         owner.AddUnitMovementFlag(MOVEMENTFLAG_FLYING2);
+-    
++
+     _setTargetLocation(owner);
+ }
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Unit.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Unit.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Unit.h	(revision 6748)
+@@ -213,6 +213,8 @@
+     HITINFO_ABSORB              = 0x00000020,               // plays absorb sound
+     HITINFO_RESIST              = 0x00000040,               // resisted atleast some damage
+     HITINFO_CRITICALHIT         = 0x00000080,
++    HITINFO_UNK2                = 0x00000100,               // wotlk?
++    HITINFO_UNK3                = 0x00002000,               // wotlk?
+     HITINFO_GLANCING            = 0x00004000,
+     HITINFO_CRUSHING            = 0x00008000,
+     HITINFO_NOACTION            = 0x00010000,
+@@ -509,7 +511,7 @@
+     UNIT_NPC_FLAG_AUCTIONEER            = 0x00200000,       // 100%
+     UNIT_NPC_FLAG_STABLEMASTER          = 0x00400000,       // 100%
+     UNIT_NPC_FLAG_GUILD_BANKER          = 0x00800000,       // cause client to send 997 opcode
+-    UNIT_NPC_FLAG_UNK3                  = 0x01000000,       // cause client to send 1015 opcode
++    UNIT_NPC_FLAG_SPELLCLICK            = 0x01000000,       // cause client to send 1015 opcode (spell click)
+     UNIT_NPC_FLAG_GUARD                 = 0x10000000,       // custom flag for guards
+ };
+ 
+@@ -1317,6 +1319,7 @@
+         bool HandleProcTriggerSpell(Unit *pVictim,uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell, uint32 procFlags,WeaponAttackType attType,uint32 cooldown);
+         bool HandleHasteAuraProc(Unit *pVictim, SpellEntry const *spellProto, uint32 effIndex, uint32 damage, Aura* triggredByAura, SpellEntry const * procSpell, uint32 procFlag,uint32 cooldown);
+         bool HandleOverrideClassScriptAuraProc(Unit *pVictim, int32 scriptId, uint32 damage, Aura* triggredByAura, SpellEntry const *procSpell,uint32 cooldown);
++
+         uint32 m_state;                                     // Even derived shouldn't modify
+         uint32 m_CombatTimer;
+         uint32 m_lastManaUse;                               // msecs
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GroupHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GroupHandler.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GroupHandler.cpp	(revision 6748)
+@@ -93,12 +93,6 @@
+         return;
+     }
+     // just ignore us
+-    if(player->GetInstanceId() != 0 && player->GetDifficulty() != GetPlayer()->GetDifficulty())
+-    {
+-        SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_TARGET_IGNORE_YOU);
+-        return;
+-    }
+-
+     if(player->GetSocial()->HasIgnore(GetPlayer()->GetGUIDLow()))
+     {
+         SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_TARGET_IGNORE_YOU);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.h	(revision 6748)
+@@ -403,7 +403,7 @@
+         void SetInitialWorldSettings();
+         void LoadConfigSettings(bool reload = false);
+ 
+-        void SendWorldText(int32 string_id, ...); 
++        void SendWorldText(int32 string_id, ...);
+         void SendGlobalMessage(WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
+         void SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
+         void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/debugcmds.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/debugcmds.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/debugcmds.cpp	(revision 6748)
+@@ -30,6 +30,7 @@
+ #include "GossipDef.h"
+ #include "Language.h"
+ #include "MapManager.h"
++#include <fstream>
+ 
+ bool ChatHandler::HandleDebugInArcCommand(const char* /*args*/)
+ {
+@@ -130,64 +131,66 @@
+     if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
+         unit = m_session->GetPlayer();
+ 
+-    FILE *file = fopen("opcode.txt", "r");
+-    if(!file)
++    std::ifstream ifs("opcode.txt");
++    if(ifs.bad())
+         return false;
+ 
+-    uint32 type;
++    uint32 opcode;
++    ifs >> opcode;
+ 
+-    uint32 val1;
+-    uint64 val2;
+-    float val3;
+-    char val4[101];
++    WorldPacket data(opcode, 0);
+ 
+-    uint32 opcode = 0;
+-    fscanf(file, "%u", &opcode);
+-    if(!opcode)
++    while(!ifs.eof())
+     {
+-        fclose(file);
+-        return false;
+-    }
++        std::string type;
++        ifs >> type;
+ 
+-    WorldPacket data(opcode, 0);
+-
+-    while(fscanf(file, "%u", &type) != EOF)
+-    {
+-        switch(type)
++        if(type == "uint8")
+         {
+-            case 0:                                         // uint8
+-                fscanf(file, "%u", &val1);
+-                data << uint8(val1);
+-                break;
+-            case 1:                                         // uint16
+-                fscanf(file, "%u", &val1);
+-                data << uint16(val1);
+-                break;
+-            case 2:                                         // uint32
+-                fscanf(file, "%u", &val1);
+-                data << uint32(val1);
+-                break;
+-            case 3:                                         // uint64
+-                fscanf(file, I64FMTD, &val2);
+-                data << uint64(val2);
+-                break;
+-            case 4:                                         // float
+-                fscanf(file, "%f", &val3);
+-                data << float(val3);
+-                break;
+-            case 5:                                         // string
+-                fscanf(file, "%s", val4, 101);
+-                data << val4;
+-                break;
+-            case 6:                                         // packed guid
+-                data.append(unit->GetPackGUID());
+-                break;
+-            default:
+-                fclose(file);
+-                return false;
++            uint8 val1;
++            ifs >> val1;
++            data << val1;
+         }
++        else if(type == "uint16")
++        {
++            uint16 val2;
++            ifs >> val2;
++            data << val2;
++        }
++        else if(type == "uint32")
++        {
++            uint32 val3;
++            ifs >> val3;
++            data << val3;
++        }
++        else if(type == "uint64")
++        {
++            uint64 val4;
++            ifs >> val4;
++            data << val4;
++        }
++        else if(type == "float")
++        {
++            float val5;
++            ifs >> val5;
++            data << val5;
++        }
++        else if(type == "string")
++        {
++            std::string val6;
++            ifs >> val6;
++            data << val6;
++        }
++        else if(type == "pguid")
++        {
++            data.append(unit->GetPackGUID());
++        }
++        else
++        {
++            sLog.outDebug("Sending opcode: unknown type %s", type.c_str());
++        }
+     }
+-    fclose(file);
++    ifs.close();
+     sLog.outDebug("Sending opcode %u", data.GetOpcode());
+     data.hexlike();
+     ((Player*)unit)->GetSession()->SendPacket(&data);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Item.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Item.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Item.cpp	(revision 6748)
+@@ -177,7 +177,7 @@
+                 case ITEM_SUBCLASS_CONTAINER:
+                     return true;
+                 case ITEM_SUBCLASS_SOUL_CONTAINER:
+-                    if(!(pProto->BagFamily & BAG_FAMILY_MASK_SHARDS))
++                    if(!(pProto->BagFamily & BAG_FAMILY_MASK_SOUL_SHARDS))
+                         return false;
+                     return true;
+                 case ITEM_SUBCLASS_HERB_CONTAINER:
+@@ -245,7 +245,7 @@
+ {
+     Object::_Create( guidlow, 0, HIGHGUID_ITEM );
+ 
+-    SetUInt32Value(OBJECT_FIELD_ENTRY, itemid);
++    SetEntry(itemid);
+     SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
+ 
+     SetUInt64Value(ITEM_FIELD_OWNER, owner ? owner->GetGUID() : 0);
+@@ -427,7 +427,7 @@
+ 
+ ItemPrototype const *Item::GetProto() const
+ {
+-    return objmgr.GetItemPrototype(GetUInt32Value(OBJECT_FIELD_ENTRY));
++    return objmgr.GetItemPrototype(GetEntry());
+ }
+ 
+ Player* Item::GetOwner()const
+@@ -760,9 +760,7 @@
+ void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges)
+ {
+     // Better lost small time at check in comparison lost time at item save to DB.
+-    if( GetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET)==id &&
+-        GetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET)==duration &&
+-        GetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET)==charges )
++    if((GetEnchantmentId(slot) == id) && (GetEnchantmentDuration(slot) == duration) && (GetEnchantmentCharges(slot) == charges))
+         return;
+ 
+     SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET,id);
+@@ -773,7 +771,7 @@
+ 
+ void Item::SetEnchantmentDuration(EnchantmentSlot slot, uint32 duration)
+ {
+-    if(GetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET)==duration)
++    if(GetEnchantmentDuration(slot) == duration)
+         return;
+ 
+     SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET,duration);
+@@ -782,17 +780,20 @@
+ 
+ void Item::SetEnchantmentCharges(EnchantmentSlot slot, uint32 charges)
+ {
++    if(GetEnchantmentCharges(slot) == charges)
++        return;
++
+     SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET,charges);
+     SetState(ITEM_CHANGED);
+ }
+ 
+ void Item::ClearEnchantment(EnchantmentSlot slot)
+ {
+-    if(!GetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET))
++    if(!GetEnchantmentId(slot))
+         return;
+ 
+-    for(int x=0;x<3;x++)
+-        SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + x,0);
++    for(uint8 x = 0; x < 3; ++x)
++        SetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + x, 0);
+     SetState(ITEM_CHANGED);
+ }
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/WorldSession.h	(revision 6748)
+@@ -28,6 +28,7 @@
+ class MailItemsInfo;
+ struct ItemPrototype;
+ struct AuctionEntry;
++struct DeclinedName;
+ 
+ class Creature;
+ class Item;
+@@ -80,6 +81,7 @@
+         void SendPacket(WorldPacket const* packet);
+         void SendNotification(const char *format,...) ATTR_PRINTF(2,3);
+         void SendNotification(int32 string_id,...);
++        void SendPetNameInvalid(uint32 error, std::string name, DeclinedName *declinedName);
+         void SendLfgResult(uint32 type, uint32 entry, uint8 lfg_type);
+         void SendPartyResult(PartyOperation operation, std::string member, PartyResult res);
+         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
+@@ -527,7 +529,7 @@
+         void HandlePetCancelAuraOpcode( WorldPacket& recvPacket );
+         void HandlePetUnlearnOpcode( WorldPacket& recvPacket );
+         void HandlePetSpellAutocastOpcode( WorldPacket& recvPacket );
+-        void HandleAddDynamicTargetObsoleteOpcode( WorldPacket& recvPacket );
++        void HandlePetCastSpellOpcode( WorldPacket& recvPacket );
+ 
+         void HandleSetActionBar(WorldPacket& recv_data);
+ 
+@@ -618,6 +620,7 @@
+ 
+         // logging helper
+         void logUnexpectedOpcode(WorldPacket *packet, const char * reason);
++
+         Player *_player;
+         WorldSocket *_socket;
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GameObject.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GameObject.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/GameObject.cpp	(revision 6748)
+@@ -133,7 +133,7 @@
+     SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
+     SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+ 
+-    SetUInt32Value(OBJECT_FIELD_ENTRY, goinfo->id);
++    SetEntry(goinfo->id);
+ 
+     SetUInt32Value(GAMEOBJECT_DISPLAYID, goinfo->displayId);
+ 
+@@ -497,7 +497,7 @@
+ 
+     if (!goI)
+         return;
+-    
++
+     if (!m_DBTableGuid)
+         m_DBTableGuid = GetGUIDLow();
+     // update in loaded data (changing data only in this place)
+@@ -523,7 +523,7 @@
+     std::ostringstream ss;
+     ss << "INSERT INTO gameobject VALUES ( "
+         << m_DBTableGuid << ", "
+-        << GetUInt32Value (OBJECT_FIELD_ENTRY) << ", "
++        << GetEntry() << ", "
+         << mapid << ", "
+         << (uint32)spawnMask << ", "
+         << GetFloatValue(GAMEOBJECT_POS_X) << ", "
+@@ -535,8 +535,8 @@
+         << GetFloatValue(GAMEOBJECT_ROTATION+2) << ", "
+         << GetFloatValue(GAMEOBJECT_ROTATION+3) << ", "
+         << m_respawnDelayTime << ", "
+-        << GetGoAnimProgress() << ", "
+-        << GetGoState() << ")";
++        << (uint32)GetGoAnimProgress() << ", "
++        << (uint32)GetGoState() << ")";
+ 
+     WorldDatabase.BeginTransaction();
+     WorldDatabase.PExecuteLog("DELETE FROM gameobject WHERE guid = '%u'", m_DBTableGuid);
+@@ -1184,7 +1184,7 @@
+ 
+             Player* player = (Player*)user;
+ 
+-            if( player->isAllowUseBattleGroundObject() )     
++            if( player->isAllowUseBattleGroundObject() )
+             {
+                 // in battleground check
+                 BattleGround *bg = player->GetBattleGround();
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Unit.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Unit.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Unit.cpp	(revision 6748)
+@@ -348,6 +348,11 @@
+         case 1:                                             // stop packet
+             SendMessageToSet( &data, true );
+             return;
++        case 2:                                             // not used currently
++            data << float(0);
++            data << float(0);
++            data << float(0);
++            break;
+         case 3:                                             // not used currently
+             data << uint64(0);                              // probably target guid
+             break;
+@@ -1894,7 +1899,7 @@
+                 float basetime = float(pVictim->getAttackTimer(BASE_ATTACK));
+ 
+                 // after parry nearest next attack time will reduced at %40 from full attack time.
+-                // The delay cannot be reduced to less than 20% of your weapon's base swing delay.
++                // The delay cannot be reduced to less than 20% of your weapon base swing delay.
+                 if (pVictim->haveOffhandWeapon() && offtime < basetime)
+                 {
+                     float percent20 = pVictim->GetAttackTime(OFF_ATTACK)*0.20;
+@@ -7238,6 +7243,7 @@
+                     TakenTotalMod *= (100.0f+(*i)->GetModifier()->m_amount)/100.0f; break;
+         }
+     }
++
+     // .. taken pct: dummy auras
+     AuraList const& mDummyAuras = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
+     for(AuraList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
+@@ -7707,7 +7713,6 @@
+     if(spellProto->Id == 15290 || spellProto->Id == 39373 || spellProto->Id == 33778 || spellProto->Id == 379 || spellProto->Id == 38395)
+         return healamount;
+ 
+-
+     int32 AdvertisedBenefit = SpellBaseHealingBonus(GetSpellSchoolMask(spellProto));
+     uint32 CastingTime = GetSpellCastTime(spellProto);
+ 
+@@ -10301,7 +10306,7 @@
+ 
+     WorldPacket data(SMSG_SPELL_COOLDOWN, 8+1+4+4);
+     data << uint64(GetGUID());
+-    data << uint8(0x0);
++    data << uint8(0x0);                                     // flags (0x1, 0x2)
+     data << uint32(spellid);
+     data << uint32(cooltime);
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SocialMgr.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SocialMgr.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SocialMgr.cpp	(revision 6748)
+@@ -327,7 +327,7 @@
+             continue;
+ 
+         social->m_playerSocialMap[friend_guid] = FriendInfo(flags, note);
+-        
++
+         if(flags & SOCIAL_FLAG_IGNORED)
+             ignoreCounter++;
+         else
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellAuras.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellAuras.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SpellAuras.h	(revision 6748)
+@@ -251,7 +251,7 @@
+         {
+             uint8 slot = GetAuraSlot();
+ 
+-            // only aura inslot with charges and without stack limitation
++            // only aura in slot with charges and without stack limitation
+             if (slot < MAX_AURAS && m_procCharges >= 1 && GetSpellProto()->StackAmount==0)
+                 SetAuraApplication(slot, m_procCharges - 1);
+         }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ObjectMgr.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ObjectMgr.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ObjectMgr.h	(revision 6748)
+@@ -228,7 +228,6 @@
+ // NPC gossip text id
+ typedef HM_NAMESPACE::hash_map<uint32, uint32> CacheNpcTextIdMap;
+ 
+-
+ typedef HM_NAMESPACE::hash_map<uint32, VendorItemData> CacheVendorItemMap;
+ typedef HM_NAMESPACE::hash_map<uint32, TrainerSpellData> CacheTrainerSpellMap;
+ 
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Spell.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Spell.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Spell.h	(revision 6748)
+@@ -64,7 +64,13 @@
+     CAST_FLAG_UNKNOWN1           = 0x00000002,
+     CAST_FLAG_UNKNOWN2           = 0x00000010,
+     CAST_FLAG_AMMO               = 0x00000020,
+-    CAST_FLAG_UNKNOWN3           = 0x00000100
++    CAST_FLAG_UNKNOWN8           = 0x00000040,
++    CAST_FLAG_UNKNOWN9           = 0x00000080,
++    CAST_FLAG_UNKNOWN3           = 0x00000100,
++    CAST_FLAG_UNKNOWN6           = 0x00000800,              // wotlk
++    CAST_FLAG_UNKNOWN4           = 0x00020000,              // wotlk
++    CAST_FLAG_UNKNOWN5           = 0x00080000,              // wotlk
++    CAST_FLAG_UNKNOWN7           = 0x00200000               // wotlk
+ };
+ 
+ enum SpellNotifyPushType
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/World.cpp	(revision 6748)
+@@ -491,7 +491,6 @@
+     else
+         m_configs[CONFIG_SOCKET_SELECTTIME] = sConfig.GetIntDefault("SocketSelectTime", DEFAULT_SOCKET_SELECT_TIME);
+ 
+-
+     m_configs[CONFIG_TCP_NO_DELAY] = sConfig.GetBoolDefault("TcpNoDelay", false);
+     m_configs[CONFIG_GROUP_XP_DISTANCE] = sConfig.GetIntDefault("MaxGroupXPDistance", 74);
+     /// \todo Add MonsterSight and GuarderSight (with meaning) in mangosd.conf or put them as define
+@@ -553,7 +552,6 @@
+         m_configs[CONFIG_SKIP_CINEMATICS] = 0;
+     }
+ 
+-
+     if(reload)
+     {
+         uint32 val = sConfig.GetIntDefault("MaxPlayerLevel", 60);
+@@ -729,7 +727,6 @@
+     m_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfig.GetIntDefault("ListenRange.TextEmote", 25);
+     m_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfig.GetIntDefault("ListenRange.Yell", 300);
+ 
+-
+     m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
+     if(m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
+     {
+@@ -972,11 +969,10 @@
+ 
+     sLog.outString( "Loading Tavern Area Triggers..." );
+     objmgr.LoadTavernAreaTriggers();
+-    
++
+     sLog.outString( "Loading AreaTrigger script names..." );
+     objmgr.LoadAreaTriggerScripts();
+ 
+-
+     sLog.outString( "Loading Graveyard-zone links...");
+     objmgr.LoadGraveyardZones();
+ 
+@@ -1133,6 +1129,7 @@
+ 
+     sLog.outString( "WORLD: World initialized" );
+ }
++
+ void World::DetectDBCLang()
+ {
+     uint32 m_lang_confid = sConfig.GetIntDefault("DBC.Locale", 255);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level2.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level2.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Level2.cpp	(revision 6748)
+@@ -1301,7 +1301,6 @@
+     }
+     uint32 itemId = atol(pitem);
+ 
+-
+     if(!objmgr.RemoveVendorItem(vendor->GetEntry(),itemId))
+     {
+         PSendSysMessage(LANG_ITEM_NOT_IN_LIST,itemId);
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ItemPrototype.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ItemPrototype.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ItemPrototype.h	(revision 6748)
+@@ -97,16 +97,18 @@
+     ITEM_FLAGS_UNIQUE_EQUIPPED                = 0x00080000,
+     ITEM_FLAGS_USEABLE_IN_ARENA               = 0x00200000,
+     ITEM_FLAGS_THROWABLE                      = 0x00400000, // not used in game for check trow possibility, only for item in game tooltip
+-    ITEM_FLAGS_SPECIALUSE                     = 0x00800000  // last used flag in 2.3.0
++    ITEM_FLAGS_SPECIALUSE                     = 0x00800000, // last used flag in 2.3.0
++    ITEM_FLAGS_BOA                            = 0x08000000, // bind on account
++    ITEM_FLAGS_MILLABLE                       = 0x20000000
+ };
+ 
+ enum BAG_FAMILY_MASK
+ {
+     BAG_FAMILY_MASK_ARROWS                    = 0x00000001,
+     BAG_FAMILY_MASK_BULLETS                   = 0x00000002,
+-    BAG_FAMILY_MASK_SHARDS                    = 0x00000004,
++    BAG_FAMILY_MASK_SOUL_SHARDS               = 0x00000004,
+     BAG_FAMILY_MASK_LEATHERWORKING_SUPP       = 0x00000008,
+-    BAG_FAMILY_MASK_UNUSED                    = 0x00000010, // not used currently
++    BAG_FAMILY_MASK_INSCRIPTION_SUPP          = 0x00000010,
+     BAG_FAMILY_MASK_HERBS                     = 0x00000020,
+     BAG_FAMILY_MASK_ENCHANTING_SUPP           = 0x00000040,
+     BAG_FAMILY_MASK_ENGINEERING_SUPP          = 0x00000080,
+@@ -114,13 +116,11 @@
+     BAG_FAMILY_MASK_GEMS                      = 0x00000200,
+     BAG_FAMILY_MASK_MINING_SUPP               = 0x00000400,
+     BAG_FAMILY_MASK_SOULBOUND_EQUIPMENT       = 0x00000800,
+-    BAG_FAMILY_MASK_VANITY_PETS               = 0x00001000
++    BAG_FAMILY_MASK_VANITY_PETS               = 0x00001000,
++    BAG_FAMILY_MASK_CURRENCY_TOKENS           = 0x00002000,
++    BAG_FAMILY_MASK_QUEST_ITEMS               = 0x00004000
+ };
+ 
+-/* TODO: Not entirely positive on need for this??
+-enum SOCKET_CONTENT ();
+-*/
+-
+ enum SocketColor
+ {
+     SOCKET_COLOR_META                           = 1,
+@@ -273,7 +273,7 @@
+     ITEM_SUBCLASS_ARMOR_TOTEM                   = 9
+ };
+ 
+-#define MAX_ITEM_SUBCLASS_ARMOR                  10
++#define MAX_ITEM_SUBCLASS_ARMOR                   10
+ 
+ enum ItemSubclassReagent
+ {
+@@ -388,6 +388,22 @@
+ 
+ #define MAX_ITEM_SUBCLASS_JUNK                    6
+ 
++enum ItemSubclassGlyph
++{
++    ITEM_SUBCLASS_GLYPH_WARRIOR                 = 1,
++    ITEM_SUBCLASS_GLYPH_PALADIN                 = 2,
++    ITEM_SUBCLASS_GLYPH_HUNTER                  = 3,
++    ITEM_SUBCLASS_GLYPH_ROGUE                   = 4,
++    ITEM_SUBCLASS_GLYPH_PRIEST                  = 5,
++    ITEM_SUBCLASS_GLYPH_DEATH_KNIGHT            = 6,
++    ITEM_SUBCLASS_GLYPH_SHAMAN                  = 7,
++    ITEM_SUBCLASS_GLYPH_MAGE                    = 8,
++    ITEM_SUBCLASS_GLYPH_WARLOCK                 = 9,
++    ITEM_SUBCLASS_GLYPH_DRUID                   = 11
++};
++
++#define MAX_ITEM_SUBCLASS_GLYPH                   12
++
+ const uint32 MaxItemSubclassValues[MAX_ITEM_CLASS] =
+ {
+     MAX_ITEM_SUBCLASS_CONSUMABLE,
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/CharacterHandler.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/CharacterHandler.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/CharacterHandler.cpp	(revision 6748)
+@@ -981,35 +981,35 @@
+ {
+     uint64 guid;
+ 
+-    CHECK_PACKET_SIZE(recv_data, 8+6);
++    CHECK_PACKET_SIZE(recv_data, 8);
+     recv_data >> guid;
+ 
+     // not accept declined names for unsupported languages
+     std::string name;
+-    if(!objmgr.GetPlayerNameByGUID(guid,name))
++    if(!objmgr.GetPlayerNameByGUID(guid, name))
+     {
+-        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT,4+8);
+-        data << (uint32)1;
+-        data << guid;
++        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4+8);
++        data << uint32(1);
++        data << uint64(guid);
+         SendPacket(&data);
+         return;
+     }
+ 
+     std::wstring wname;
+-    if(!Utf8toWStr(name,wname))
++    if(!Utf8toWStr(name, wname))
+     {
+-        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT,4+8);
+-        data << (uint32)1;
+-        data << guid;
++        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4+8);
++        data << uint32(1);
++        data << uint64(guid);
+         SendPacket(&data);
+         return;
+     }
+ 
+     if(!isCyrillicCharacter(wname[0]))                      // name already stored as only single alphabet using
+     {
+-        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT,4+8);
+-        data << (uint32)1;
+-        data << guid;
++        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4+8);
++        data << uint32(1);
++        data << uint64(guid);
+         SendPacket(&data);
+         return;
+     }
+@@ -1017,35 +1017,37 @@
+     std::string name2;
+     DeclinedName declinedname;
+ 
++    CHECK_PACKET_SIZE(recv_data, recv_data.rpos() + 1);
+     recv_data >> name2;
+ 
+-    if(name2!=name)                                         // character have different name
++    if(name2 != name)                                       // character have different name
+     {
+-        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT,4+8);
+-        data << (uint32)1;
+-        data << guid;
++        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4+8);
++        data << uint32(1);
++        data << uint64(guid);
+         SendPacket(&data);
+         return;
+     }
+ 
+     for(int i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
+     {
++        CHECK_PACKET_SIZE(recv_data, recv_data.rpos() + 1);
+         recv_data >> declinedname.name[i];
+         if(!normalizePlayerName(declinedname.name[i]))
+         {
+-            WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT,4+8);
+-            data << (uint32)1;
+-            data << guid;
++            WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4+8);
++            data << uint32(1);
++            data << uint64(guid);
+             SendPacket(&data);
+             return;
+         }
+     }
+ 
+-    if(!ObjectMgr::CheckDeclinedNames(GetMainPartOfName(wname,0),declinedname))
++    if(!ObjectMgr::CheckDeclinedNames(GetMainPartOfName(wname, 0), declinedname))
+     {
+-        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT,4+8);
+-        data << (uint32)1;
+-        data << guid;
++        WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4+8);
++        data << uint32(1);
++        data << uint64(guid);
+         SendPacket(&data);
+         return;
+     }
+@@ -1056,11 +1058,11 @@
+     CharacterDatabase.BeginTransaction();
+     CharacterDatabase.PExecute("DELETE FROM character_declinedname WHERE guid = '%u'", GUID_LOPART(guid));
+     CharacterDatabase.PExecute("INSERT INTO character_declinedname (guid, genitive, dative, accusative, instrumental, prepositional) VALUES ('%u','%s','%s','%s','%s','%s')",
+-        GUID_LOPART(guid), declinedname.name[0].c_str(),declinedname.name[1].c_str(),declinedname.name[2].c_str(),declinedname.name[3].c_str(),declinedname.name[4].c_str());
++        GUID_LOPART(guid), declinedname.name[0].c_str(), declinedname.name[1].c_str(), declinedname.name[2].c_str(), declinedname.name[3].c_str(), declinedname.name[4].c_str());
+     CharacterDatabase.CommitTransaction();
+ 
+-    WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT,4+8);
+-    data << (uint32)0;                                      // OK
+-    data << guid;
++    WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4+8);
++    data << uint32(0);                                      // OK
++    data << uint64(guid);
+     SendPacket(&data);
+ }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/DestinationHolderImp.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/DestinationHolderImp.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/DestinationHolderImp.h	(revision 6748)
+@@ -154,13 +154,13 @@
+         }
+         // Change movement computation to micro movement based on last tick coords, this makes system work
+         // even on multiple floors zones without hugh vmaps usage ;)
+-        
++
+         // Take care of underrun of uint32
+         if (i_totalTravelTime >= i_timeElapsed)
+             i_totalTravelTime -= i_timeElapsed;     // Consider only the remaining part
+         else
+             i_totalTravelTime = 0;
+-        
++
+         i_timeElapsed = 0;
+         i_fromX = x;                            // and change origine
+         i_fromY = y;                            // then I take into account only micro movement
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Group.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Group.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Group.cpp	(revision 6748)
+@@ -858,7 +858,6 @@
+             data << (uint64)m_looterGuid;                   // looter guid
+             data << (uint8)m_lootThreshold;                 // loot threshold
+             data << (uint8)m_difficulty;                    // Heroic Mod Group
+-
+         }
+         player->GetSession()->SendPacket( &data );
+     }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Player.cpp	(revision 6748)
+@@ -5188,7 +5188,6 @@
+     // code block for underwater state update
+     UpdateUnderwaterState(m, x, y, z);
+ 
+-
+     CheckExploreSystem();
+ 
+     // group update
+@@ -11097,7 +11096,6 @@
+     }
+ }
+ 
+-
+ void Player::RemoveAllEnchantments(EnchantmentSlot slot)
+ {
+     // remove enchantments from equipped items first to clean up the m_enchantDuration list
+@@ -11927,7 +11925,7 @@
+     uint32 quest_id = pQuest->GetQuestId();
+ 
+     // if not exist then created with set uState==NEW and rewarded=false
+-    QuestStatusData& questStatusData =  mQuestStatus[quest_id];
++    QuestStatusData& questStatusData = mQuestStatus[quest_id];
+     if (questStatusData.uState != QUEST_NEW)
+         questStatusData.uState = QUEST_CHANGED;
+ 
+@@ -15603,7 +15601,6 @@
+     }
+ }
+ 
+-
+ void Player::RemoveMiniPet()
+ {
+     if(Pet* pet = GetMiniPet())
+@@ -16289,7 +16286,7 @@
+                                                             // last check 2.0.10
+     WorldPacket data(SMSG_SPELL_COOLDOWN, 8+1+m_spells.size()*8);
+     data << GetGUID();
+-    data << uint8(0x0);
++    data << uint8(0x0);                                     // flags (0x1, 0x2)
+     time_t curTime = time(NULL);
+     for(PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
+     {
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Item.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Item.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Item.h	(revision 6748)
+@@ -226,7 +226,6 @@
+         bool IsLimitedToAnotherMapOrZone( uint32 cur_mapId, uint32 cur_zoneId) const;
+         bool GemsFitSockets() const;
+ 
+-        uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
+         uint32 GetCount() const { return GetUInt32Value (ITEM_FIELD_STACK_COUNT); }
+         void SetCount(uint32 value) { SetUInt32Value (ITEM_FIELD_STACK_COUNT, value); }
+         uint32 GetMaxStackCount() const { return GetProto()->Stackable; }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PointMovementGenerator.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PointMovementGenerator.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/PointMovementGenerator.cpp	(revision 6748)
+@@ -30,7 +30,7 @@
+     unit.StopMoving();
+     Traveller<T> traveller(unit);
+     i_destinationHolder.SetDestination(traveller,i_x,i_y,i_z);
+-    
++
+     if (unit.GetTypeId() == TYPEID_UNIT && ((Creature*)&unit)->canFly())
+         unit.AddUnitMovementFlag(MOVEMENTFLAG_FLYING2);
+ }
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Spell.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Spell.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Spell.cpp	(revision 6748)
+@@ -164,8 +164,9 @@
+         m_unitTargetGUID = caster->GetGUID();
+         return true;
+     }
++
+     // TARGET_FLAG_UNK2 is used for non-combat pets, maybe other?
+-    if( m_targetMask & (TARGET_FLAG_UNIT|TARGET_FLAG_UNK2) )
++    if( m_targetMask & ( TARGET_FLAG_UNIT | TARGET_FLAG_UNK2 ))
+         if(!readGUID(*data, m_unitTargetGUID))
+             return false;
+ 
+@@ -3188,7 +3189,6 @@
+         if(m_spellInfo->TargetAuraStateNot && target->HasAuraState(AuraState(m_spellInfo->TargetAuraStateNot)))
+             return SPELL_FAILED_TARGET_AURASTATE;
+ 
+-
+         if(target != m_caster)
+         {
+             // target state requirements (apply to non-self only), to allow cast affects to self like Dirty Deeds
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/LootMgr.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/LootMgr.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/LootMgr.cpp	(revision 6748)
+@@ -45,7 +45,6 @@
+ LootStore LootTemplates_Reference(    "reference_loot_template",    "reference id");
+ LootStore LootTemplates_Skinning(     "skinning_loot_template",     "creature skinning id");
+ 
+-
+ class LootTemplate::LootGroup                               // A set of loot definitions for items (refs are not allowed)
+ {
+     public:
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Pet.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Pet.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Pet.cpp	(revision 6748)
+@@ -1215,7 +1215,7 @@
+ 
+         WorldPacket data(SMSG_SPELL_COOLDOWN, (8+1+result->GetRowCount()*8));
+         data << GetGUID();
+-        data << uint8(0x0);
++        data << uint8(0x0);                                 // flags (0x1, 0x2)
+ 
+         do
+         {
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Opcodes.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Opcodes.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Opcodes.cpp	(revision 6748)
+@@ -311,7 +311,6 @@
+     /*0x11A*/ { "CMSG_ACCEPT_TRADE",                STATUS_LOGGEDIN, &WorldSession::HandleAcceptTradeOpcode         },
+     /*0x11B*/ { "CMSG_UNACCEPT_TRADE",              STATUS_LOGGEDIN, &WorldSession::HandleUnacceptTradeOpcode       },
+     /*0x11C*/ { "CMSG_CANCEL_TRADE",                STATUS_AUTHED,   &WorldSession::HandleCancelTradeOpcode         },
+-                                                            // also send after logout complete
+     /*0x11D*/ { "CMSG_SET_TRADE_ITEM",              STATUS_LOGGEDIN, &WorldSession::HandleSetTradeItemOpcode        },
+     /*0x11E*/ { "CMSG_CLEAR_TRADE_ITEM",            STATUS_LOGGEDIN, &WorldSession::HandleClearTradeItemOpcode      },
+     /*0x11F*/ { "CMSG_SET_TRADE_GOLD",              STATUS_LOGGEDIN, &WorldSession::HandleSetTradeGoldOpcode        },
+@@ -523,7 +522,7 @@
+     /*0x1ED*/ { "CMSG_AUTH_SESSION",                STATUS_NEVER,    &WorldSession::Handle_EarlyProccess            },
+     /*0x1EE*/ { "SMSG_AUTH_RESPONSE",               STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
+     /*0x1EF*/ { "MSG_GM_SHOWLABEL",                 STATUS_NEVER,    &WorldSession::Handle_NULL                     },
+-    /*0x1F0*/ { "CMSG_PET_CAST_SPELL",              STATUS_LOGGEDIN, &WorldSession::HandleAddDynamicTargetObsoleteOpcode},
++    /*0x1F0*/ { "CMSG_PET_CAST_SPELL",              STATUS_LOGGEDIN, &WorldSession::HandlePetCastSpellOpcode        },
+     /*0x1F1*/ { "MSG_SAVE_GUILD_EMBLEM",            STATUS_LOGGEDIN, &WorldSession::HandleGuildSaveEmblemOpcode     },
+     /*0x1F2*/ { "MSG_TABARDVENDOR_ACTIVATE",        STATUS_LOGGEDIN, &WorldSession::HandleTabardVendorActivateOpcode},
+     /*0x1F3*/ { "SMSG_PLAY_SPELL_VISUAL",           STATUS_NEVER,    &WorldSession::Handle_ServerSide               },
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/RandomMovementGenerator.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/RandomMovementGenerator.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/RandomMovementGenerator.h	(revision 6748)
+@@ -23,7 +23,6 @@
+ #include "DestinationHolder.h"
+ #include "Traveller.h"
+ 
+-
+ template<class T>
+ class MANGOS_DLL_SPEC RandomMovementGenerator
+ : public MovementGeneratorMedium< T, RandomMovementGenerator<T> >
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SharedDefines.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SharedDefines.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/SharedDefines.h	(revision 6748)
+@@ -64,7 +64,7 @@
+     CLASS_HUNTER        = 3,
+     CLASS_ROGUE         = 4,
+     CLASS_PRIEST        = 5,
+-    // CLASS_UNK1       = 6, DK
++    CLASS_DEATH_KNIGHT  = 6,
+     CLASS_SHAMAN        = 7,
+     CLASS_MAGE          = 8,
+     CLASS_WARLOCK       = 9,
+@@ -892,7 +892,7 @@
+     GAMEOBJECT_TYPE_CAPTURE_POINT          = 29,
+     GAMEOBJECT_TYPE_AURA_GENERATOR         = 30,
+     GAMEOBJECT_TYPE_DUNGEON_DIFFICULTY     = 31,
+-    GAMEOBJECT_TYPE_DO_NOT_USE_YET         = 32,
++    GAMEOBJECT_TYPE_BARBER_CHAIR           = 32,
+     GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING  = 33,
+     GAMEOBJECT_TYPE_GUILD_BANK             = 34,
+ };
+@@ -1480,7 +1480,7 @@
+ enum CreatureType
+ {
+     CREATURE_TYPE_BEAST            = 1,
+-    CREATURE_TYPE_DRAGON           = 2,
++    CREATURE_TYPE_DRAGONKIN        = 2,
+     CREATURE_TYPE_DEMON            = 3,
+     CREATURE_TYPE_ELEMENTAL        = 4,
+     CREATURE_TYPE_GIANT            = 5,
+@@ -1488,7 +1488,7 @@
+     CREATURE_TYPE_HUMANOID         = 7,
+     CREATURE_TYPE_CRITTER          = 8,
+     CREATURE_TYPE_MECHANICAL       = 9,
+-    CREATURE_TYPE_NOTSPECIFIED     = 10,
++    CREATURE_TYPE_NOT_SPECIFIED    = 10,
+     CREATURE_TYPE_TOTEM            = 11,
+     CREATURE_TYPE_NON_COMBAT_PET   = 12,
+     CREATURE_TYPE_GAS_CLOUD        = 13
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/MapInstanced.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/MapInstanced.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/MapInstanced.cpp	(revision 6748)
+@@ -249,4 +249,3 @@
+     delete itr->second;
+     m_InstancedMaps.erase(itr++);
+ }
+-
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/AuctionHouse.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/AuctionHouse.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/AuctionHouse.cpp	(revision 6748)
+@@ -87,8 +87,8 @@
+         sLog.outError("auction to item, that doesn't exist !!!!");
+         return false;
+     }
+-    data << auction->Id;
+-    data << pItem->GetUInt32Value(OBJECT_FIELD_ENTRY);
++    data << (uint32) auction->Id;
++    data << (uint32) pItem->GetEntry();
+ 
+     for (uint8 i = 0; i < MAX_INSPECTED_ENCHANTMENT_SLOT; i++)
+     {
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Creature.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Creature.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Creature.cpp	(revision 6748)
+@@ -96,7 +96,7 @@
+ lootForPickPocketed(false), lootForBody(false), m_groupLootTimer(0), lootingGroupLeaderGUID(0),
+ m_lootMoney(0), m_lootRecipient(0),
+ m_deathTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(0.0f),
+-m_gossipOptionLoaded(false),m_emoteState(0), m_isPet(false), m_isTotem(false),
++m_gossipOptionLoaded(false), m_emoteState(0), m_isPet(false), m_isTotem(false),
+ m_regenTimer(2000), m_defaultMovementType(IDLE_MOTION_TYPE), m_equipmentId(0),
+ m_AlreadyCallAssistence(false), m_regenHealth(true), m_AI_locked(false), m_isDeadByDefault(false),
+ m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),m_creatureInfo(NULL), m_DBTableGuid(0)
+@@ -181,7 +181,7 @@
+         }
+     }
+ 
+-    SetUInt32Value(OBJECT_FIELD_ENTRY, Entry);              // normal entry always
++    SetEntry(Entry);                                        // normal entry always
+     m_creatureInfo = cinfo;                                 // map mode related always
+ 
+     if (cinfo->DisplayID_A == 0 || cinfo->DisplayID_H == 0) // Cancel load if no model defined
+@@ -316,7 +316,7 @@
+                 lootForPickPocketed = false;
+                 lootForBody         = false;
+ 
+-                if(m_originalEntry != GetUInt32Value(OBJECT_FIELD_ENTRY))
++                if(m_originalEntry != GetEntry())
+                     UpdateEntry(m_originalEntry);
+ 
+                 CreatureInfo const *cinfo = GetCreatureInfo();
+@@ -349,7 +349,7 @@
+             if( m_deathTimer <= diff )
+             {
+                 RemoveCorpse();
+-                DEBUG_LOG("Removing corpse... %u ", GetUInt32Value(OBJECT_FIELD_ENTRY));
++                DEBUG_LOG("Removing corpse... %u ", GetEntry());
+             }
+             else
+             {
+@@ -380,7 +380,7 @@
+                 if( m_deathTimer <= diff )
+                 {
+                     RemoveCorpse();
+-                    DEBUG_LOG("Removing alive corpse... %u ", GetUInt32Value(OBJECT_FIELD_ENTRY));
++                    DEBUG_LOG("Removing alive corpse... %u ", GetEntry());
+                 }
+                 else
+                 {
+@@ -545,7 +545,6 @@
+ 
+     TrainerSpellData const* trainer_spells = GetTrainerSpells();
+ 
+-
+     if(!trainer_spells || trainer_spells->spellList.empty())
+     {
+         sLog.outErrorDb("Creature %u (Entry: %u) have UNIT_NPC_FLAG_TRAINER but have empty trainer spell list.",
+@@ -1353,7 +1352,7 @@
+     {
+         if (force)
+         {
+-            for (uint8 i=0;i<3;i++)
++            for (uint8 i = 0; i < 3; i++)
+             {
+                 SetUInt32Value( UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + i, 0);
+                 SetUInt32Value( UNIT_VIRTUAL_ITEM_INFO + (i * 2), 0);
+@@ -1369,7 +1368,7 @@
+         return;
+ 
+     m_equipmentId = equip_entry;
+-    for (uint8 i=0;i<3;i++)
++    for (uint8 i = 0; i < 3; i++)
+     {
+         SetUInt32Value( UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + i, einfo->equipmodel[i]);
+         SetUInt32Value( UNIT_VIRTUAL_ITEM_INFO + (i * 2), einfo->equipinfo[i]);
+@@ -1948,7 +1947,6 @@
+     return ObjectMgr::GetCreatureTemplate(GetEntry())->ScriptName;
+ }
+ 
+-
+ VendorItemData const* Creature::GetVendorItems() const
+ {
+     return objmgr.GetNpcVendorItemList(GetEntry());
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ObjectMgr.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ObjectMgr.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/ObjectMgr.cpp	(revision 6748)
+@@ -484,7 +484,6 @@
+ 
+         // will delete item or place to receiver mail list
+         WorldSession::SendMailTo(owner, MAIL_AUCTION, MAIL_STATIONERY_AUCTION, auction->location, GUID_LOPART(owner_guid), subject.str(), 0, &mi, 0, 0, MAIL_CHECK_MASK_NONE);
+-
+     }
+     // owner not found
+     else
+@@ -4481,6 +4480,7 @@
+     sLog.outString();
+     sLog.outString( ">> Loaded %u areatrigger scripts", count );
+ }
++
+ uint32 ObjectMgr::GetNearestTaxiNode( float x, float y, float z, uint32 mapid )
+ {
+     bool found = false;
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Map.cpp
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Map.cpp	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Map.cpp	(revision 6748)
+@@ -88,7 +88,7 @@
+     {
+         if(vmgr->isMapLoadingEnabled())
+         {
+-                                                            // x and y are swaped !! => fixed now
++                                                            // x and y are swapped !! => fixed now
+             bool exists = vmgr->existsMap((sWorld.GetDataPath()+ "vmaps").c_str(),  mapid, x,y);
+             if(!exists)
+             {
+@@ -104,7 +104,7 @@
+ 
+ void Map::LoadVMap(int x,int y)
+ {
+-                                                            // x and y are swaped !!
++                                                            // x and y are swapped !!
+     int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapManager()->loadMap((sWorld.GetDataPath()+ "vmaps").c_str(),  GetId(), x,y);
+     switch(vmapLoadResult)
+     {
+@@ -142,7 +142,7 @@
+         return;
+     }
+ 
+-    //map already load, delete it before reloading (Is it neccessary? Do we really need the abilty the reload maps during runtime?)
++    //map already load, delete it before reloading (Is it necessary? Do we really need the ability the reload maps during runtime?)
+     if(GridMaps[x][y])
+     {
+         sLog.outDetail("Unloading already loaded map %u before reloading.",mapid);
+@@ -311,7 +311,7 @@
+ template<class T>
+ void Map::DeleteFromWorld(T* obj)
+ {
+-    // Note: In case resurrectable corpse and pet its removed from gloabal lists in own destructors
++    // Note: In case resurrectable corpse and pet its removed from global lists in own destructor
+     delete obj;
+ }
+ 
+@@ -585,7 +585,6 @@
+         i_data->Update(t_diff);
+ }
+ 
+-
+ void Map::Remove(Player *player, bool remove)
+ {
+     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Language.h
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Language.h	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/src/game/Language.h	(revision 6748)
+@@ -623,7 +623,7 @@
+     // Room for BG/ARENA                  717-799 not used
+ 
+     // in game strings
+-    LANG_PET_INVALID_NAME               = 800,
++    //                                  = 800, not used
+     LANG_NOT_ENOUGH_GOLD                = 801,
+     LANG_NOT_FREE_TRADE_SLOTS           = 802,
+     LANG_NOT_PARTNER_FREE_TRADE_SLOTS   = 803,
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC71/shared.vcproj
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC71/shared.vcproj	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC71/shared.vcproj	(revision 6748)
+@@ -195,6 +195,9 @@
+ 			<Filter
+ 				Name="DataStores">
+ 				<File
++					RelativePath="..\..\src\shared\Database\DBCEnums.h">
++				</File>
++				<File
+ 					RelativePath="..\..\src\shared\Database\dbcfile.cpp">
+ 				</File>
+ 				<File
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC80/shared.vcproj
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC80/shared.vcproj	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC80/shared.vcproj	(revision 6748)
+@@ -436,6 +436,10 @@
+ 				Name="DataStores"
+ 				>
+ 				<File
++					RelativePath="..\..\src\shared\Database\DBCEnums.h"
++					>
++				</File>
++				<File
+ 					RelativePath="..\..\src\shared\Database\dbcfile.cpp"
+ 					>
+ 				</File>
+Index: C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC90/shared.vcproj
+===================================================================
+--- C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC90/shared.vcproj	(revision 6747)
++++ C:/Documents and Settings/Администратор/Рабочий стол/EmulatorX/Source/win/VC90/shared.vcproj	(revision 6748)
+@@ -445,6 +445,10 @@
+ 				Name="DataStores"
+ 				>
+ 				<File
++					RelativePath="..\..\src\shared\Database\DBCEnums.h"
++					>
++				</File>
++				<File
+ 					RelativePath="..\..\src\shared\Database\dbcfile.cpp"
+ 					>
+ 				</File>
+
+
+- Use SMSG_PET_NAME_INVALID opcode instead of db string.
+- Clean up and fixes.
