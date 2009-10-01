@@ -1698,7 +1698,7 @@ index 5eb6d62..1c81f03 100644
      UpdatePointsCount(Team);
  }
 diff --git a/src/game/BattleGroundHandler.cpp b/src/game/BattleGroundHandler.cpp
-index e26ed01..8fe600d 100644
+index 3b744f0..f699d3e 100644
 --- a/src/game/BattleGroundHandler.cpp
 +++ b/src/game/BattleGroundHandler.cpp
 @@ -26,9 +26,11 @@
@@ -2052,7 +2052,7 @@ index e26ed01..8fe600d 100644
 -            // if the player is dead, resurrect him before teleport
 -            if(!_player->isAlive())
 -            {
--                _player->ResurrectPlayer(1.0f,false);
+-                _player->ResurrectPlayer(1.0f);
 -                _player->SpawnCorpseBones();
 +                // if bg not found, then continue
 +                if(!bg)
@@ -2162,7 +2162,7 @@ index e26ed01..8fe600d 100644
 +                // resurrect the player
 +                if(!_player->isAlive())
 +                {
-+                    _player->ResurrectPlayer(1.0f,false);
++                    _player->ResurrectPlayer(1.0f);
 +                    _player->SpawnCorpseBones();
 +                }
 +                // stop taxi flight at port
@@ -4797,7 +4797,7 @@ index 0e9a38b..dd000ce 100644
  };
  #endif
 diff --git a/src/game/BattleGroundWS.cpp b/src/game/BattleGroundWS.cpp
-index 4334304..a82176a 100644
+index dfaf0d0..95bf61e 100644
 --- a/src/game/BattleGroundWS.cpp
 +++ b/src/game/BattleGroundWS.cpp
 @@ -49,6 +49,16 @@ void BattleGroundWS::Update(time_t diff)
@@ -5011,7 +5011,7 @@ index 7dcee62..1f9b8db 100644
      // in game strings
      //                                  = 800, not used
 diff --git a/src/game/Level1.cpp b/src/game/Level1.cpp
-index f5e4234..21da6d1 100644
+index 37b8b14..b590fa6 100644
 --- a/src/game/Level1.cpp
 +++ b/src/game/Level1.cpp
 @@ -351,7 +351,14 @@ bool ChatHandler::HandleNamegoCommand(const char* args)
@@ -5057,10 +5057,10 @@ index f5e4234..21da6d1 100644
 +        }
 +        else if(cMap->IsDungeon())
          {
-             Map* pMap = MapManager::Instance().GetMap(_player->GetMapId(),_player);
- 
+             // we have to go to instance, and can go to player only if:
+             //   1) we are in his group (either as leader or as member)
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index ed8fccf..d1a5603 100644
+index 2a12a53..5957b96 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -5082,7 +5082,7 @@ index ed8fccf..d1a5603 100644
 +    return true;
 +}
 diff --git a/src/game/MapInstanced.cpp b/src/game/MapInstanced.cpp
-index 741e0a9..5f7a033 100644
+index 79a8b88..ce4be94 100644
 --- a/src/game/MapInstanced.cpp
 +++ b/src/game/MapInstanced.cpp
 @@ -141,7 +141,17 @@ Map* MapInstanced::GetInstance(const WorldObject* obj)
@@ -5105,7 +5105,7 @@ index 741e0a9..5f7a033 100644
              InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), player->GetDifficulty());
              InstanceSave *pSave = pBind ? pBind->save : NULL;
 diff --git a/src/game/MapManager.cpp b/src/game/MapManager.cpp
-index a8d897b..82e4c8e 100644
+index 691448b..878b845 100644
 --- a/src/game/MapManager.cpp
 +++ b/src/game/MapManager.cpp
 @@ -107,7 +107,7 @@ MapManager::_GetBaseMap(uint32 id)
@@ -5115,7 +5115,7 @@ index a8d897b..82e4c8e 100644
 -        if (entry && entry->IsDungeon())
 +        if (entry && entry->Instanceable())
          {
-             m = new MapInstanced(id, i_gridCleanUpDelay, 0);
+             m = new MapInstanced(id, i_gridCleanUpDelay);
          }
 diff --git a/src/game/MiscHandler.cpp b/src/game/MiscHandler.cpp
 index 2d77c73..70293e6 100644
@@ -5133,7 +5133,7 @@ index 2d77c73..70293e6 100644
      if(!GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
          return;
 diff --git a/src/game/MovementHandler.cpp b/src/game/MovementHandler.cpp
-index 694bde8..5ad7778 100644
+index 8ebae23..b4d8402 100644
 --- a/src/game/MovementHandler.cpp
 +++ b/src/game/MovementHandler.cpp
 @@ -130,22 +130,28 @@ void WorldSession::HandleMoveWorldportAckOpcode()
@@ -5224,7 +5224,7 @@ index 6e0b178..c625b4b 100644
          static CreatureInfo const *GetCreatureTemplate( uint32 id );
          CreatureModelInfo const *GetCreatureModelInfo( uint32 modelid );
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index 4b318d4..f4e2025 100644
+index a89b113..3781cc9 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -346,8 +346,8 @@ Player::Player (WorldSession *session): Unit()
@@ -5238,7 +5238,7 @@ index 4b318d4..f4e2025 100644
      }
      m_bgTeam = 0;
  
-@@ -1437,7 +1437,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
+@@ -1439,7 +1439,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
      MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
  
      // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
@@ -5248,7 +5248,7 @@ index 4b318d4..f4e2025 100644
          return false;
  
      // client without expansion support
-@@ -1552,7 +1553,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
+@@ -1554,7 +1555,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
      else
      {
          // far teleport to another map
@@ -5257,7 +5257,7 @@ index 4b318d4..f4e2025 100644
          // check if we can enter before stopping combat / removing pet / totems / interrupting spells
  
          // Check enter rights before map getting to avoid creating instance copy for player
-@@ -3427,6 +3428,29 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
+@@ -3429,6 +3430,29 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
              guild->DelMember(guid);
      }
  
@@ -5287,7 +5287,7 @@ index 4b318d4..f4e2025 100644
      // the player was uninvited already on logout so just remove from group
      QueryResult *resultGroup = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", guid);
      if(resultGroup)
-@@ -5849,6 +5873,10 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
+@@ -5851,6 +5875,10 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
      // need call before fields update to have chance move yesterday data to appropriate fields before today data change.
      UpdateHonorFields();
  
@@ -5298,7 +5298,7 @@ index 4b318d4..f4e2025 100644
      if(honor <= 0)
      {
          if(!uVictim || uVictim == this || uVictim->HasAuraType(SPELL_AURA_NO_PVP_CREDIT))
-@@ -7656,19 +7684,34 @@ void Player::SendInitWorldStates()
+@@ -7658,19 +7686,34 @@ void Player::SendInitWorldStates()
              data << uint32(0xa5f) << uint32(0x0);           // 35
              break;
          case 3698:                                          // Nagrand Arena
@@ -5366,7 +5366,7 @@ index 4b318d4..f4e2025 100644
          return false;
  
 diff --git a/src/game/Player.h b/src/game/Player.h
-index 7db2548..b45ec7a 100644
+index 2d8275e..dbcd46d 100644
 --- a/src/game/Player.h
 +++ b/src/game/Player.h
 @@ -1807,24 +1807,32 @@ class MANGOS_DLL_SPEC Player : public Unit
@@ -5480,7 +5480,7 @@ index 7db2548..b45ec7a 100644
          BgBattleGroundQueueID_Rec m_bgBattleGroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
          uint32 m_bgEntryPointMap;
 diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
-index 0beaf61..1296b55 100644
+index 6732fc5..050283b 100644
 --- a/src/game/SpellAuras.cpp
 +++ b/src/game/SpellAuras.cpp
 @@ -2137,7 +2137,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
@@ -5494,7 +5494,7 @@ index 0beaf61..1296b55 100644
                  return;
              }
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index 0e08b9c..22e5179 100644
+index 61a5e32..9997766 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -2598,7 +2598,7 @@ void Spell::DoCreateItem(uint32 i, uint32 itemtype)
@@ -5507,7 +5507,7 @@ index 0e08b9c..22e5179 100644
      }
  }
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 46f5a15..d1da1af 100644
+index 57b0c91..54d257a 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -600,25 +600,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
@@ -5562,7 +5562,7 @@ index 46f5a15..d1da1af 100644
      }
      else                                                    // if (health <= damage)
      {
-@@ -4154,6 +4154,22 @@ void Unit::RemoveAllAuras()
+@@ -4152,6 +4152,22 @@ void Unit::RemoveAllAuras()
      }
  }
  
@@ -5586,7 +5586,7 @@ index 46f5a15..d1da1af 100644
  {
      // used just after dieing to remove all visible auras
 diff --git a/src/game/Unit.h b/src/game/Unit.h
-index ee5b94b..a9fa26d 100644
+index 5d598fb..ef82a09 100644
 --- a/src/game/Unit.h
 +++ b/src/game/Unit.h
 @@ -1006,6 +1006,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
@@ -5598,10 +5598,10 @@ index ee5b94b..a9fa26d 100644
          void DelayAura(uint32 spellId, uint32 effindex, int32 delaytime);
  
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 8174364..dd99d5f 100644
+index 11b95cf..57074de 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
-@@ -796,6 +796,13 @@ void World::LoadConfigSettings(bool reload)
+@@ -795,6 +795,13 @@ void World::LoadConfigSettings(bool reload)
      m_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfig.GetIntDefault("ListenRange.TextEmote", 25);
      m_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfig.GetIntDefault("ListenRange.Yell", 300);
  
@@ -5615,7 +5615,7 @@ index 8174364..dd99d5f 100644
      m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
      if(m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
      {
-@@ -1189,6 +1196,7 @@ void World::SetInitialWorldSettings()
+@@ -1188,6 +1195,7 @@ void World::SetInitialWorldSettings()
      ///- Initialize Battlegrounds
      sLog.outString( "Starting BattleGround System" );
      sBattleGroundMgr.CreateInitialBattleGrounds();
@@ -5623,7 +5623,7 @@ index 8174364..dd99d5f 100644
  
      //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
      sLog.outString( "Loading Transports..." );
-@@ -2134,6 +2142,24 @@ void World::SendWorldText(int32 string_id, ...)
+@@ -2133,6 +2141,24 @@ void World::SendWorldText(int32 string_id, ...)
              delete data_cache[i][j];
  }
  
@@ -5673,7 +5673,7 @@ index 108b1bb..6d66af7 100644
          void SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
          void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
 diff --git a/src/game/debugcmds.cpp b/src/game/debugcmds.cpp
-index df5e434..fdb58bc 100644
+index 4fd1efd..78836a9 100644
 --- a/src/game/debugcmds.cpp
 +++ b/src/game/debugcmds.cpp
 @@ -30,6 +30,7 @@

@@ -1,0 +1,803 @@
+diff --git a/src/game/Makefile.am b/src/game/Makefile.am
+index 03dbeef..7b802b0 100644
+--- a/src/game/Makefile.am
++++ b/src/game/Makefile.am
+@@ -266,7 +266,9 @@ libmangosgame_a_SOURCES = \
+     FollowerRefManager.h \
+     GroupReference.cpp \
+     GroupReference.h \
+-    GroupRefManager.h
++    GroupRefManager.h \
++    MapUpdater.h \
++    MapUpdater.cpp
+ 
+ ## Link against shared library
+ libmangosgame_a_LIBADD = ../shared/libmangosshared.a ../shared/Auth/libmangosauth.a ../shared/Config/libmangosconfig.a ../shared/Database/libmangosdatabase.a ../shared/vmap/libmangosvmaps.a
+diff --git a/src/game/Map.cpp b/src/game/Map.cpp
+index 7518cf1..865561c 100644
+--- a/src/game/Map.cpp
++++ b/src/game/Map.cpp
+@@ -1326,6 +1326,33 @@ void Map::AddObjectToRemoveList(WorldObject *obj)
+     //sLog.outDebug("Object (GUID: %u TypeId: %u ) added to removing list.",obj->GetGUIDLow(),obj->GetTypeId());
+ }
+ 
++void Map::UpdateCells (uint32 diff)
++{
++  MaNGOS::ObjectUpdater updater (diff);
++  // for creature
++  TypeContainerVisitor<MaNGOS::ObjectUpdater, GridTypeMapContainer > grid_object_update (updater);
++  // for pets
++  TypeContainerVisitor<MaNGOS::ObjectUpdater, WorldTypeMapContainer > world_object_update (updater);
++
++  while(!update_cells.empty ())
++ {
++   CellPair& cell_pair = update_cells.front ();
++
++   Cell cell (cell_pair);
++   cell.data.Part.reserved = CENTER_DISTRICT;
++   cell.SetNoCreate ();
++   CellLock<NullGuard> cell_lock (cell, cell_pair);
++   cell_lock->Visit (cell_lock, grid_object_update, *this);
++   cell_lock->Visit (cell_lock, world_object_update, *this);
++
++   update_cells.pop ();
++ }
++
++  //ensure cells are unmarked ,note there is one call in ObjectAccessor
++  //it needs to be removed when the old method for updating is removed
++  this->resetMarkedCells ();
++}
++
+ void Map::RemoveAllObjectsInRemoveList()
+ {
+     if(i_objectsToRemove.empty())
+diff --git a/src/game/Map.h b/src/game/Map.h
+index 6da1e56..8f0b6a2 100644
+--- a/src/game/Map.h
++++ b/src/game/Map.h
+@@ -137,6 +137,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
+         template<class T> void Remove(T *, bool);
+ 
+         virtual void Update(const uint32&);
++        
++        void AddCellForUpdate(CellPair& cell) { this->update_cells.push(cell); }
++        bool NeedsUpdateCells() { return !this->update_cells.empty (); }
++        void UpdateCells (uint32 diff);
+ 
+         void MessageBroadcast(Player *, WorldPacket *, bool to_self);
+         void MessageBroadcast(WorldObject *, WorldPacket *);
+@@ -292,6 +296,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
+ 
+         std::set<WorldObject *> i_objectsToRemove;
+ 
++        //cells that need to be updated
++        typedef std::queue<CellPair> update_cells_type;
++        update_cells_type update_cells;
++
+         // Type specific code for add/remove to/from grid
+         template<class T>
+             void AddToGrid(T*, NGridType *, Cell const&);
+diff --git a/src/game/MapManager.cpp b/src/game/MapManager.cpp
+index 691448b..fd6f550 100644
+--- a/src/game/MapManager.cpp
++++ b/src/game/MapManager.cpp
+@@ -16,6 +16,7 @@
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include "MapUpdater.h"
+ #include "MapManager.h"
+ #include "InstanceSaveMgr.h"
+ #include "Policies/SingletonImp.h"
+@@ -28,6 +29,7 @@
+ #include "DestinationHolderImp.h"
+ #include "World.h"
+ #include "CellImpl.h"
++#include "Config/ConfigEnv.h"
+ #include "Corpse.h"
+ #include "ObjectMgr.h"
+ 
+@@ -37,9 +39,11 @@ INSTANTIATE_CLASS_MUTEX(MapManager, ZThread::Mutex);
+ 
+ extern GridState* si_GridStates[];                          // debugging code, should be deleted some day
+ 
+-MapManager::MapManager() : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_INTERVAL_GRIDCLEAN))
++MapManager::MapManager() : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_INTERVAL_GRIDCLEAN)),
++i_NumThreads(0)
+ {
+     i_timer.SetInterval(sWorld.getConfig(CONFIG_INTERVAL_MAPUPDATE));
++	i_MapUpdater = new MapUpdater ();
+ }
+ 
+ MapManager::~MapManager()
+@@ -51,6 +55,7 @@ MapManager::~MapManager()
+         delete *i;
+ 
+     Map::DeleteStateMachine();
++	delete i_MapUpdater;
+ }
+ 
+ void
+@@ -68,6 +73,15 @@ MapManager::Initialize()
+     }
+ 
+     InitMaxInstanceId();
++    
++    i_NumThreads = sConfig.GetIntDefault ("Map.Threads", 0);
++
++  if (i_NumThreads > 0)
++    if (this->i_MapUpdater->activate (static_cast<size_t> (i_NumThreads)) == -1)
++      {
++        sLog.outError("Failed to start mtmap threads");
++        abort ();
++      }
+ }
+ 
+ // debugging code, should be deleted some day
+@@ -310,6 +324,38 @@ void MapManager::InitMaxInstanceId()
+     }
+ }
+ 
++void MapManager::UpdateAllMaps(uint32 diff)
++{
++  //shouldnt be called if multithreaded maps are disabled
++  assert(i_NumThreads > 0);
++
++  for (MapMapType::iterator iter = i_maps.begin (); iter != i_maps.end (); ++iter)
++    {
++      Map* map = iter->second;
++      if(map->NeedsUpdateCells ())
++        {
++          this->i_MapUpdater->schedule_update (*map,diff);
++        }
++      
++      if(map->Instanceable ())
++        {
++          MapInstanced::InstancedMaps& imaps = ((MapInstanced*)map)->GetInstancedMaps ();
++          
++            for (MapInstanced::InstancedMaps::iterator iiter = imaps.begin (); iiter != imaps.end (); ++iiter)
++              {
++                Map* imap = iiter->second;
++                
++                if(imap->NeedsUpdateCells ())
++                  {
++                    this->i_MapUpdater->schedule_update (*imap,diff);
++                  }
++              }
++        }
++    }
++  
++  this->i_MapUpdater->wait ();
++}
++
+ uint32 MapManager::GetNumInstances()
+ {
+     uint32 ret = 0;
+diff --git a/src/game/MapManager.h b/src/game/MapManager.h
+index 71a627b..4f206b6 100644
+--- a/src/game/MapManager.h
++++ b/src/game/MapManager.h
+@@ -27,6 +27,7 @@
+ #include "GridStates.h"
+ 
+ class Transport;
++class MapUpdater;
+ 
+ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockable<MapManager, ZThread::Mutex> >
+ {
+@@ -55,6 +56,10 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
+ 
+         void Initialize(void);
+         void Update(time_t);
++        
++        //update all creatures in maps in paralel
++        void UpdateAllMaps(uint32 diff);
++        bool HasUpdateAllMaps() { return this->i_NumThreads > 0;}
+ 
+         inline void SetGridCleanUpDelay(uint32 t)
+         {
+@@ -138,5 +143,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
+         IntervalTimer i_timer;
+ 
+         uint32 i_MaxInstanceId;
++        int i_NumThreads;
++        MapUpdater* i_MapUpdater;
+ };
+ #endif
+diff --git a/src/game/MapUpdater.cpp b/src/game/MapUpdater.cpp
+new file mode 100644
+index 0000000..a1b9395
+--- /dev/null
++++ b/src/game/MapUpdater.cpp
+@@ -0,0 +1,152 @@
++/*
++ * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++
++#include "MapUpdater.h"
++
++#include "DelayExecutor.h"
++#include "Map.h"
++#include "Database/DatabaseEnv.h"
++
++#include <ace/Guard_T.h>
++#include <ace/Method_Request.h>
++
++//the reason this things are here is that i want to make
++//the netcode patch and the multithreaded maps independant
++//once they are merged 1 class should be used
++class  WDBThreadStartReq1 : public ACE_Method_Request
++{
++public:
++  WDBThreadStartReq1 () { }
++  virtual int
++  call (void)
++  {
++    WorldDatabase.ThreadStart ();
++    return 0;
++  }
++};
++
++class  WDBThreadEndReq1 : public ACE_Method_Request
++{
++public:
++  WDBThreadEndReq1 () { }
++  virtual int
++  call (void)
++  {
++    WorldDatabase.ThreadEnd ();
++    return 0;
++  }
++};
++
++class MapUpdateRequest : public ACE_Method_Request
++{
++public:
++  Map& m_map;
++  MapUpdater& m_updater;
++  ACE_UINT32 m_diff;
++  MapUpdateRequest (Map& m,MapUpdater& u,ACE_UINT32 d) : m_map(m),m_updater(u),m_diff(d) { }
++  virtual int
++  call (void)
++  {
++    m_map.UpdateCells (m_diff);
++    m_updater.update_finished ();
++	return 0;
++  }
++};
++
++MapUpdater::MapUpdater () :
++m_mutex (),
++m_condition (m_mutex),
++m_executor (),
++pedning_requests (0)
++{
++  return;
++}
++
++MapUpdater::~MapUpdater ()
++{
++  this->deactivate ();
++}
++
++int
++MapUpdater::activate (size_t num_threads)
++{
++  return this->m_executor.activate (static_cast<int> (num_threads),
++                                    new WDBThreadStartReq1,
++                                    new WDBThreadEndReq1);
++}
++
++int
++MapUpdater::deactivate (void)
++{
++  this->wait ();
++  
++  return this->m_executor.deactivate ();
++}
++
++int
++MapUpdater::wait () 
++{
++  ACE_GUARD_RETURN(ACE_Thread_Mutex,guard,this->m_mutex,-1);
++  
++  while(this->pedning_requests > 0)
++    this->m_condition.wait ();
++  
++  return 0;
++}
++
++int 
++MapUpdater::schedule_update(Map& map, ACE_UINT32 diff)
++{
++  ACE_GUARD_RETURN(ACE_Thread_Mutex,guard,this->m_mutex,-1);
++  
++  ++this->pedning_requests;
++  
++  if( this->m_executor.execute (new MapUpdateRequest(map,*this,diff)) == -1)
++    {
++      ACE_DEBUG ((LM_ERROR,
++                  ACE_TEXT ("(%t) \n"),
++                  ACE_TEXT ("Failed to schedule Map Update")));
++      
++      --this->pedning_requests;
++      return -1;
++    }
++  
++  return 0;
++}
++
++void
++MapUpdater::update_finished ()
++{
++  ACE_GUARD (ACE_Thread_Mutex, guard, this->m_mutex);
++
++  if (this->pedning_requests == 0)
++    {
++      ACE_ERROR ((LM_ERROR,
++                  ACE_TEXT ("(%t)\n"),
++                  ACE_TEXT ("MapUpdater::update_finished BUG, report to devs")));
++
++      return;
++    }
++
++  --this->pedning_requests;
++  
++  //TODO can more than one thread call wait (), it shouldnt happen
++  //however I ensure if in future more than 1 thread call it by
++  //using broadcast instead of signal ()
++  this->m_condition.broadcast ();
++}
+diff --git a/src/game/MapUpdater.h b/src/game/MapUpdater.h
+new file mode 100644
+index 0000000..4e97dbf
+--- /dev/null
++++ b/src/game/MapUpdater.h
+@@ -0,0 +1,62 @@
++/*
++ * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++
++#ifndef _MAP_UPDATER_H_INCLUDED
++#define _MAP_UPDATER_H_INCLUDED
++
++
++#include <ace/Thread_Mutex.h>
++#include <ace/Condition_Thread_Mutex.h>
++
++#include "DelayExecutor.h"
++
++class Map;
++
++class MapUpdater
++{
++public:
++  MapUpdater ();
++  virtual ~MapUpdater ();
++  
++  friend class MapUpdateRequest;
++
++  /// schedule update on a map, the update will start
++  /// as soon as possible ,
++  /// it may even start before the call returns
++  int schedule_update(Map& map, ACE_UINT32 diff);
++  
++  /// Wait untill all pending updates finish
++  int wait ();
++  
++  /// Start the worker threads
++  int activate (size_t num_threads);
++  
++  /// Stop the worker threads
++  int deactivate (void);
++  
++private:
++  /// hook called by worker threads
++  void update_finished ();
++  
++  DelayExecutor m_executor;
++  ACE_Condition_Thread_Mutex m_condition;
++  ACE_Thread_Mutex m_mutex;
++  size_t pedning_requests;
++};
++
++#endif //_MAP_UPDATER_H_INCLUDED
+diff --git a/src/game/ObjectAccessor.cpp b/src/game/ObjectAccessor.cpp
+index f1cf1e5..314bbc3 100644
+--- a/src/game/ObjectAccessor.cpp
++++ b/src/game/ObjectAccessor.cpp
+@@ -558,18 +558,29 @@ ObjectAccessor::Update(uint32 diff)
+                     {
+                         CellPair cell_pair(x,y);
+                         map->markCell(cell_id);
+-                        Cell cell(cell_pair);
++
++                    if (!MapManager::Instance ().HasUpdateAllMaps ())
++                      {
++                        Cell cell (cell_pair);
+                         cell.data.Part.reserved = CENTER_DISTRICT;
+-                        cell.SetNoCreate();
+-                        CellLock<NullGuard> cell_lock(cell, cell_pair);
+-                        cell_lock->Visit(cell_lock, grid_object_update,  *map);
+-                        cell_lock->Visit(cell_lock, world_object_update, *map);
++                        cell.SetNoCreate ();
++                        CellLock<NullGuard> cell_lock (cell, cell_pair);
++                        cell_lock->Visit (cell_lock, grid_object_update, *map);
++                        cell_lock->Visit (cell_lock, world_object_update, *map);
++                      }
++                    else
++                      {
++                          map->AddCellForUpdate (cell_pair);
++                      }
+                     }
+                 }
+             }
+         }
+     }
+ 
++  if (MapManager::Instance ().HasUpdateAllMaps ())
++    MapManager::Instance ().UpdateAllMaps (diff);
++
+     _update();
+ }
+ 
+diff --git a/src/mangosd/mangosd.conf.dist.in b/src/mangosd/mangosd.conf.dist.in
+index 4c69f2d..625fc83 100644
+--- a/src/mangosd/mangosd.conf.dist.in
++++ b/src/mangosd/mangosd.conf.dist.in
+@@ -1047,6 +1047,18 @@ Network.OutUBuff = 65536
+ Network.TcpNodelay = 1
+ 
+ ###################################################################################################################
++#
++# MULTITHREADED MAPS CONFIG
++#
++#    Map.Threads
++#         Number of threads for maps, recommend 1 thread for 1 CPU.
++#         Default: 1
++#
++###################################################################################################################
++
++Map.Threads = 1
++
++###################################################################################################################
+ # CONSOLE AND REMOTE ACCESS
+ #
+ #    Console.Enable
+diff --git a/src/shared/DelayExecutor.cpp b/src/shared/DelayExecutor.cpp
+new file mode 100644
+index 0000000..2e4d526
+--- /dev/null
++++ b/src/shared/DelayExecutor.cpp
+@@ -0,0 +1,131 @@
++
++#include <ace/Singleton.h>
++#include <ace/Thread_Mutex.h>
++
++#include "DelayExecutor.h"
++
++#include <ace/Log_Msg.h>
++
++DelayExecutor*
++DelayExecutor::instance ()
++{
++  return ACE_Singleton<DelayExecutor, ACE_Thread_Mutex>::instance ();
++}
++
++DelayExecutor::DelayExecutor () :
++activated_ (false),
++pre_svc_hook_ (0),
++post_svc_hook_ (0) { }
++
++DelayExecutor::~DelayExecutor ()
++{
++  if (pre_svc_hook_)
++    delete pre_svc_hook_;
++
++  if (post_svc_hook_)
++    delete post_svc_hook_;
++
++  this->deactivate ();
++
++  //todo probably free the queue ??
++}
++
++int
++DelayExecutor::deactivate ()
++{
++  if (!this->activated ())
++    return -1;
++
++  this->activated (false);
++
++  this->queue_.queue ()->deactivate ();
++
++  this->wait ();
++
++  return 0;
++}
++
++int
++DelayExecutor::svc (void)
++{
++  if (pre_svc_hook_)
++    pre_svc_hook_->call ();
++
++  for (;;)
++    {
++      ACE_Method_Request* rq = this->queue_.dequeue ();
++
++      if (!rq)
++        break;
++
++      rq->call ();
++
++      delete rq;
++    }
++
++  if (post_svc_hook_)
++    post_svc_hook_->call ();
++
++  return 0;
++}
++
++int
++DelayExecutor::activate (int num_threads,
++                         ACE_Method_Request* pre_svc_hook,
++                         ACE_Method_Request* post_svc_hook)
++{
++  if (this->activated ())
++    return -1;
++
++  if (num_threads < 1)
++    return -1;
++
++  if (pre_svc_hook_)
++    delete pre_svc_hook_;
++
++  if (post_svc_hook_)
++    delete post_svc_hook_;
++
++  this->pre_svc_hook_ = pre_svc_hook;
++  this->post_svc_hook_ = post_svc_hook;
++
++  this->queue_.queue ()->activate ();
++
++  if( ACE_Task_Base::activate (THR_NEW_LWP | THR_JOINABLE | THR_INHERIT_SCHED,
++                                  num_threads) == -1)
++    return -1;
++  
++  this->activated(true);
++  
++  return true;
++}
++
++int 
++DelayExecutor::execute (ACE_Method_Request* new_req)
++{
++  if(new_req == NULL)
++    return -1;
++  
++  if(this->queue_.enqueue (new_req,
++                           (ACE_Time_Value*)&ACE_Time_Value::zero) == -1)
++    {
++      delete new_req;
++      ACE_ERROR_RETURN ((LM_ERROR,
++                         ACE_TEXT ("(%t) %p\n"),
++                         ACE_TEXT ("DelayExecutor::execute enqueue")),
++                        -1);
++    }
++  return 0;
++}
++
++bool
++DelayExecutor::activated ()
++{
++  return this->activated_;
++}
++
++void
++DelayExecutor::activated (bool s)
++{
++  this->activated_ = s;
++}
+diff --git a/src/shared/DelayExecutor.h b/src/shared/DelayExecutor.h
+new file mode 100644
+index 0000000..0a7b77e
+--- /dev/null
++++ b/src/shared/DelayExecutor.h
+@@ -0,0 +1,39 @@
++#ifndef _M_DELAY_EXECUTOR_H
++#define	_M_DELAY_EXECUTOR_H
++
++#include <ace/Task.h>
++#include <ace/Activation_Queue.h>
++#include <ace/Method_Request.h>
++
++class DelayExecutor : protected ACE_Task_Base
++{
++public:
++  DelayExecutor ();
++  virtual ~DelayExecutor ();
++
++  static DelayExecutor* instance ();
++
++  /// example
++  /// DelayExecutor::instance ()->execute(new MyRequest(myarg));
++  /// returns -1 on failures
++  int execute (ACE_Method_Request* new_req);
++
++  int activate (int num_threads = 1,
++                ACE_Method_Request* pre_svc_hook = 0,
++                ACE_Method_Request* post_svc_hook = 0);
++
++  int deactivate ();
++
++  bool activated ();
++
++  virtual int svc (void);
++private:
++  ACE_Activation_Queue queue_;
++  ACE_Method_Request* pre_svc_hook_;
++  ACE_Method_Request* post_svc_hook_;
++
++  void activated (bool s);
++  bool activated_;
++};
++
++#endif // _M_DELAY_EXECUTOR_H
+diff --git a/src/shared/Makefile.am b/src/shared/Makefile.am
+index 915076a..3a9fe89 100644
+--- a/src/shared/Makefile.am
++++ b/src/shared/Makefile.am
+@@ -46,8 +46,10 @@ libmangosshared_a_SOURCES = \
+     Util.cpp \
+     Util.h \
+     WorldPacket.h \
+-    revision.h
+-
++    revision.h \
++    DelayExecutor.h \
++    DelayExecutor.cpp
++    
+ # Get revision (git or svn)
+ REVISION_FILE = revision.h
+ 
+diff --git a/win/VC71/game.vcproj b/win/VC71/game.vcproj
+index d131d0f..e05cbf5 100644
+--- a/win/VC71/game.vcproj
++++ b/win/VC71/game.vcproj
+@@ -848,6 +848,12 @@
+ 				RelativePath="..\..\src\game\GroupRefManager.h">
+ 			</File>
+ 			<File
++				RelativePath="..\..\src\game\MapUpdater.cpp">
++			</File>
++			<File
++				RelativePath="..\..\src\game\MapUpdater.h">
++			</File>
++			<File
+ 				RelativePath="..\..\src\game\HostilRefManager.cpp">
+ 			</File>
+ 			<File
+diff --git a/win/VC71/shared.vcproj b/win/VC71/shared.vcproj
+index 924ccdb..ac8ff84 100644
+--- a/win/VC71/shared.vcproj
++++ b/win/VC71/shared.vcproj
+@@ -415,6 +415,12 @@
+ 			<File
+ 				RelativePath="..\..\src\shared\vmap\VMapTools.h">
+ 			</File>
++			<File
++				RelativePath="..\..\src\shared\DelayExecutor.cpp">
++			</File>
++			<File
++			        RelativePath="..\..\src\shared\DelayExecutor.h">
++			</File>
+ 		</Filter>
+ 		<File
+ 			RelativePath="..\..\src\shared\Common.cpp">
+diff --git a/win/VC80/game.vcproj b/win/VC80/game.vcproj
+index 80aa58b..5ca59f5 100644
+--- a/win/VC80/game.vcproj
++++ b/win/VC80/game.vcproj
+@@ -1303,6 +1303,14 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath="..\..\src\game\MapUpdater.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\..\src\game\MapUpdater.h"
++				>
++			</File>
++			<File
+ 				RelativePath="..\..\src\game\HostilRefManager.cpp"
+ 				>
+ 			</File>
+diff --git a/win/VC80/shared.vcproj b/win/VC80/shared.vcproj
+index 9ca9a66..5408363 100644
+--- a/win/VC80/shared.vcproj
++++ b/win/VC80/shared.vcproj
+@@ -762,6 +762,14 @@
+ 			>
+ 		</File>
+ 		<File
++			RelativePath="..\..\src\shared\DelayExecutor.cpp"
++			>
++		</File>
++		<File
++			RelativePath="..\..\src\shared\DelayExecutor.h"
++			>
++		</File>
++		<File
+ 			RelativePath="..\..\src\shared\revision.h"
+ 			>
+ 			<FileConfiguration
+diff --git a/win/VC90/game.vcproj b/win/VC90/game.vcproj
+index 19b0ae4..51e881c 100644
+--- a/win/VC90/game.vcproj
++++ b/win/VC90/game.vcproj
+@@ -1304,6 +1304,14 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath="..\..\src\game\MapUpdater.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\..\src\game\MapUpdater.h"
++				>
++			</File>
++			<File
+ 				RelativePath="..\..\src\game\HostilRefManager.cpp"
+ 				>
+ 			</File>
+diff --git a/win/VC90/shared.vcproj b/win/VC90/shared.vcproj
+index de3fa88..36ca5b4 100644
+--- a/win/VC90/shared.vcproj
++++ b/win/VC90/shared.vcproj
+@@ -806,6 +806,14 @@
+ 			</FileConfiguration>
+ 		</File>
+ 		<File
++			RelativePath="..\..\src\shared\DelayExecutor.cpp"
++			>
++		</File>
++		<File
++			RelativePath="..\..\src\shared\DelayExecutor.h"
++			>
++		</File>
++		<File
+ 			RelativePath="..\..\src\shared\ServiceWin32.cpp"
+ 			>
+ 		</File>
