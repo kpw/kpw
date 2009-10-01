@@ -12,15 +12,15 @@ update creature_template set RegenHealth = 0 where entry in (18192,18256);
 -- 
 update creature_template set faction_A = 1630, faction_H = 1630, ScriptName = 'mob_eventai' where entry = 18225;
 -- pvp flag
-update creature_template set flags = flags | 0x1000 where entry in (18816,18821,21474,21484,21483,18192,18817,18822,21485,21487,21488,18256);
+update creature_template set unit_flags = unit_flags | 0x1000 where entry in (18816,18821,21474,21484,21483,18192,18817,18822,21485,21487,21488,18256);
 
 -- faction changes
 -- (destroyed) wyvern posts
-update gameobject_template set faction = 84, flags = 0 where entry in (182266,182267,182275,182276,182277,182280,182281,182282);
-update gameobject_template set faction = 83, flags = 0 where entry in (182297, 182298, 182299, 182300, 182301, 182302, 182303, 182304);
+update gameobject_template set faction = 84, unit_flags = 0 where entry in (182266,182267,182275,182276,182277,182280,182281,182282);
+update gameobject_template set faction = 83, unit_flags = 0 where entry in (182297, 182298, 182299, 182300, 182301, 182302, 182303, 182304);
 -- bomb wagons
-update gameobject_template set faction = 83, flags = 0 where entry in (182222, 182272, 182273, 182274); -- horde friendly
-update gameobject_template set faction = 84, flags = 0 where entry in (182305, 182306, 182307, 182308); -- ally friendly
+update gameobject_template set faction = 83, unit_flags = 0 where entry in (182222, 182272, 182273, 182274); -- horde friendly
+update gameobject_template set faction = 84, unit_flags = 0 where entry in (182305, 182306, 182307, 182308); -- ally friendly
 
 update gameobject_template set data0 = 0 where entry in (181598, 181597); -- without this, the client sends a spellcast packet on go use instead of use go packet
 update gameobject_template set data0 = 0 where entry = 181682;

@@ -1,8 +1,8 @@
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index aaf107d..607d61c 100644
+index 46f5a15..6eeaa0b 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
-@@ -2799,7 +2799,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
+@@ -2805,7 +2805,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
  
      // All positive spells can`t miss
      // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
