@@ -8576,7 +8576,7 @@ index ef2fcbf..fd10616 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 355f246..b51cec0 100644
+index 86e96d5..755071a 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
 @@ -168,6 +168,7 @@ ChatCommand * ChatHandler::getCommandTable()
@@ -8605,7 +8605,7 @@ index 355f246..b51cec0 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 6ab125f..5d1f772 100644
+index c91f0b6..0f4817f 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
 @@ -319,6 +319,8 @@ class ChatHandler
@@ -10364,7 +10364,7 @@ index 5672f14..b07146d 100644
      }
  }
 diff --git a/src/game/Language.h b/src/game/Language.h
-index acdd14b..c46512a 100644
+index e512d29..2330797 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
 @@ -21,6 +21,8 @@
@@ -10376,7 +10376,7 @@ index acdd14b..c46512a 100644
      // for chat commands
      LANG_SELECT_CHAR_OR_CREATURE        = 1,
      LANG_SELECT_CREATURE                = 2,
-@@ -619,6 +621,63 @@ enum MangosStrings
+@@ -621,6 +623,63 @@ enum MangosStrings
      LANG_ARENA_FIFTEEN_SECONDS          = 703,
      LANG_ARENA_BEGUN                    = 704,
  
@@ -10440,7 +10440,7 @@ index acdd14b..c46512a 100644
      LANG_WAIT_BEFORE_SPEAKING           = 705,
      LANG_NOT_EQUIPPED_ITEM              = 706,
      LANG_PLAYER_DND                     = 707,
-@@ -629,11 +688,65 @@ enum MangosStrings
+@@ -631,11 +690,65 @@ enum MangosStrings
      LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
      LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
  
@@ -10566,7 +10566,7 @@ index 243e393..fb15fab 100644
          SendSysMessage(LANG_BAD_VALUE);
          SetSentErrorMessage(true);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 4e84316..983d359 100644
+index fbf2357..1a7b7ee 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -11328,7 +11328,7 @@ index 0b6bb20..08de19b 100644
 +    if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 4 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
  }
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
-index 9ce7fad..c8a90c0 100644
+index 9720564..82707ae 100644
 --- a/src/game/ObjectMgr.cpp
 +++ b/src/game/ObjectMgr.cpp
 @@ -20,6 +20,7 @@
@@ -11413,10 +11413,10 @@ index 9ce7fad..c8a90c0 100644
  {
      mAreaTriggers.clear();                                  // need for reload case
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index b6997a9..2ad0bb6 100644
+index 982b9a4..d113147 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
-@@ -309,6 +309,8 @@ class ObjectMgr
+@@ -311,6 +311,8 @@ class ObjectMgr
          ArenaTeam* GetArenaTeamByCapitan(uint64 const& guid) const;
          void AddArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.insert( arenateam ); }
          void RemoveArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.erase( arenateam ); }
@@ -11425,7 +11425,7 @@ index b6997a9..2ad0bb6 100644
  
          static CreatureInfo const *GetCreatureTemplate( uint32 id );
          CreatureModelInfo const *GetCreatureModelInfo( uint32 modelid );
-@@ -436,6 +438,7 @@ class ObjectMgr
+@@ -438,6 +440,7 @@ class ObjectMgr
  
          WorldSafeLocsEntry const *GetClosestGraveYard(float x, float y, float z, uint32 MapId, uint32 team);
          bool AddGraveYardLink(uint32 id, uint32 zone, uint32 team, bool inDB = true);
@@ -20063,7 +20063,7 @@ index 295981a..5d897ef 100644
          void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
          void SetAuraFlag(uint32 slot, bool add);
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index 614d6d2..1bb9886 100644
+index 6525efe..07756b8 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -48,6 +48,7 @@
@@ -20395,7 +20395,7 @@ index 614d6d2..1bb9886 100644
  }
  
 diff --git a/src/game/SpellMgr.cpp b/src/game/SpellMgr.cpp
-index ef84b1d..fe1207d 100644
+index d89c6e3..ec76724 100644
 --- a/src/game/SpellMgr.cpp
 +++ b/src/game/SpellMgr.cpp
 @@ -530,6 +530,17 @@ bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellI
@@ -20836,7 +20836,7 @@ index 7673622..3dbdb52 100644
  
      // far teleport case
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 339a590..f18addc 100644
+index aaf107d..d324700 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -41,6 +41,7 @@
@@ -23827,7 +23827,7 @@ index 339a590..f18addc 100644
  SpellSchoolMask Unit::GetMeleeDamageSchoolMask() const
  {
 diff --git a/src/game/Unit.h b/src/game/Unit.h
-index 6eb6438..f221792 100644
+index 99d6b61..afb10f0 100644
 --- a/src/game/Unit.h
 +++ b/src/game/Unit.h
 @@ -74,7 +74,7 @@ enum SpellAuraInterruptFlags
@@ -23990,7 +23990,7 @@ index 6eb6438..f221792 100644
          uint32 m_state;                                     // Even derived shouldn't modify
          uint32 m_CombatTimer;
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 5c0d0b6..cac5ff8 100644
+index 1496e7b..86bd2d6 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -41,6 +41,7 @@
@@ -24182,7 +24182,7 @@ index 5c0d0b6..cac5ff8 100644
  {
      m_resultQueue = new SqlResultQueue;
 diff --git a/src/game/World.h b/src/game/World.h
-index 2dad314..8977b48 100644
+index 108b1bb..0d0c8d3 100644
 --- a/src/game/World.h
 +++ b/src/game/World.h
 @@ -59,7 +59,8 @@ enum WorldTimers
@@ -24235,7 +24235,7 @@ index 2dad314..8977b48 100644
  
          void ProcessCliCommands();
          void QueueCliCommand( CliCommandHolder::Print* zprintf, char const* input ) { cliCmdQueue.add(new CliCommandHolder(input, zprintf)); }
-@@ -494,7 +507,11 @@ class World
+@@ -503,7 +516,11 @@ class World
          static float m_MaxVisibleDistanceInFlight;
          static float m_VisibleUnitGreyDistance;
          static float m_VisibleObjectGreyDistance;
@@ -24924,7 +24924,7 @@ index e3ed6b5..6a75b85 100644
  				>
  			</File>
 diff --git a/win/VC90/game.vcproj b/win/VC90/game.vcproj
-index 58e3675..2e467d6 100644
+index 8d914b3..81b1d7e 100644
 --- a/win/VC90/game.vcproj
 +++ b/win/VC90/game.vcproj
 @@ -496,6 +496,22 @@
