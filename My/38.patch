@@ -8577,7 +8577,7 @@ index 23c90a7..53c67c1 100644
      const char *message = "";
      uint8 type = 0;
 diff --git a/src/game/CharacterHandler.cpp b/src/game/CharacterHandler.cpp
-index 700f4f8..6e7bbaa 100644
+index 0d55aa0..d7a1c87 100644
 --- a/src/game/CharacterHandler.cpp
 +++ b/src/game/CharacterHandler.cpp
 @@ -36,6 +36,7 @@
@@ -8589,7 +8589,7 @@ index 700f4f8..6e7bbaa 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index d77838c..b6938a9 100644
+index 068476c..3fdf712 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
 @@ -169,6 +169,7 @@ ChatCommand * ChatHandler::getCommandTable()
@@ -8600,7 +8600,7 @@ index d77838c..b6938a9 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
  
-@@ -484,6 +485,8 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -485,6 +486,8 @@ ChatCommand * ChatHandler::getCommandTable()
          { "gps",            SEC_MODERATOR,      false, &ChatHandler::HandleGPSCommand,                 "", NULL },
          { "guid",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGUIDCommand,                "", NULL },
          { "help",           SEC_PLAYER,         true,  &ChatHandler::HandleHelpCommand,                "", NULL },
@@ -8609,7 +8609,7 @@ index d77838c..b6938a9 100644
          { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", NULL },
          { "cooldown",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleCooldownCommand,            "", NULL },
          { "unlearn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnLearnCommand,             "", NULL },
-@@ -532,6 +535,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -533,6 +536,7 @@ ChatCommand * ChatHandler::getCommandTable()
          { "damage",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDamageCommand,              "", NULL },
          { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
          { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterDeleteCommand,     "", NULL },
@@ -8618,7 +8618,7 @@ index d77838c..b6938a9 100644
          { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
          { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 86f310e..d988bd1 100644
+index 77a9d51..7dbf7ff 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
 @@ -151,6 +151,8 @@ class ChatHandler
@@ -8630,7 +8630,7 @@ index 86f310e..d988bd1 100644
  
          bool HandleModifyKnownTitlesCommand(const char* args);
          bool HandleModifyHPCommand(const char* args);
-@@ -413,6 +415,7 @@ class ChatHandler
+@@ -414,6 +416,7 @@ class ChatHandler
          bool HandleComeToMeCommand(const char *args);
          bool HandleCombatStopCommand(const char *args);
          bool HandleSendMessageCommand(const char * args);
@@ -8638,7 +8638,7 @@ index 86f310e..d988bd1 100644
          bool HandleRepairitemsCommand(const char* args);
          bool HandleWaterwalkCommand(const char* args);
  
-@@ -427,6 +430,7 @@ class ChatHandler
+@@ -428,6 +431,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
          bool HandleGetLootRecipient(const char * args);
@@ -10377,7 +10377,7 @@ index 5672f14..b07146d 100644
      }
  }
 diff --git a/src/game/Language.h b/src/game/Language.h
-index 9f279c0..21af16c 100644
+index ad5a2b4..d1fa519 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
 @@ -21,6 +21,8 @@
@@ -10582,7 +10582,7 @@ index 3bb2475..49cea90 100644
          SendSysMessage(LANG_BAD_VALUE);
          SetSentErrorMessage(true);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 6d12b8b..d99784e 100644
+index 8d7e412..ac2eecf 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -10593,7 +10593,7 @@ index 6d12b8b..d99784e 100644
  #include "InstanceSaveMgr.h"
  #include "InstanceData.h"
  
-@@ -4846,6 +4847,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
+@@ -4855,6 +4856,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
      return true;
  }
  
@@ -10686,7 +10686,7 @@ index 6d12b8b..d99784e 100644
  bool ChatHandler::HandleBanAccountCommand(const char* args)
  {
      return HandleBanHelper(BAN_ACCOUNT,args);
-@@ -5356,24 +5443,30 @@ bool ChatHandler::HandleFlyModeCommand(const char* args)
+@@ -5365,24 +5452,30 @@ bool ChatHandler::HandleFlyModeCommand(const char* args)
      if(!args)
          return false;
  
@@ -10723,7 +10723,7 @@ index 6d12b8b..d99784e 100644
      return true;
  }
  
-@@ -6397,6 +6490,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
+@@ -6407,6 +6500,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
      return true;
  }
  
@@ -11275,7 +11275,7 @@ index 0000000..4e97dbf
 +
 +#endif //_MAP_UPDATER_H_INCLUDED
 diff --git a/src/game/MiscHandler.cpp b/src/game/MiscHandler.cpp
-index 24a9bfb..483744e 100644
+index 5c40964..f348d64 100644
 --- a/src/game/MiscHandler.cpp
 +++ b/src/game/MiscHandler.cpp
 @@ -38,6 +38,7 @@
@@ -11808,7 +11808,7 @@ index 586f84a..6751b24 100644
  }
  
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
-index a3fbf67..afc586e 100644
+index 6350770..0e92aee 100644
 --- a/src/game/ObjectMgr.cpp
 +++ b/src/game/ObjectMgr.cpp
 @@ -20,6 +20,7 @@
@@ -11837,7 +11837,7 @@ index a3fbf67..afc586e 100644
          data.spawnMask      = fields[14].GetUInt8();
          int16 gameEvent     = fields[15].GetInt16();
  
-@@ -4889,6 +4894,54 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool inD
+@@ -4904,6 +4909,54 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool inD
      return true;
  }
  
@@ -11893,10 +11893,10 @@ index a3fbf67..afc586e 100644
  {
      mAreaTriggers.clear();                                  // need for reload case
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index 788934e..b94dfdf 100644
+index 4c5a1c4..4f26adc 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
-@@ -313,6 +313,8 @@ class ObjectMgr
+@@ -320,6 +320,8 @@ class ObjectMgr
          ArenaTeam* GetArenaTeamByCapitan(uint64 const& guid) const;
          void AddArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.insert( arenateam ); }
          void RemoveArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.erase( arenateam ); }
@@ -11905,7 +11905,7 @@ index 788934e..b94dfdf 100644
  
          static CreatureInfo const *GetCreatureTemplate( uint32 id );
          CreatureModelInfo const *GetCreatureModelInfo( uint32 modelid );
-@@ -440,6 +442,7 @@ class ObjectMgr
+@@ -447,6 +449,7 @@ class ObjectMgr
  
          WorldSafeLocsEntry const *GetClosestGraveYard(float x, float y, float z, uint32 MapId, uint32 team);
          bool AddGraveYardLink(uint32 id, uint32 zone, uint32 team, bool inDB = true);
@@ -17445,7 +17445,7 @@ index 0000000..ae94f59
 +// todo: flag carrier death/leave/mount/activitychange should give back the gossip options
 +#endif
 diff --git a/src/game/Pet.cpp b/src/game/Pet.cpp
-index b0ac1f6..677c87f 100644
+index e72e29e..63d6c2b 100644
 --- a/src/game/Pet.cpp
 +++ b/src/game/Pet.cpp
 @@ -367,6 +367,10 @@ bool Pet::LoadPetFromDB( Unit* owner, uint32 petentry, uint32 petnumber, bool cu
@@ -17482,7 +17482,7 @@ index 144b2d7..b16877a 100644
          }
      }
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index ed5bf47..233b1cf 100644
+index 8d80991..4e2158e 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -52,7 +52,10 @@
@@ -18330,7 +18330,43 @@ index ed5bf47..233b1cf 100644
              break;
          case 3703:                                          // Shattrath City
              break;
-@@ -12999,7 +13225,8 @@ bool Player::HasQuestForItem( uint32 itemid ) const
+@@ -11577,7 +11803,7 @@ void Player::SendPreparedQuest( uint64 guid )
+             else if( status == DIALOG_STATUS_INCOMPLETE )
+                 PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, false, true );
+             // Send completable on repeatable quest if player don't have quest
+-            else if( pQuest->IsRepeatable() )
++            else if( pQuest->IsRepeatable() && !pQuest->IsDaily() )
+                 PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, CanCompleteRepeatableQuest(pQuest), true );
+             else
+                 PlayerTalkClass->SendQuestGiverQuestDetails( pQuest, guid, true );
+@@ -11819,7 +12045,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, bool msg )
+     if(!pQuest->IsAutoComplete() && GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
+         return false;
+ 
+-    // daily quest can't be rewarded (10 daily quest already completed)
++    // daily quest can't be rewarded (25 daily quest already completed)
+     if(!SatisfyQuestDay(pQuest,true))
+         return false;
+ 
+@@ -12421,9 +12647,16 @@ bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg )
+             continue;
+ 
+         QuestStatusMap::iterator i_exstatus = mQuestStatus.find( exclude_Id );
++		Quest const* Nquest = objmgr.GetQuestTemplate(exclude_Id);
+ 
+         // alternative quest already started or completed
+-        if( i_exstatus != mQuestStatus.end()
++        if( !SatisfyQuestDay(Nquest, false) )
++		{
++			if( msg )
++                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
++            return false;
++		}
++		else if( i_exstatus != mQuestStatus.end()
+             && (i_exstatus->second.m_status == QUEST_STATUS_COMPLETE || i_exstatus->second.m_status == QUEST_STATUS_INCOMPLETE) )
+         {
+             if( msg )
+@@ -13016,7 +13249,8 @@ bool Player::HasQuestForItem( uint32 itemid ) const
  
              // hide quest if player is in raid-group and quest is no raid quest
              if(GetGroup() && GetGroup()->isRaidGroup() && qinfo->GetType() != QUEST_TYPE_RAID)
@@ -18340,7 +18376,17 @@ index ed5bf47..233b1cf 100644
  
              // There should be no mixed ReqItem/ReqSource drop
              // This part for ReqItem drop
-@@ -14707,8 +14934,10 @@ void Player::SaveToDB()
+@@ -14266,7 +14500,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
+                 // add to quest log
+                 if( slot < MAX_QUEST_LOG_SIZE &&
+                     ( questStatusData.m_status==QUEST_STATUS_INCOMPLETE ||
+-                    questStatusData.m_status==QUEST_STATUS_COMPLETE && !questStatusData.m_rewarded ) )
++                    questStatusData.m_status==QUEST_STATUS_COMPLETE && 
++					(!questStatusData.m_rewarded || pQuest->IsDaily()) ) )
+                 {
+                     SetQuestSlot(slot,quest_id,quest_time);
+ 
+@@ -14729,8 +14964,10 @@ void Player::SaveToDB()
      // first save/honor gain after midnight will also update the player's honor fields
      UpdateHonorFields();
  
@@ -18353,7 +18399,7 @@ index ed5bf47..233b1cf 100644
          return;
  
      int is_save_resting = HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0;
-@@ -15483,7 +15712,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
+@@ -15528,7 +15765,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
      if(!pet)
          pet = GetPet();
  
@@ -18362,7 +18408,7 @@ index ed5bf47..233b1cf 100644
      {
          //returning of reagents only for players, so best done here
          uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
-@@ -17464,7 +17693,8 @@ bool Player::InArena() const
+@@ -17509,7 +17746,8 @@ bool Player::InArena() const
  
  bool Player::GetBGAccessByLevel(uint32 bgTypeId) const
  {
@@ -18372,7 +18418,7 @@ index ed5bf47..233b1cf 100644
      if(!bg)
          return false;
  
-@@ -17493,6 +17723,7 @@ uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
+@@ -17538,6 +17776,7 @@ uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
      return 10*(queue_id+2)-1;
  }
  
@@ -18380,7 +18426,7 @@ index ed5bf47..233b1cf 100644
  uint32 Player::GetBattleGroundQueueIdFromLevel() const
  {
      uint32 level = getLevel();
-@@ -17658,6 +17889,11 @@ void Player::AutoUnequipOffhandIfNeed()
+@@ -17703,6 +17942,11 @@ void Player::AutoUnequipOffhandIfNeed()
      }
  }
  
@@ -18392,7 +18438,7 @@ index ed5bf47..233b1cf 100644
  bool Player::HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item const* ignoreItem)
  {
      if(spellInfo->EquippedItemClass < 0)
-@@ -18143,9 +18379,34 @@ bool Player::isAllowUseBattleGroundObject()
+@@ -18188,9 +18432,34 @@ bool Player::isAllowUseBattleGroundObject()
  {
      return ( //InBattleGround() &&                            // in battleground - not need, check in other cases
               !IsMounted() &&                                  // not mounted
@@ -18428,7 +18474,7 @@ index ed5bf47..233b1cf 100644
 +    return false;
 +}
 diff --git a/src/game/Player.h b/src/game/Player.h
-index 3d19dc5..5a558af 100644
+index 3308c08..833ad48 100644
 --- a/src/game/Player.h
 +++ b/src/game/Player.h
 @@ -45,6 +45,7 @@ class PlayerMenu;
@@ -18439,7 +18485,7 @@ index 3d19dc5..5a558af 100644
  
  typedef std::deque<Mail*> PlayerMails;
  
-@@ -1780,7 +1781,7 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1774,7 +1775,7 @@ class MANGOS_DLL_SPEC Player : public Unit
          void UpdateEquipSpellsAtFormChange();
          void CastItemCombatSpell(Item *item,Unit* Target, WeaponAttackType attType);
  
@@ -18448,7 +18494,7 @@ index 3d19dc5..5a558af 100644
          void SendUpdateWorldState(uint32 Field, uint32 Value);
          void SendDirectMessage(WorldPacket *data);
  
-@@ -1807,24 +1808,32 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1801,24 +1802,32 @@ class MANGOS_DLL_SPEC Player : public Unit
          static uint32 GetMaxLevelForBattleGroundQueueId(uint32 queue_id);
          uint32 GetBattleGroundQueueIdFromLevel() const;
  
@@ -18489,7 +18535,7 @@ index 3d19dc5..5a558af 100644
          }
  
          void SetBattleGroundId(uint32 val)  { m_bgBattleGroundID = val; }
-@@ -1832,34 +1841,47 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1826,34 +1835,47 @@ class MANGOS_DLL_SPEC Player : public Unit
          {
              for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; i++)
              {
@@ -18547,7 +18593,7 @@ index 3d19dc5..5a558af 100644
          uint32 GetBattleGroundEntryPointMap() const { return m_bgEntryPointMap; }
          float GetBattleGroundEntryPointX() const { return m_bgEntryPointX; }
          float GetBattleGroundEntryPointY() const { return m_bgEntryPointY; }
-@@ -1885,6 +1907,15 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1879,6 +1901,15 @@ class MANGOS_DLL_SPEC Player : public Unit
  
          bool GetBGAccessByLevel(uint32 bgTypeId) const;
          bool isAllowUseBattleGroundObject();
@@ -18563,7 +18609,7 @@ index 3d19dc5..5a558af 100644
  
          /*********************************************************/
          /***                    REST SYSTEM                    ***/
-@@ -1916,7 +1947,8 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1910,7 +1941,8 @@ class MANGOS_DLL_SPEC Player : public Unit
          bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
          bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
  
@@ -18573,7 +18619,7 @@ index 3d19dc5..5a558af 100644
          bool IsFlying() const { return HasUnitMovementFlag(MOVEMENTFLAG_FLYING); }
  
          void HandleDrowning();
-@@ -1982,6 +2014,10 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1976,6 +2008,10 @@ class MANGOS_DLL_SPEC Player : public Unit
          uint32 GetOldPetSpell() const { return m_oldpetspell; }
          void SetOldPetSpell(uint32 petspell) { m_oldpetspell = petspell; }
  
@@ -18584,7 +18630,7 @@ index 3d19dc5..5a558af 100644
          /*********************************************************/
          /***                 INSTANCE SYSTEM                   ***/
          /*********************************************************/
-@@ -2040,8 +2076,8 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -2034,8 +2070,8 @@ class MANGOS_DLL_SPEC Player : public Unit
          */
          struct BgBattleGroundQueueID_Rec
          {
@@ -18595,7 +18641,7 @@ index 3d19dc5..5a558af 100644
          };
          BgBattleGroundQueueID_Rec m_bgBattleGroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
          uint32 m_bgEntryPointMap;
-@@ -2222,6 +2258,16 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -2216,6 +2252,16 @@ class MANGOS_DLL_SPEC Player : public Unit
          float m_rest_bonus;
          RestType rest_type;
          ////////////////////Rest System/////////////////////
@@ -18612,7 +18658,7 @@ index 3d19dc5..5a558af 100644
  
          // Transports
          Transport * m_transport;
-@@ -2243,9 +2289,12 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -2237,9 +2283,12 @@ class MANGOS_DLL_SPEC Player : public Unit
          uint32 m_temporaryUnsummonedPetNumber;
          uint32 m_oldpetspell;
  
@@ -18656,7 +18702,7 @@ index 5b68829..e84cc31 100644
          {
              if( pQuest->IsRepeatable() )
 diff --git a/src/game/SharedDefines.h b/src/game/SharedDefines.h
-index 817ae81..241bd48 100644
+index 907cceb..ca2ce17 100644
 --- a/src/game/SharedDefines.h
 +++ b/src/game/SharedDefines.h
 @@ -798,14 +798,16 @@ enum Targets
@@ -21337,7 +21383,7 @@ index 7673622..3dbdb52 100644
  
      // far teleport case
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 0f5ef86..639a9ea 100644
+index 425e0a7..25f51c8 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -41,6 +41,7 @@
@@ -23799,7 +23845,7 @@ index 0f5ef86..639a9ea 100644
 @@ -8134,7 +9390,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
      for(AuraList::const_iterator i = mDamageTaken.begin();i != mDamageTaken.end(); ++i)
-         if((*i)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL)
+         if((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask())
 -            TakenFlatBenefit += (*i)->GetModifier()->m_amount;
 +            TakenFlatBenefit += (*i)->GetModifier()->m_amount * (*i)->m_stackAmount;
  
@@ -23815,7 +23861,7 @@ index 0f5ef86..639a9ea 100644
      // ..taken
      AuraList const& mModDamagePercentTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN);
      for(AuraList::const_iterator i = mModDamagePercentTaken.begin(); i != mModDamagePercentTaken.end(); ++i)
-         if((*i)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL)
+         if((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask())
 -            TakenTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
 +            TakenTotalMod *= ((*i)->GetModifier()->m_amount * (*i)->m_stackAmount+100.0f)/100.0f;
  
@@ -24495,7 +24541,7 @@ index 3ebab69..d7c5c3e 100644
          uint32 m_state;                                     // Even derived shouldn't modify
          uint32 m_CombatTimer;
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index a3322cf..22ed050 100644
+index db9bee3..3b90098 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -41,6 +41,7 @@
@@ -24542,7 +24588,7 @@ index a3322cf..22ed050 100644
      m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
      if(m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
      {
-@@ -1161,6 +1175,9 @@ void World::SetInitialWorldSettings()
+@@ -1164,6 +1178,9 @@ void World::SetInitialWorldSettings()
      WorldDatabase.PExecute("INSERT INTO uptime (startstring, starttime, uptime) VALUES('%s', " I64FMTD ", 0)",
          isoDate, uint64(m_startTime));
  
@@ -24552,7 +24598,7 @@ index a3322cf..22ed050 100644
      m_timers[WUPDATE_OBJECTS].SetInterval(0);
      m_timers[WUPDATE_SESSIONS].SetInterval(0);
      m_timers[WUPDATE_WEATHERS].SetInterval(1000);
-@@ -1168,6 +1185,7 @@ void World::SetInitialWorldSettings()
+@@ -1171,6 +1188,7 @@ void World::SetInitialWorldSettings()
      m_timers[WUPDATE_UPTIME].SetInterval(m_configs[CONFIG_UPTIME_UPDATE]*MINUTE*1000);
                                                              //Update "uptime" table based on configuration entry in minutes.
      m_timers[WUPDATE_CORPSES].SetInterval(20*MINUTE*1000);  //erase corpses every 20 minutes
@@ -24560,7 +24606,7 @@ index a3322cf..22ed050 100644
  
      //to set mailtimer to return mails every day between 4 and 5 am
      //mailtimer is increased when updating auctions
-@@ -1189,6 +1207,10 @@ void World::SetInitialWorldSettings()
+@@ -1192,6 +1210,10 @@ void World::SetInitialWorldSettings()
      ///- Initialize Battlegrounds
      sLog.outString( "Starting BattleGround System" );
      sBattleGroundMgr.CreateInitialBattleGrounds();
@@ -24571,7 +24617,7 @@ index a3322cf..22ed050 100644
  
      //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
      sLog.outString( "Loading Transports..." );
-@@ -1204,6 +1226,8 @@ void World::SetInitialWorldSettings()
+@@ -1207,6 +1229,8 @@ void World::SetInitialWorldSettings()
      uint32 nextGameEvent = gameeventmgr.Initialize();
      m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
  
@@ -24580,7 +24626,7 @@ index a3322cf..22ed050 100644
      sLog.outString( "WORLD: World initialized" );
  }
  
-@@ -1272,6 +1296,7 @@ void World::Update(time_t diff)
+@@ -1275,6 +1299,7 @@ void World::Update(time_t diff)
      /// <ul><li> Handle auctions when the timer has passed
      if (m_timers[WUPDATE_AUCTIONS].Passed())
      {
@@ -24588,7 +24634,7 @@ index a3322cf..22ed050 100644
          m_timers[WUPDATE_AUCTIONS].Reset();
  
          ///- Update mails (return old mails with item, or delete them)
-@@ -1383,6 +1408,8 @@ void World::Update(time_t diff)
+@@ -1386,6 +1411,8 @@ void World::Update(time_t diff)
              ScriptsProcess();
  
          sBattleGroundMgr.Update(diff);
@@ -24597,7 +24643,7 @@ index a3322cf..22ed050 100644
      }
  
      // execute callbacks from sql queries that were queued recently
-@@ -1405,6 +1432,17 @@ void World::Update(time_t diff)
+@@ -1408,6 +1435,17 @@ void World::Update(time_t diff)
          m_timers[WUPDATE_EVENTS].Reset();
      }
  
@@ -24615,7 +24661,7 @@ index a3322cf..22ed050 100644
      /// </ul>
      ///- Move all creatures with "delayed move" and remove and delete all objects with "delayed remove"
      MapManager::Instance().DoDelayedMovesAndRemoves();
-@@ -2134,6 +2172,24 @@ void World::SendWorldText(int32 string_id, ...)
+@@ -2132,6 +2170,24 @@ void World::SendWorldText(int32 string_id, ...)
              delete data_cache[i][j];
  }
  
@@ -24640,7 +24686,7 @@ index a3322cf..22ed050 100644
  /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
  void World::SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self, uint32 team)
  {
-@@ -2468,6 +2524,45 @@ void World::ProcessCliCommands()
+@@ -2466,6 +2522,45 @@ void World::ProcessCliCommands()
      zprint("mangos>");
  }
  

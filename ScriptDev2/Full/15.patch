@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 735)
+--- Makefile.am	(revision 736)
 +++ Makefile.am	(working copy)
 @@ -51,10 +51,20 @@
  scripts/custom/custom_example.cpp \
@@ -62,7 +62,7 @@ Index: Makefile.am
  scripts/zone/zulaman/zulaman.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 735)
+--- ScriptMgr.cpp	(revision 736)
 +++ ScriptMgr.cpp	(working copy)
 @@ -77,12 +77,22 @@
  extern void AddSC_custom_example();
@@ -1706,7 +1706,7 @@ Index: scripts/guard/g_marcus_jonathan.cpp
 +}
 Index: scripts/guard/guard_ai.cpp
 ===================================================================
---- scripts/guard/guard_ai.cpp	(revision 735)
+--- scripts/guard/guard_ai.cpp	(revision 736)
 +++ scripts/guard/guard_ai.cpp	(working copy)
 @@ -1,26 +1,12 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -2251,7 +2251,7 @@ Index: scripts/guard/guard_ai.cpp
      else
 Index: scripts/guard/guard_ai.h
 ===================================================================
---- scripts/guard/guard_ai.h	(revision 735)
+--- scripts/guard/guard_ai.h	(revision 736)
 +++ scripts/guard/guard_ai.h	(working copy)
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -3855,7 +3855,7 @@ Index: scripts/guard/thrall.cpp
 +}
 Index: scripts/item/item_scripts.cpp
 ===================================================================
---- scripts/item/item_scripts.cpp	(revision 735)
+--- scripts/item/item_scripts.cpp	(revision 736)
 +++ scripts/item/item_scripts.cpp	(working copy)
 @@ -393,6 +393,25 @@
  }
@@ -3895,9 +3895,157 @@ Index: scripts/item/item_scripts.cpp
      newscript->Name="item_yehkinyas_bramble";
      newscript->pItemUse = ItemUse_item_yehkinyas_bramble;
      m_scripts[nrscripts++] = newscript;
+Index: scripts/zone/azuremyst_isle/azuremyst_isle.cpp
+===================================================================
+--- scripts/zone/azuremyst_isle/azuremyst_isle.cpp	(revision 736)
++++ scripts/zone/azuremyst_isle/azuremyst_isle.cpp	(working copy)
+@@ -29,6 +29,7 @@
+ EndContentData */
+ 
+ #include "precompiled.h"
++#include "../../npc/npc_escortAI.h"
+ #include <cmath>
+ 
+ /*######
+@@ -340,6 +341,124 @@
+ }
+ 
+ /*######
++## npc_magwin
++######*/
++
++#define SAY_AGGRO   -1585031
++#define SAY_START   -1585030
++#define SAY_PROGRESS  -1585032
++#define SAY_END1   -1585033
++#define SAY_END2   -1585034
++#define EMOTE_HUG   -1585035
++
++#define QUEST_A_CRY_FOR_HELP   9528
++
++struct MANGOS_DLL_DECL npc_magwinAI : public npc_escortAI
++{
++        npc_magwinAI(Creature *c) : npc_escortAI(c) {Reset();}
++ 
++ 
++    void WaypointReached(uint32 i)
++    {
++ Unit* player = Unit::GetUnit((*m_creature), PlayerGUID);
++        if( !player )
++            return;
++ 
++        switch(i)
++        {
++  case 0: 
++   DoScriptText(SAY_START, m_creature, player);
++   break;
++  case 17: 
++   DoScriptText(SAY_PROGRESS, m_creature, player);
++   break;
++  case 27:
++   DoScriptText(EMOTE_HUG, m_creature, player); break;
++   DoScriptText(SAY_END1, m_creature, player); break;
++  case 28: if( PlayerGUID )
++     {
++     DoScriptText(SAY_END2, m_creature, player);
++     Unit* player = ((Creature*)Unit::GetUnit((*m_creature), PlayerGUID));
++     if( player && player->GetTypeId() == TYPEID_PLAYER )
++     ((Player*)player)->GroupEventHappens(QUEST_A_CRY_FOR_HELP,m_creature);
++     }
++    break;
++        }
++    }
++ 
++    void Aggro(Unit* who)
++ {
++            DoScriptText(SAY_AGGRO, m_creature, who);
++ }
++
++ void Reset() 
++ {
++ m_creature->setFaction(79);
++ }
++
++ void JustDied(Unit* killer) 
++ {
++  if (PlayerGUID)
++  {
++   Unit* player = Unit::GetUnit((*m_creature), PlayerGUID);
++   if (player)
++   ((Player*)player)->FailQuest(QUEST_A_CRY_FOR_HELP);
++   }
++  }
++
++     void UpdateAI(const uint32 diff) 
++  {
++   npc_escortAI::UpdateAI(diff);
++  }
++};
++
++bool QuestAccept_npc_magwin(Player* player, Creature* creature, Quest const* quest)
++{
++       if (quest->GetQuestId() == QUEST_A_CRY_FOR_HELP)
++              ((npc_escortAI*)(creature->AI()))->Start(true, true, false, player->GetGUID());
++              return true;
++}
++
++
++CreatureAI* GetAI_npc_magwinAI(Creature *_Creature)
++{
++    npc_magwinAI* magwinAI = new npc_magwinAI(_Creature);
++
++ magwinAI->AddWaypoint(0, -4784.532227, -11051.060547, 3.484263);
++ magwinAI->AddWaypoint(1, -4805.509277, -11037.293945, 3.043942);
++ magwinAI->AddWaypoint(2, -4827.826172, -11034.398438, 1.741959);
++ magwinAI->AddWaypoint(3, -4852.630859, -11033.695313, 2.208656);
++ magwinAI->AddWaypoint(4, -4876.791992, -11034.517578, 3.175228);
++ magwinAI->AddWaypoint(5, -4895.486816, -11038.306641, 9.390890);
++ magwinAI->AddWaypoint(6, -4915.464844, -11048.402344, 12.369793);
++ magwinAI->AddWaypoint(7, -4937.288086, -11067.041992, 13.857983);
++ magwinAI->AddWaypoint(8, -4966.577637, -11067.507813, 15.754786);
++ magwinAI->AddWaypoint(9, -4993.799805, -11056.544922, 19.175295);
++ magwinAI->AddWaypoint(10, -5017.836426, -11052.569336, 22.476587);
++ magwinAI->AddWaypoint(11, -5039.706543, -11058.459961, 25.831593);
++ magwinAI->AddWaypoint(12, -5057.289063, -11045.474609, 26.972496);
++ magwinAI->AddWaypoint(13, -5078.828125, -11037.601563, 29.053417);
++ magwinAI->AddWaypoint(14, -5104.158691, -11039.195313, 29.440195);
++ magwinAI->AddWaypoint(15, -5120.780273, -11039.518555, 30.142139);
++ magwinAI->AddWaypoint(16, -5140.833008, -11039.810547, 28.788074);
++ magwinAI->AddWaypoint(17, -5161.201660, -11040.050781, 27.879545, 4000);
++ magwinAI->AddWaypoint(18, -5171.842285, -11046.803711, 27.183821);
++ magwinAI->AddWaypoint(19, -5185.995117, -11056.359375, 20.234867);
++ magwinAI->AddWaypoint(20, -5198.485840, -11065.065430, 18.872593);
++ magwinAI->AddWaypoint(21, -5214.062500, -11074.653320, 19.215731);
++ magwinAI->AddWaypoint(22, -5220.157227, -11088.377930, 19.818476);
++ magwinAI->AddWaypoint(23, -5233.652832, -11098.846680, 18.349432);
++ magwinAI->AddWaypoint(24, -5250.163086, -11111.653320, 16.438959);
++ magwinAI->AddWaypoint(25, -5268.194336, -11125.639648, 12.668313);
++ magwinAI->AddWaypoint(26, -5286.270508, -11130.669922, 6.912246);
++ magwinAI->AddWaypoint(27, -5317.449707, -11137.392578, 4.963446);
++ magwinAI->AddWaypoint(28, -5334.854492, -11154.384766, 6.742664);
++ magwinAI->AddWaypoint(29, -5353.874512, -11171.595703, 6.903912);
++
++    return (CreatureAI*)magwinAI;
++}
++
++/*######
+ ##
+ ######*/
+ 
+@@ -369,4 +488,10 @@
+     newscript->pGossipHello =  &GossipHello_npc_susurrus;
+     newscript->pGossipSelect = &GossipSelect_npc_susurrus;
+     m_scripts[nrscripts++] = newscript;
++
++    newscript = new Script;
++    newscript->Name="npc_magwin";
++    newscript->GetAI = &GetAI_npc_magwinAI;
++    newscript->pQuestAccept = &QuestAccept_npc_magwin;
++    m_scripts[nrscripts++] = newscript;
+ }
 Index: scripts/zone/black_temple/boss_supremus.cpp
 ===================================================================
---- scripts/zone/black_temple/boss_supremus.cpp	(revision 735)
+--- scripts/zone/black_temple/boss_supremus.cpp	(revision 736)
 +++ scripts/zone/black_temple/boss_supremus.cpp	(working copy)
 @@ -122,7 +122,7 @@
          CheckTimer = 1000;
@@ -3927,7 +4075,7 @@ Index: scripts/zone/black_temple/boss_supremus.cpp
                  }
 Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
 ===================================================================
---- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 735)
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 736)
 +++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
 @@ -66,7 +66,7 @@
  #define TAINTED_ELEMENTAL           22009
@@ -4009,7 +4157,7 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
      newscript = new Script;
 Index: scripts/zone/deadmines/deadmines.cpp
 ===================================================================
---- scripts/zone/deadmines/deadmines.cpp	(revision 735)
+--- scripts/zone/deadmines/deadmines.cpp	(revision 736)
 +++ scripts/zone/deadmines/deadmines.cpp	(working copy)
 @@ -22,3 +22,223 @@
  EndScriptData */
@@ -4256,7 +4404,7 @@ Index: scripts/zone/deadmines/def_deadmines.h
 +#endif
 Index: scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
 ===================================================================
---- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 735)
+--- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 736)
 +++ scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(working copy)
 @@ -179,6 +179,8 @@
                  m_creature->setFaction(14);
@@ -4388,7 +4536,7 @@ Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_blade
 +}
 Index: scripts/zone/karazhan/boss_nightbane.cpp
 ===================================================================
---- scripts/zone/karazhan/boss_nightbane.cpp	(revision 735)
+--- scripts/zone/karazhan/boss_nightbane.cpp	(revision 736)
 +++ scripts/zone/karazhan/boss_nightbane.cpp	(working copy)
 @@ -22,12 +22,370 @@
  EndScriptData */
@@ -4771,7 +4919,7 @@ Index: scripts/zone/karazhan/boss_nightbane.cpp
 +}
 Index: scripts/zone/netherstorm/netherstorm.cpp
 ===================================================================
---- scripts/zone/netherstorm/netherstorm.cpp	(revision 735)
+--- scripts/zone/netherstorm/netherstorm.cpp	(revision 736)
 +++ scripts/zone/netherstorm/netherstorm.cpp	(working copy)
 @@ -388,7 +388,366 @@
      }
@@ -5752,7 +5900,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +}
 Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 735)
+--- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 736)
 +++ scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(working copy)
 @@ -121,7 +121,7 @@
                  target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
@@ -5779,7 +5927,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
          }else ArcaneOrb_Timer -= diff;
 Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 735)
+--- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 736)
 +++ scripts/zone/tempest_keep/the_eye/def_the_eye.h	(working copy)
 @@ -17,4 +17,5 @@
  #define DATA_SOLARIANEVENT                  10
@@ -5789,7 +5937,7 @@ Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
  #endif
 Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 735)
+--- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 736)
 +++ scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(working copy)
 @@ -43,8 +43,10 @@
      uint64 MasterEngineerTelonicus;
@@ -7726,7 +7874,7 @@ Index: scripts/zone/zulaman/boss_hexlord.cpp
 +}
 Index: scripts/zone/zulaman/boss_janalai.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_janalai.cpp	(revision 735)
+--- scripts/zone/zulaman/boss_janalai.cpp	(revision 736)
 +++ scripts/zone/zulaman/boss_janalai.cpp	(working copy)
 @@ -16,7 +16,7 @@
  
@@ -8809,7 +8957,7 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  }
 Index: scripts/zone/zulaman/boss_nalorakk.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 735)
+--- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 736)
 +++ scripts/zone/zulaman/boss_nalorakk.cpp	(working copy)
 @@ -22,6 +22,7 @@
  EndScriptData */
@@ -9820,7 +9968,7 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +}
 Index: scripts/zone/zulaman/def_zulaman.h
 ===================================================================
---- scripts/zone/zulaman/def_zulaman.h	(revision 735)
+--- scripts/zone/zulaman/def_zulaman.h	(revision 736)
 +++ scripts/zone/zulaman/def_zulaman.h	(working copy)
 @@ -5,26 +5,14 @@
  #ifndef DEF_ZULAMAN_H
@@ -9860,7 +10008,7 @@ Index: scripts/zone/zulaman/def_zulaman.h
  #endif
 Index: scripts/zone/zulaman/instance_zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/instance_zulaman.cpp	(revision 735)
+--- scripts/zone/zulaman/instance_zulaman.cpp	(revision 736)
 +++ scripts/zone/zulaman/instance_zulaman.cpp	(working copy)
 @@ -16,7 +16,7 @@
  
@@ -10214,7 +10362,7 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
  
 Index: scripts/zone/zulaman/zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/zulaman.cpp	(revision 735)
+--- scripts/zone/zulaman/zulaman.cpp	(revision 736)
 +++ scripts/zone/zulaman/zulaman.cpp	(working copy)
 @@ -97,6 +97,74 @@
      return new npc_forest_frogAI (_Creature);
@@ -10305,7 +10453,7 @@ Index: scripts/zone/zulaman/zulaman.cpp
  }
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 735)
+--- VC80/80ScriptDev2.vcproj	(revision 736)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="Windows-1252"?>
@@ -10443,7 +10591,7 @@ Index: VC80/80ScriptDev2.vcproj
  					</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 735)
+--- VC90/90ScriptDev2.vcproj	(revision 736)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -408,6 +408,18 @@
  				Name="guard"

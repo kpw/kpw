@@ -1,0 +1,50 @@
+diff --git a/src/game/Player.cpp b/src/game/Player.cpp
+index 922e458..c723a54 100644
+--- a/src/game/Player.cpp
++++ b/src/game/Player.cpp
+@@ -11575,7 +11575,7 @@ void Player::SendPreparedQuest( uint64 guid )
+             else if( status == DIALOG_STATUS_INCOMPLETE )
+                 PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, false, true );
+             // Send completable on repeatable quest if player don't have quest
+-            else if( pQuest->IsRepeatable() )
++            else if( pQuest->IsRepeatable() && !pQuest->IsDaily() )
+                 PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, CanCompleteRepeatableQuest(pQuest), true );
+             else
+                 PlayerTalkClass->SendQuestGiverQuestDetails( pQuest, guid, true );
+@@ -11817,7 +11817,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, bool msg )
+     if(!pQuest->IsAutoComplete() && GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
+         return false;
+ 
+-    // daily quest can't be rewarded (10 daily quest already completed)
++    // daily quest can't be rewarded (25 daily quest already completed)
+     if(!SatisfyQuestDay(pQuest,true))
+         return false;
+ 
+@@ -12419,9 +12419,16 @@ bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg )
+             continue;
+ 
+         QuestStatusMap::iterator i_exstatus = mQuestStatus.find( exclude_Id );
++		Quest const* Nquest = objmgr.GetQuestTemplate(exclude_Id);
+ 
+         // alternative quest already started or completed
+-        if( i_exstatus != mQuestStatus.end()
++        if( !SatisfyQuestDay(Nquest, false) )
++		{
++			if( msg )
++                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
++            return false;
++		}
++		else if( i_exstatus != mQuestStatus.end()
+             && (i_exstatus->second.m_status == QUEST_STATUS_COMPLETE || i_exstatus->second.m_status == QUEST_STATUS_INCOMPLETE) )
+         {
+             if( msg )
+@@ -14259,7 +14266,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
+                 // add to quest log
+                 if( slot < MAX_QUEST_LOG_SIZE &&
+                     ( questStatusData.m_status==QUEST_STATUS_INCOMPLETE ||
+-                    questStatusData.m_status==QUEST_STATUS_COMPLETE && !questStatusData.m_rewarded ) )
++                    questStatusData.m_status==QUEST_STATUS_COMPLETE && 
++					(!questStatusData.m_rewarded || pQuest->IsDaily()) ) )
+                 {
+                     SetQuestSlot(slot,quest_id,quest_time);
+ 

@@ -959,7 +959,7 @@ index 57b0c91..52a28f6 100644
 -    pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_FEAR, damage);
 +    if (!spellProto || !IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR, spellProto->Id))
 +        pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_FEAR, damage);
-     // root type spells do not dispell the root effect
+     // root type spells do not dispel the root effect
 -    if(!spellProto || spellProto->Mechanic != MECHANIC_ROOT)
 +    if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || IsAuraAddedBySpell(SPELL_AURA_MOD_ROOT, spellProto->Id)))
          pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, damage);

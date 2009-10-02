@@ -1,5 +1,7 @@
 diff --git a/src/game/MovementHandler.cpp b/src/game/MovementHandler.cpp
-index 694bde8..863d76d 100755
+old mode 100644
+new mode 100755
+index a171e7b..bedd28a
 --- a/src/game/MovementHandler.cpp
 +++ b/src/game/MovementHandler.cpp
 @@ -30,6 +30,9 @@
@@ -37,7 +39,7 @@ index 694bde8..863d76d 100755
  
      /* extract packet */
      MovementInfo movementInfo;
-@@ -251,47 +260,78 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+@@ -251,47 +260,77 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
      {
          // transports size limited
          // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
@@ -48,7 +50,7 @@ index 694bde8..863d76d 100755
          if( !MaNGOS::IsValidMapCoord(movementInfo.x+movementInfo.t_x, movementInfo.y+movementInfo.t_y,
              movementInfo.z+movementInfo.t_z, movementInfo.o+movementInfo.t_o) )
              return;
- 
+-
 -        // if we boarded a transport, add us to it
 -        if (!GetPlayer()->m_transport)
 +        if ((GetPlayer()->m_anti_transportGUID == 0) && (movementInfo.t_guid !=0))
@@ -106,7 +108,7 @@ index 694bde8..863d76d 100755
 +        GetPlayer()->m_anti_transportGUID = 0;
      }
  
-     // fall damage generation (ignore in flight case that can be triggred also at lags in moment teleportation to another map).
+     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
      if (recv_data.GetOpcode() == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
      {
          Player *target = GetPlayer();
@@ -132,7 +134,7 @@ index 694bde8..863d76d 100755
          //Players with Feather Fall or low fall time, or physical immunity (charges used) are ignored
          if (movementInfo.fallTime > 1100 && !target->isDead() && !target->isGameMaster() &&
              !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
-@@ -348,37 +388,234 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+@@ -348,37 +387,234 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
          GetPlayer()->SetInWater( !GetPlayer()->IsInWater() || GetPlayer()->GetBaseMap()->IsUnderWater(movementInfo.x, movementInfo.y, movementInfo.z) );
      }
  
@@ -389,7 +391,7 @@ index 694bde8..863d76d 100755
      }
  }
  
-@@ -529,34 +766,60 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
+@@ -529,34 +765,60 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
      GetPlayer()->SendMessageToSet(&data, false);
  }
  
@@ -463,7 +465,9 @@ index 694bde8..863d76d 100755
  
  void WorldSession::HandleMoveHoverAck( WorldPacket& /*recv_data*/ )
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index 4b318d4..1b887d4 100755
+old mode 100644
+new mode 100755
+index dcf3ae2..0154677
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -375,7 +375,18 @@ Player::Player (WorldSession *session): Unit()
@@ -486,7 +490,7 @@ index 4b318d4..1b887d4 100755
      m_mailsLoaded = false;
      m_mailsUpdated = false;
      unReadMails = 0;
-@@ -1430,7 +1441,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
+@@ -1432,7 +1443,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
          sLog.outError("TeleportTo: invalid map %d or absent instance template.", mapid);
          return false;
      }
@@ -497,10 +501,12 @@ index 4b318d4..1b887d4 100755
      Pet* pet = GetPet();
  
 diff --git a/src/game/Player.h b/src/game/Player.h
-index 7db2548..4f8da20 100755
+old mode 100644
+new mode 100755
+index 3308c08..02aa135
 --- a/src/game/Player.h
 +++ b/src/game/Player.h
-@@ -2222,7 +2222,17 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -2216,7 +2216,17 @@ class MANGOS_DLL_SPEC Player : public Unit
          float m_rest_bonus;
          RestType rest_type;
          ////////////////////Rest System/////////////////////
@@ -520,7 +526,9 @@ index 7db2548..4f8da20 100755
          Transport * m_transport;
  
 diff --git a/src/game/TaxiHandler.cpp b/src/game/TaxiHandler.cpp
-index 7673622..aca110b 100755
+old mode 100644
+new mode 100755
+index 7673622..53257f7
 --- a/src/game/TaxiHandler.cpp
 +++ b/src/game/TaxiHandler.cpp
 @@ -192,7 +192,7 @@ void WorldSession::HandleActivateTaxiFarOpcode ( WorldPacket & recv_data )
@@ -532,7 +540,7 @@ index 7673622..aca110b 100755
  {
      sLog.outDebug( "WORLD: Received CMSG_MOVE_SPLINE_DONE" );
  
-@@ -200,12 +200,45 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& /*recv_data*/)
+@@ -200,12 +200,46 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& /*recv_data*/)
      // 1) end taxi path in far (multi-node) flight
      // 2) switch from one map to other in case multim-map taxi path
      // we need proccess only (1)
@@ -557,6 +565,7 @@ index 7673622..aca110b 100755
 +        GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
 +        GetPlayer()->m_movementInfo = movementInfo;
 +        GetPlayer()->m_anti_lastmovetime = movementInfo.time;
++        GetPlayer()->m_anti_justteleported = 1;
 +        //<<< end movement anticheat
          return;
 +    }
@@ -579,7 +588,9 @@ index 7673622..aca110b 100755
      if(curDestNode && curDestNode->map_id != GetPlayer()->GetMapId())
      {
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 8174364..9f9d90c 100755
+old mode 100644
+new mode 100755
+index a3322cf..88ea59a
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -70,7 +70,9 @@ float World::m_MaxVisibleDistanceForObject    = DEFAULT_VISIBILITY_DISTANCE;
@@ -613,7 +624,9 @@ index 8174364..9f9d90c 100755
  
      m_configs[CONFIG_COMPRESSION] = sConfig.GetIntDefault("Compression", 1);
 diff --git a/src/game/World.h b/src/game/World.h
-index 108b1bb..978b50c 100755
+old mode 100644
+new mode 100755
+index baa36fd..fb7b2e6
 --- a/src/game/World.h
 +++ b/src/game/World.h
 @@ -439,7 +439,10 @@ class World
@@ -640,7 +653,9 @@ index 108b1bb..978b50c 100755
          ZThread::LockedQueue<CliCommandHolder*, ZThread::FastMutex> cliCmdQueue;
          SqlResultQueue *m_resultQueue;
 diff --git a/src/mangosd/mangosd.conf.dist.in b/src/mangosd/mangosd.conf.dist.in
-index 4c69f2d..9f75381 100755
+old mode 100644
+new mode 100755
+index 4c69f2d..9f75381
 --- a/src/mangosd/mangosd.conf.dist.in
 +++ b/src/mangosd/mangosd.conf.dist.in
 @@ -1079,3 +1079,19 @@ Ra.IP = 0.0.0.0

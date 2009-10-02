@@ -23286,7 +23286,7 @@ index 0f5ef86..639a9ea 100644
 @@ -8134,7 +9390,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
      for(AuraList::const_iterator i = mDamageTaken.begin();i != mDamageTaken.end(); ++i)
-         if((*i)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL)
+         if((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask())
 -            TakenFlatBenefit += (*i)->GetModifier()->m_amount;
 +            TakenFlatBenefit += (*i)->GetModifier()->m_amount * (*i)->m_stackAmount;
  
@@ -23302,7 +23302,7 @@ index 0f5ef86..639a9ea 100644
      // ..taken
      AuraList const& mModDamagePercentTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN);
      for(AuraList::const_iterator i = mModDamagePercentTaken.begin(); i != mModDamagePercentTaken.end(); ++i)
-         if((*i)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL)
+         if((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask())
 -            TakenTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
 +            TakenTotalMod *= ((*i)->GetModifier()->m_amount * (*i)->m_stackAmount+100.0f)/100.0f;
  
