@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 728)
+--- Makefile.am	(revision 738)
 +++ Makefile.am	(working copy)
 @@ -332,6 +332,7 @@
  scripts/zone/tempest_keep/the_eye/boss_astromancer.cpp \
@@ -12,9 +12,9 @@ Index: Makefile.am
  scripts/zone/tempest_keep/the_eye/the_eye.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 728)
+--- ScriptMgr.cpp	(revision 738)
 +++ ScriptMgr.cpp	(working copy)
-@@ -493,6 +493,7 @@
+@@ -494,6 +494,7 @@
  extern void AddSC_boss_kaelthas();
  extern void AddSC_boss_void_reaver();
  extern void AddSC_boss_high_astromancer_solarian();
@@ -22,7 +22,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_instance_the_eye();
  extern void AddSC_the_eye();
  
-@@ -1671,6 +1672,7 @@
+@@ -1676,6 +1677,7 @@
      AddSC_boss_kaelthas();
      AddSC_boss_void_reaver();
      AddSC_boss_high_astromancer_solarian();
@@ -611,23 +611,23 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="boss_alar";
-+    newscript->GetAI = GetAI_boss_alar;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_alar";
++    newscript->GetAI = &GetAI_boss_alar;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="mob_ember_of_alar";
-+    newscript->GetAI = GetAI_mob_ember_of_alar;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "mob_ember_of_alar";
++    newscript->GetAI = &GetAI_mob_ember_of_alar;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="mob_flame_patch_alar";
-+    newscript->GetAI = GetAI_mob_flame_patch_alar;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "mob_flame_patch_alar";
++    newscript->GetAI = &GetAI_mob_flame_patch_alar;
++    newscript->RegisterSelf();
 +}
 Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 728)
+--- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 738)
 +++ scripts/zone/tempest_keep/the_eye/def_the_eye.h	(working copy)
 @@ -17,4 +17,5 @@
  #define DATA_SOLARIANEVENT                  10
@@ -637,7 +637,7 @@ Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
  #endif
 Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 728)
+--- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 738)
 +++ scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(working copy)
 @@ -43,8 +43,10 @@
      uint64 MasterEngineerTelonicus;
@@ -701,9 +701,9 @@ Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
                  return Encounters[1];
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 728)
+--- VC80/80ScriptDev2.vcproj	(revision 738)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
-@@ -1767,6 +1767,10 @@
+@@ -1771,6 +1771,10 @@
  							>
  						</File>
  						<File
@@ -716,9 +716,9 @@ Index: VC80/80ScriptDev2.vcproj
  						</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 728)
+--- VC90/90ScriptDev2.vcproj	(revision 738)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
-@@ -1766,6 +1766,10 @@
+@@ -1770,6 +1770,10 @@
  							>
  						</File>
  						<File

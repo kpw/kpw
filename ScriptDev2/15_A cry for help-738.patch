@@ -1,7 +1,7 @@
 Index: scripts/zone/azuremyst_isle/azuremyst_isle.cpp
 ===================================================================
---- scripts/zone/azuremyst_isle/azuremyst_isle.cpp (revision 735)
-+++ scripts/zone/azuremyst_isle/azuremyst_isle.cpp (working copy)
+--- scripts/zone/azuremyst_isle/azuremyst_isle.cpp	(revision 738)
++++ scripts/zone/azuremyst_isle/azuremyst_isle.cpp	(working copy)
 @@ -29,6 +29,7 @@
  EndContentData */
  
@@ -138,11 +138,11 @@ Index: scripts/zone/azuremyst_isle/azuremyst_isle.cpp
 @@ -369,4 +488,10 @@
      newscript->pGossipHello =  &GossipHello_npc_susurrus;
      newscript->pGossipSelect = &GossipSelect_npc_susurrus;
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="npc_magwin";
++    newscript->Name = "npc_magwin";
 +    newscript->GetAI = &GetAI_npc_magwinAI;
 +    newscript->pQuestAccept = &QuestAccept_npc_magwin;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->RegisterSelf();
  }

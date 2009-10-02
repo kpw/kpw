@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 736)
+--- Makefile.am	(revision 740)
 +++ Makefile.am	(working copy)
 @@ -51,10 +51,20 @@
  scripts/custom/custom_example.cpp \
@@ -23,7 +23,7 @@ Index: Makefile.am
  scripts/item/item_scripts.cpp \
  scripts/item/item_test.cpp \
  scripts/npc/npc_escortAI.cpp \
-@@ -166,6 +176,7 @@
+@@ -167,6 +177,7 @@
  scripts/zone/coilfang_resevoir/underbog/boss_hungarfen.cpp \
  scripts/zone/darkshore/darkshore.cpp \
  scripts/zone/deadmines/deadmines.cpp \
@@ -31,7 +31,7 @@ Index: Makefile.am
  scripts/zone/dun_morogh/dun_morogh.cpp \
  scripts/zone/dustwallow_marsh/dustwallow_marsh.cpp \
  scripts/zone/eastern_plaguelands/eastern_plaguelands.cpp \
-@@ -188,6 +199,7 @@
+@@ -189,6 +200,7 @@
  scripts/zone/hellfire_citadel/magtheridons_lair/instance_magtheridons_lair.cpp \
  scripts/zone/hellfire_citadel/shattered_halls/boss_nethekurse.cpp \
  scripts/zone/hellfire_citadel/shattered_halls/boss_warbringer_omrogg.cpp \
@@ -39,7 +39,7 @@ Index: Makefile.am
  scripts/zone/hellfire_citadel/shattered_halls/def_shattered_halls.h \
  scripts/zone/hellfire_citadel/shattered_halls/instance_shattered_halls.cpp \
  scripts/zone/hellfire_peninsula/boss_doomlord_kazzak.cpp \
-@@ -332,6 +344,7 @@
+@@ -333,6 +345,7 @@
  scripts/zone/tempest_keep/the_eye/boss_astromancer.cpp \
  scripts/zone/tempest_keep/the_eye/boss_kaelthas.cpp \
  scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp \
@@ -47,7 +47,7 @@ Index: Makefile.am
  scripts/zone/tempest_keep/the_eye/def_the_eye.h \
  scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp \
  scripts/zone/tempest_keep/the_eye/the_eye.cpp \
-@@ -364,8 +377,12 @@
+@@ -365,8 +378,12 @@
  scripts/zone/westfall/westfall.cpp \
  scripts/zone/winterspring/winterspring.cpp \
  scripts/zone/zangarmarsh/zangarmarsh.cpp \
@@ -62,9 +62,9 @@ Index: Makefile.am
  scripts/zone/zulaman/zulaman.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 736)
+--- ScriptMgr.cpp	(revision 740)
 +++ ScriptMgr.cpp	(working copy)
-@@ -77,12 +77,22 @@
+@@ -78,12 +78,22 @@
  extern void AddSC_custom_example();
  extern void AddSC_custom_gossip_codebox();
  extern void AddSC_test();
@@ -87,7 +87,7 @@ Index: ScriptMgr.cpp
  
  // -- Honor --
  
-@@ -246,6 +256,8 @@
+@@ -249,6 +259,8 @@
  //Darkshore
  //Darnassus
  //Deadmines
@@ -96,7 +96,7 @@ Index: ScriptMgr.cpp
  //Deadwind pass
  //Desolace
  //Dire Maul
-@@ -295,6 +307,7 @@
+@@ -298,6 +310,7 @@
  //--Shattered Halls
  extern void AddSC_boss_grand_warlock_nethekurse();
  extern void AddSC_boss_warbringer_omrogg();
@@ -104,7 +104,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_instance_shattered_halls();
  
  //--Ramparts
-@@ -320,6 +333,7 @@
+@@ -323,6 +336,7 @@
  extern void AddSC_boss_shade_of_aran();
  extern void AddSC_boss_malchezaar();
  extern void AddSC_boss_terestian_illhoof();
@@ -112,7 +112,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_netherspite_infernal();
  extern void AddSC_boss_moroes();
  extern void AddSC_bosses_opera();
-@@ -493,6 +507,7 @@
+@@ -496,6 +510,7 @@
  extern void AddSC_boss_kaelthas();
  extern void AddSC_boss_void_reaver();
  extern void AddSC_boss_high_astromancer_solarian();
@@ -120,7 +120,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_instance_the_eye();
  extern void AddSC_the_eye();
  
-@@ -563,9 +578,14 @@
+@@ -566,9 +581,14 @@
  extern void AddSC_boss_renataki();
  extern void AddSC_boss_wushoolay();
  extern void AddSC_instance_zulgurub();
@@ -135,7 +135,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_instance_zulaman();
  extern void AddSC_zulaman();
  
-@@ -1257,12 +1277,22 @@
+@@ -1262,12 +1282,22 @@
      AddSC_custom_example();
      AddSC_custom_gossip_codebox();
      AddSC_test();
@@ -158,7 +158,7 @@ Index: ScriptMgr.cpp
  
      // -- Honor --
  
-@@ -1426,6 +1456,8 @@
+@@ -1433,6 +1463,8 @@
      //Darkshore
      //Darnassus
      //Deadmines
@@ -167,7 +167,7 @@ Index: ScriptMgr.cpp
      //Deadwind pass
      //Desolace
      //Dire Maul
-@@ -1475,6 +1507,7 @@
+@@ -1482,6 +1514,7 @@
      //--Shattered Halls
      AddSC_boss_grand_warlock_nethekurse();
      AddSC_boss_warbringer_omrogg();
@@ -175,7 +175,7 @@ Index: ScriptMgr.cpp
      AddSC_instance_shattered_halls();
  
      //--Ramparts
-@@ -1500,6 +1533,7 @@
+@@ -1507,6 +1540,7 @@
      AddSC_boss_shade_of_aran();
      AddSC_boss_malchezaar();
      AddSC_boss_terestian_illhoof();
@@ -183,7 +183,7 @@ Index: ScriptMgr.cpp
      AddSC_netherspite_infernal();
      AddSC_boss_moroes();
      AddSC_bosses_opera();
-@@ -1673,6 +1707,7 @@
+@@ -1680,6 +1714,7 @@
      AddSC_boss_kaelthas();
      AddSC_boss_void_reaver();
      AddSC_boss_high_astromancer_solarian();
@@ -191,7 +191,7 @@ Index: ScriptMgr.cpp
      AddSC_instance_the_eye();
      AddSC_the_eye();
  
-@@ -1745,8 +1780,12 @@
+@@ -1752,8 +1787,12 @@
      AddSC_instance_zulgurub();
  
      //Zul'Aman
@@ -899,7 +899,7 @@ Index: scripts/custom/teleguy.cpp
 +    Script *newscript;
 + 
 +newscript = new Script;
-+newscript->Name="teleguy";
++newscript->Name = "teleguy";
 +newscript->pGossipHello = &GossipHello_teleguy;
 +newscript->pGossipSelect = &GossipSelect_teleguy;
 +newscript->pItemHello = NULL;
@@ -909,7 +909,7 @@ Index: scripts/custom/teleguy.cpp
 +newscript->pGOQuestAccept = NULL;
 +newscript->pGOChooseReward = NULL;
 +
-+m_scripts[nrscripts++] = newscript;
++newscript->RegisterSelf();
 +}
 Index: scripts/guard/ancient_of_war.cpp
 ===================================================================
@@ -1146,9 +1146,9 @@ Index: scripts/guard/ancient_of_war.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="ancient_of_war";
-+    newscript->GetAI = GetAI_ancient_of_war;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "ancient_of_war";
++    newscript->GetAI = &GetAI_ancient_of_war;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/archbishop_benedictus.cpp
 ===================================================================
@@ -1490,14 +1490,14 @@ Index: scripts/guard/archbishop_benedictus.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="archbishop_benedictus";
-+    newscript->GetAI = GetAI_archbishop_benedictus;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "archbishop_benedictus";
++    newscript->GetAI = &GetAI_archbishop_benedictus;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="cathedral_of_light";
-+    newscript->GetAI = GetAI_cathedral_of_light;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "cathedral_of_light";
++    newscript->GetAI = &GetAI_cathedral_of_light;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/g_marcus_jonathan.cpp
 ===================================================================
@@ -1700,13 +1700,13 @@ Index: scripts/guard/g_marcus_jonathan.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="g_marcus_jonathan";
-+    newscript->GetAI = GetAI_g_marcus_jonathan;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "g_marcus_jonathan";
++    newscript->GetAI = &GetAI_g_marcus_jonathan;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/guard_ai.cpp
 ===================================================================
---- scripts/guard/guard_ai.cpp	(revision 736)
+--- scripts/guard/guard_ai.cpp	(revision 740)
 +++ scripts/guard/guard_ai.cpp	(working copy)
 @@ -1,26 +1,12 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -2251,7 +2251,7 @@ Index: scripts/guard/guard_ai.cpp
      else
 Index: scripts/guard/guard_ai.h
 ===================================================================
---- scripts/guard/guard_ai.h	(revision 736)
+--- scripts/guard/guard_ai.h	(revision 740)
 +++ scripts/guard/guard_ai.h	(working copy)
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -2501,9 +2501,9 @@ Index: scripts/guard/high_fire_mage.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="high_fire_mage";
-+    newscript->GetAI = GetAI_high_fire_mage;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "high_fire_mage";
++    newscript->GetAI = &GetAI_high_fire_mage;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/high_sorcerer_andromath.cpp
 ===================================================================
@@ -2711,9 +2711,9 @@ Index: scripts/guard/high_sorcerer_andromath.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="high_sorcerer_andromath";
-+    newscript->GetAI = GetAI_high_sorcerer_andromath;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "high_sorcerer_andromath";
++    newscript->GetAI = &GetAI_high_sorcerer_andromath;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/highlord_bolvar_fordragon.cpp
 ===================================================================
@@ -2942,9 +2942,9 @@ Index: scripts/guard/highlord_bolvar_fordragon.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="highlord_bolvar_fordragon";
-+    newscript->GetAI = GetAI_highlord_bolvar_fordragon;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "highlord_bolvar_fordragon";
++    newscript->GetAI = &GetAI_highlord_bolvar_fordragon;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/officers.cpp
 ===================================================================
@@ -3321,14 +3321,14 @@ Index: scripts/guard/officers.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="city_officer";
-+    newscript->GetAI = GetAI_city_officer;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "city_officer";
++    newscript->GetAI = &GetAI_city_officer;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="city_guard";
-+    newscript->GetAI = GetAI_city_guard;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "city_guard";
++    newscript->GetAI = &GetAI_city_guard;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/overlord_saurfang.cpp
 ===================================================================
@@ -3566,9 +3566,9 @@ Index: scripts/guard/overlord_saurfang.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="overlord_saurfang";
-+    newscript->GetAI = GetAI_overlord_saurfang;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "overlord_saurfang";
++    newscript->GetAI = &GetAI_overlord_saurfang;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/thrall.cpp
 ===================================================================
@@ -3849,13 +3849,13 @@ Index: scripts/guard/thrall.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="thrall";
-+    newscript->GetAI = GetAI_thrall;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "thrall";
++    newscript->GetAI = &GetAI_thrall;
++    newscript->RegisterSelf();
 +}
 Index: scripts/item/item_scripts.cpp
 ===================================================================
---- scripts/item/item_scripts.cpp	(revision 736)
+--- scripts/item/item_scripts.cpp	(revision 740)
 +++ scripts/item/item_scripts.cpp	(working copy)
 @@ -393,6 +393,25 @@
  }
@@ -3884,20 +3884,20 @@ Index: scripts/item/item_scripts.cpp
  #####*/
  
 @@ -518,6 +537,11 @@
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
  
      newscript = new Script;
-+    newscript->Name="item_wolpertinger_net";
-+    newscript->pItemUse = ItemUse_item_wolpertinger_net;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "item_wolpertinger_net";
++    newscript->pItemUse = &ItemUse_item_wolpertinger_net;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-     newscript->Name="item_yehkinyas_bramble";
-     newscript->pItemUse = ItemUse_item_yehkinyas_bramble;
-     m_scripts[nrscripts++] = newscript;
+     newscript->Name = "item_yehkinyas_bramble";
+     newscript->pItemUse = &ItemUse_item_yehkinyas_bramble;
+     newscript->RegisterSelf();
 Index: scripts/zone/azuremyst_isle/azuremyst_isle.cpp
 ===================================================================
---- scripts/zone/azuremyst_isle/azuremyst_isle.cpp	(revision 736)
+--- scripts/zone/azuremyst_isle/azuremyst_isle.cpp	(revision 740)
 +++ scripts/zone/azuremyst_isle/azuremyst_isle.cpp	(working copy)
 @@ -29,6 +29,7 @@
  EndContentData */
@@ -4035,17 +4035,17 @@ Index: scripts/zone/azuremyst_isle/azuremyst_isle.cpp
 @@ -369,4 +488,10 @@
      newscript->pGossipHello =  &GossipHello_npc_susurrus;
      newscript->pGossipSelect = &GossipSelect_npc_susurrus;
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="npc_magwin";
++    newscript->Name = "npc_magwin";
 +    newscript->GetAI = &GetAI_npc_magwinAI;
 +    newscript->pQuestAccept = &QuestAccept_npc_magwin;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->RegisterSelf();
  }
 Index: scripts/zone/black_temple/boss_supremus.cpp
 ===================================================================
---- scripts/zone/black_temple/boss_supremus.cpp	(revision 736)
+--- scripts/zone/black_temple/boss_supremus.cpp	(revision 740)
 +++ scripts/zone/black_temple/boss_supremus.cpp	(working copy)
 @@ -122,7 +122,7 @@
          CheckTimer = 1000;
@@ -4075,7 +4075,7 @@ Index: scripts/zone/black_temple/boss_supremus.cpp
                  }
 Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
 ===================================================================
---- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 736)
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 740)
 +++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
 @@ -66,7 +66,7 @@
  #define TAINTED_ELEMENTAL           22009
@@ -4145,19 +4145,19 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
  
  CreatureAI* GetAI_mob_shield_generator_channel(Creature *_Creature)
 @@ -856,8 +865,8 @@
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
  
      newscript = new Script;
--    newscript->Name="mob_fathom_sporebat";
--    newscript->GetAI = GetAI_mob_fathom_sporebat;
-+    newscript->Name="mob_toxic_spore_bat";
-+    newscript->GetAI = GetAI_mob_toxic_spore_bat;
-     m_scripts[nrscripts++] = newscript;
+-    newscript->Name = "mob_fathom_sporebat";
+-    newscript->GetAI = &GetAI_mob_fathom_sporebat;
++    newscript->Name = "mob_toxic_spore_bat";
++    newscript->GetAI = &GetAI_mob_toxic_spore_bat;
+     newscript->RegisterSelf();
  
      newscript = new Script;
 Index: scripts/zone/deadmines/deadmines.cpp
 ===================================================================
---- scripts/zone/deadmines/deadmines.cpp	(revision 736)
+--- scripts/zone/deadmines/deadmines.cpp	(revision 740)
 +++ scripts/zone/deadmines/deadmines.cpp	(working copy)
 @@ -22,3 +22,223 @@
  EndScriptData */
@@ -4374,13 +4374,13 @@ Index: scripts/zone/deadmines/deadmines.cpp
 +	Script *newscript;
 +	newscript = new Script;
 +	newscript->Name = "instance_deadmines";
-+	newscript->GetInstanceData = GetInstanceData_instance_deadmines;
-+	m_scripts[nrscripts++] = newscript;
++	newscript->GetInstanceData = &GetInstanceData_instance_deadmines;
++	newscript->RegisterSelf();
 +	
 +	newscript = new Script;
-+	newscript->Name="item_Defias_Gunpowder";
-+	newscript->pItemUse = ItemUse_item_Defias_Gunpowder;
-+	m_scripts[nrscripts++] = newscript;
++	newscript->Name = "item_Defias_Gunpowder";
++	newscript->pItemUse = &ItemUse_item_Defias_Gunpowder;
++	newscript->RegisterSelf();
 +
 +}
 Index: scripts/zone/deadmines/def_deadmines.h
@@ -4404,7 +4404,7 @@ Index: scripts/zone/deadmines/def_deadmines.h
 +#endif
 Index: scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
 ===================================================================
---- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 736)
+--- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 740)
 +++ scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(working copy)
 @@ -179,6 +179,8 @@
                  m_creature->setFaction(14);
@@ -4529,14 +4529,14 @@ Index: scripts/zone/hellfire_citadel/shattered_halls/boss_warchief_kargath_blade
 +{ 
 +    Script *newscript; 
 +    newscript = new Script; 
-+    newscript->Name="boss_warchief_kargath_bladefist"; 
-+    newscript->GetAI = GetAI_boss_warchief_kargath_bladefist; 
-+    m_scripts[nrscripts++] = newscript; 
++    newscript->Name = "boss_warchief_kargath_bladefist"; 
++    newscript->GetAI = &GetAI_boss_warchief_kargath_bladefist; 
++    newscript->RegisterSelf(); 
 +   return; 
 +}
 Index: scripts/zone/karazhan/boss_nightbane.cpp
 ===================================================================
---- scripts/zone/karazhan/boss_nightbane.cpp	(revision 736)
+--- scripts/zone/karazhan/boss_nightbane.cpp	(revision 740)
 +++ scripts/zone/karazhan/boss_nightbane.cpp	(working copy)
 @@ -22,12 +22,370 @@
  EndScriptData */
@@ -4913,13 +4913,13 @@ Index: scripts/zone/karazhan/boss_nightbane.cpp
 +{
 +    Script *newscript;
 +    newscript = new Script;
-+    newscript->Name="boss_nightbane";
-+    newscript->GetAI = GetAI_boss_nightbane;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_nightbane";
++    newscript->GetAI = &GetAI_boss_nightbane;
++    newscript->RegisterSelf();
 +}
 Index: scripts/zone/netherstorm/netherstorm.cpp
 ===================================================================
---- scripts/zone/netherstorm/netherstorm.cpp	(revision 736)
+--- scripts/zone/netherstorm/netherstorm.cpp	(revision 740)
 +++ scripts/zone/netherstorm/netherstorm.cpp	(working copy)
 @@ -388,7 +388,366 @@
      }
@@ -5291,17 +5291,17 @@ Index: scripts/zone/netherstorm/netherstorm.cpp
 @@ -418,4 +777,14 @@
      newscript->pGossipHello =   &GossipHello_npc_veronia;
      newscript->pGossipSelect =  &GossipSelect_npc_veronia;
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
 +
 +	newscript = new Script;
 +    newscript->Name = "npc_commander_dawnforge";
-+    newscript->GetAI = GetAI_npc_commander_dawnforge;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->GetAI = &GetAI_npc_commander_dawnforge;
++    newscript->RegisterSelf();
 +	
 +	newscript = new Script;
 +    newscript->Name = "mob_arcane_annihilator";
-+    newscript->GetAI = GetAI_mob_arcane_annihilator;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->GetAI = &GetAI_mob_arcane_annihilator;
++    newscript->RegisterSelf();
  }
 Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 ===================================================================
@@ -5884,23 +5884,23 @@ Index: scripts/zone/tempest_keep/the_eye/boss_alar.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="boss_alar";
-+    newscript->GetAI = GetAI_boss_alar;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_alar";
++    newscript->GetAI = &GetAI_boss_alar;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="mob_ember_of_alar";
-+    newscript->GetAI = GetAI_mob_ember_of_alar;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "mob_ember_of_alar";
++    newscript->GetAI = &GetAI_mob_ember_of_alar;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="mob_flame_patch_alar";
-+    newscript->GetAI = GetAI_mob_flame_patch_alar;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "mob_flame_patch_alar";
++    newscript->GetAI = &GetAI_mob_flame_patch_alar;
++    newscript->RegisterSelf();
 +}
 Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 736)
+--- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 740)
 +++ scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(working copy)
 @@ -121,7 +121,7 @@
                  target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());
@@ -5927,7 +5927,7 @@ Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
          }else ArcaneOrb_Timer -= diff;
 Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 736)
+--- scripts/zone/tempest_keep/the_eye/def_the_eye.h	(revision 740)
 +++ scripts/zone/tempest_keep/the_eye/def_the_eye.h	(working copy)
 @@ -17,4 +17,5 @@
  #define DATA_SOLARIANEVENT                  10
@@ -5937,7 +5937,7 @@ Index: scripts/zone/tempest_keep/the_eye/def_the_eye.h
  #endif
 Index: scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 736)
+--- scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(revision 740)
 +++ scripts/zone/tempest_keep/the_eye/instance_the_eye.cpp	(working copy)
 @@ -43,8 +43,10 @@
      uint64 MasterEngineerTelonicus;
@@ -6519,14 +6519,14 @@ Index: scripts/zone/zulaman/boss_akilzon.cpp
 +    Script *newscript = NULL;
 +
 +    newscript = new Script;
-+    newscript->Name="boss_akilzon";
-+    newscript->GetAI = GetAI_boss_akilzon;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_akilzon";
++    newscript->GetAI = &GetAI_boss_akilzon;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="mob_akilzon_eagle";
-+    newscript->GetAI = GetAI_mob_soaring_eagle;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "mob_akilzon_eagle";
++    newscript->GetAI = &GetAI_mob_soaring_eagle;
++    newscript->RegisterSelf();
 +}
 Index: scripts/zone/zulaman/boss_halazzi.cpp
 ===================================================================
@@ -6926,14 +6926,14 @@ Index: scripts/zone/zulaman/boss_halazzi.cpp
 +{
 +    Script *newscript;
 +    newscript = new Script;
-+    newscript->Name="boss_halazzi";
-+    newscript->GetAI = GetAI_boss_halazziAI;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_halazzi";
++    newscript->GetAI = &GetAI_boss_halazziAI;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="mob_halazzi_lynx";
-+    newscript->GetAI = GetAI_boss_spiritlynxAI;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "mob_halazzi_lynx";
++    newscript->GetAI = &GetAI_boss_spiritlynxAI;
++    newscript->RegisterSelf();
 +}
 Index: scripts/zone/zulaman/boss_hexlord.cpp
 ===================================================================
@@ -7828,53 +7828,53 @@ Index: scripts/zone/zulaman/boss_hexlord.cpp
 +{
 +    Script *newscript;
 +    newscript = new Script;
-+    newscript->Name="boss_hexlord_malacrass";
-+    newscript->GetAI = GetAI_boss_hex_lord_malacrass;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_hexlord_malacrass";
++    newscript->GetAI = &GetAI_boss_hex_lord_malacrass;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="boss_thurg";
-+    newscript->GetAI = GetAI_boss_thurg;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_thurg";
++    newscript->GetAI = &GetAI_boss_thurg;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="boss_gazakroth";
-+    newscript->GetAI = GetAI_boss_gazakroth;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_gazakroth";
++    newscript->GetAI = &GetAI_boss_gazakroth;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="boss_lord_raadan";
-+    newscript->GetAI = GetAI_boss_lord_raadan;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_lord_raadan";
++    newscript->GetAI = &GetAI_boss_lord_raadan;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="boss_darkheart";
-+    newscript->GetAI = GetAI_boss_darkheart;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_darkheart";
++    newscript->GetAI = &GetAI_boss_darkheart;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="boss_slither";
-+    newscript->GetAI = GetAI_boss_slither;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_slither";
++    newscript->GetAI = &GetAI_boss_slither;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="boss_fenstalker";
-+    newscript->GetAI = GetAI_boss_fenstalker;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_fenstalker";
++    newscript->GetAI = &GetAI_boss_fenstalker;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="boss_koragg";
-+    newscript->GetAI = GetAI_boss_koragg;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_koragg";
++    newscript->GetAI = &GetAI_boss_koragg;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="boss_alyson_antille";
-+    newscript->GetAI = GetAI_boss_alyson_antille;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_alyson_antille";
++    newscript->GetAI = &GetAI_boss_alyson_antille;
++    newscript->RegisterSelf();
 +}
 Index: scripts/zone/zulaman/boss_janalai.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_janalai.cpp	(revision 736)
+--- scripts/zone/zulaman/boss_janalai.cpp	(revision 740)
 +++ scripts/zone/zulaman/boss_janalai.cpp	(working copy)
 @@ -16,7 +16,7 @@
  
@@ -8930,34 +8930,34 @@ Index: scripts/zone/zulaman/boss_janalai.cpp
  {
      Script *newscript;
 @@ -710,17 +686,22 @@
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
  
      newscript = new Script;
--    newscript->Name="mob_jandalai_firebomb";
-+    newscript->Name="mob_janalai_firebomb";
-     newscript->GetAI = GetAI_mob_jandalai_firebombAI;
-     m_scripts[nrscripts++] = newscript;
+-    newscript->Name = "mob_jandalai_firebomb";
++    newscript->Name = "mob_janalai_firebomb";
+     newscript->GetAI = &GetAI_mob_jandalai_firebombAI;
+     newscript->RegisterSelf();
  
      newscript = new Script;
--    newscript->Name="mob_amanishi_hatcher";
-+    newscript->Name="mob_janalai_hatcher";
-     newscript->GetAI = GetAI_mob_amanishi_hatcherAI;
-     m_scripts[nrscripts++] = newscript;
+-    newscript->Name = "mob_amanishi_hatcher";
++    newscript->Name = "mob_janalai_hatcher";
+     newscript->GetAI = &GetAI_mob_amanishi_hatcherAI;
+     newscript->RegisterSelf();
  
      newscript = new Script;
--    newscript->Name="mob_hatchling";
-+    newscript->Name="mob_janalai_hatchling";
-     newscript->GetAI = GetAI_mob_hatchlingAI;
-     m_scripts[nrscripts++] = newscript;
+-    newscript->Name = "mob_hatchling";
++    newscript->Name = "mob_janalai_hatchling";
+     newscript->GetAI = &GetAI_mob_hatchlingAI;
+     newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="mob_janalai_egg";
-+    newscript->GetAI = GetAI_mob_eggAI;
-+    m_scripts[nrscripts++] = newscript; 
++    newscript->Name = "mob_janalai_egg";
++    newscript->GetAI = &GetAI_mob_eggAI;
++    newscript->RegisterSelf(); 
  }
 Index: scripts/zone/zulaman/boss_nalorakk.cpp
 ===================================================================
---- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 736)
+--- scripts/zone/zulaman/boss_nalorakk.cpp	(revision 740)
 +++ scripts/zone/zulaman/boss_nalorakk.cpp	(working copy)
 @@ -22,6 +22,7 @@
  EndScriptData */
@@ -9952,23 +9952,23 @@ Index: scripts/zone/zulaman/boss_zuljin.cpp
 +{
 +    Script *newscript;
 +    newscript = new Script;
-+    newscript->Name="boss_zuljin";
-+    newscript->GetAI = GetAI_boss_zuljin;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_zuljin";
++    newscript->GetAI = &GetAI_boss_zuljin;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="do_nothing";
-+    newscript->GetAI = GetAI_do_nothing;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "do_nothing";
++    newscript->GetAI = &GetAI_do_nothing;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="mob_zuljin_vortex";
-+    newscript->GetAI = GetAI_feather_vortexAI;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "mob_zuljin_vortex";
++    newscript->GetAI = &GetAI_feather_vortexAI;
++    newscript->RegisterSelf();
 +}
 Index: scripts/zone/zulaman/def_zulaman.h
 ===================================================================
---- scripts/zone/zulaman/def_zulaman.h	(revision 736)
+--- scripts/zone/zulaman/def_zulaman.h	(revision 740)
 +++ scripts/zone/zulaman/def_zulaman.h	(working copy)
 @@ -5,26 +5,14 @@
  #ifndef DEF_ZULAMAN_H
@@ -10008,7 +10008,7 @@ Index: scripts/zone/zulaman/def_zulaman.h
  #endif
 Index: scripts/zone/zulaman/instance_zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/instance_zulaman.cpp	(revision 736)
+--- scripts/zone/zulaman/instance_zulaman.cpp	(revision 740)
 +++ scripts/zone/zulaman/instance_zulaman.cpp	(working copy)
 @@ -16,7 +16,7 @@
  
@@ -10362,7 +10362,7 @@ Index: scripts/zone/zulaman/instance_zulaman.cpp
  
 Index: scripts/zone/zulaman/zulaman.cpp
 ===================================================================
---- scripts/zone/zulaman/zulaman.cpp	(revision 736)
+--- scripts/zone/zulaman/zulaman.cpp	(revision 740)
 +++ scripts/zone/zulaman/zulaman.cpp	(working copy)
 @@ -97,6 +97,74 @@
      return new npc_forest_frogAI (_Creature);
@@ -10440,20 +10440,20 @@ Index: scripts/zone/zulaman/zulaman.cpp
  {
      Script *newscript;
 @@ -105,4 +173,11 @@
-     newscript->Name="npc_forest_frog";
-     newscript->GetAI = GetAI_npc_forest_frog;
-     m_scripts[nrscripts++] = newscript;
+     newscript->Name = "npc_forest_frog";
+     newscript->GetAI = &GetAI_npc_forest_frog;
+     newscript->RegisterSelf();
 +
 +    newscript = new Script;
 +    newscript->Name = "npc_zulaman_hostage";
-+    newscript->GetAI = GetAI_npc_zulaman_hostage;
++    newscript->GetAI = &GetAI_npc_zulaman_hostage;
 +    newscript->pGossipHello = GossipHello_npc_zulaman_hostage;
 +    newscript->pGossipSelect = GossipSelect_npc_zulaman_hostage;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->RegisterSelf();
  }
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 736)
+--- VC80/80ScriptDev2.vcproj	(revision 740)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="Windows-1252"?>
@@ -10525,7 +10525,7 @@ Index: VC80/80ScriptDev2.vcproj
  					RelativePath="..\scripts\custom\test.cpp"
  					>
  				</File>
-@@ -551,6 +591,10 @@
+@@ -555,6 +595,10 @@
  						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"
  						>
  					</File>
@@ -10536,7 +10536,7 @@ Index: VC80/80ScriptDev2.vcproj
  				</Filter>
  				<Filter
  					Name="Deadwind Pass"
-@@ -1619,6 +1663,10 @@
+@@ -1623,6 +1667,10 @@
  							>
  						</File>
  						<File
@@ -10547,7 +10547,7 @@ Index: VC80/80ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
  							>
  						</File>
-@@ -1771,6 +1819,10 @@
+@@ -1775,6 +1823,10 @@
  							>
  						</File>
  						<File
@@ -10558,7 +10558,7 @@ Index: VC80/80ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_kaelthas.cpp"
  							>
  						</File>
-@@ -2104,14 +2156,30 @@
+@@ -2108,14 +2160,30 @@
  					Name="Zul&apos;Aman"
  					>
  					<File
@@ -10591,7 +10591,7 @@ Index: VC80/80ScriptDev2.vcproj
  					</File>
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 736)
+--- VC90/90ScriptDev2.vcproj	(revision 740)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -408,6 +408,18 @@
  				Name="guard"
@@ -10654,7 +10654,7 @@ Index: VC90/90ScriptDev2.vcproj
  					RelativePath="..\scripts\custom\test.cpp"
  					>
  				</File>
-@@ -550,6 +590,10 @@
+@@ -554,6 +594,10 @@
  						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"
  						>
  					</File>
@@ -10665,7 +10665,7 @@ Index: VC90/90ScriptDev2.vcproj
  				</Filter>
  				<Filter
  					Name="Deadwind Pass"
-@@ -1618,6 +1662,10 @@
+@@ -1622,6 +1666,10 @@
  							>
  						</File>
  						<File
@@ -10676,7 +10676,7 @@ Index: VC90/90ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\hellfire_citadel\shattered_halls\def_shattered_halls.h"
  							>
  						</File>
-@@ -1770,6 +1818,10 @@
+@@ -1774,6 +1822,10 @@
  							>
  						</File>
  						<File
@@ -10687,7 +10687,7 @@ Index: VC90/90ScriptDev2.vcproj
  							RelativePath="..\scripts\zone\tempest_keep\the_eye\boss_kaelthas.cpp"
  							>
  						</File>
-@@ -2103,14 +2155,30 @@
+@@ -2107,14 +2159,30 @@
  					Name="Zul&apos;Aman"
  					>
  					<File

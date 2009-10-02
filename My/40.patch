@@ -1304,7 +1304,7 @@ index 0000000..04815b7
 +
 +#endif
 diff --git a/src/game/BattleGround.cpp b/src/game/BattleGround.cpp
-index 2781ef6..bdc0854 100644
+index 2781ef6..309804c 100644
 --- a/src/game/BattleGround.cpp
 +++ b/src/game/BattleGround.cpp
 @@ -24,6 +24,7 @@
@@ -8753,10 +8753,10 @@ index 0d55aa0..d7a1c87 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 068476c..3fdf712 100644
+index 0eaaeab..0dbec01 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
-@@ -169,6 +169,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -197,6 +197,7 @@ ChatCommand * ChatHandler::getCommandTable()
          { "Mod32Value",     SEC_ADMINISTRATOR,  false, &ChatHandler::HandleMod32Value,                 "", NULL },
          { "anim",           SEC_GAMEMASTER,     false, &ChatHandler::HandleAnimCommand,                "", NULL },
          { "lootrecipient",  SEC_GAMEMASTER,     false, &ChatHandler::HandleGetLootRecipient,           "", NULL },
@@ -8764,7 +8764,7 @@ index 068476c..3fdf712 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
  
-@@ -485,6 +486,8 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -513,6 +514,8 @@ ChatCommand * ChatHandler::getCommandTable()
          { "gps",            SEC_MODERATOR,      false, &ChatHandler::HandleGPSCommand,                 "", NULL },
          { "guid",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGUIDCommand,                "", NULL },
          { "help",           SEC_PLAYER,         true,  &ChatHandler::HandleHelpCommand,                "", NULL },
@@ -8773,7 +8773,7 @@ index 068476c..3fdf712 100644
          { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", NULL },
          { "cooldown",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleCooldownCommand,            "", NULL },
          { "unlearn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnLearnCommand,             "", NULL },
-@@ -533,6 +536,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -561,6 +564,7 @@ ChatCommand * ChatHandler::getCommandTable()
          { "damage",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDamageCommand,              "", NULL },
          { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
          { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterDeleteCommand,     "", NULL },
@@ -8782,7 +8782,7 @@ index 068476c..3fdf712 100644
          { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
          { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 77a9d51..7dbf7ff 100644
+index 73e0d6d..6fe3c4f 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
 @@ -151,6 +151,8 @@ class ChatHandler
@@ -8794,7 +8794,7 @@ index 77a9d51..7dbf7ff 100644
  
          bool HandleModifyKnownTitlesCommand(const char* args);
          bool HandleModifyHPCommand(const char* args);
-@@ -414,6 +416,7 @@ class ChatHandler
+@@ -415,6 +417,7 @@ class ChatHandler
          bool HandleComeToMeCommand(const char *args);
          bool HandleCombatStopCommand(const char *args);
          bool HandleSendMessageCommand(const char * args);
@@ -8802,7 +8802,7 @@ index 77a9d51..7dbf7ff 100644
          bool HandleRepairitemsCommand(const char* args);
          bool HandleWaterwalkCommand(const char* args);
  
-@@ -428,6 +431,7 @@ class ChatHandler
+@@ -429,6 +432,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
          bool HandleGetLootRecipient(const char * args);
@@ -10264,7 +10264,7 @@ index 0000000..7460b92
 +#define sChatLog MaNGOS::Singleton<ChatLog>::Instance()
 +#endif
 diff --git a/src/game/Creature.cpp b/src/game/Creature.cpp
-index db576c3..eb38cac 100644
+index 256f7bb..54fbea0 100644
 --- a/src/game/Creature.cpp
 +++ b/src/game/Creature.cpp
 @@ -42,6 +42,7 @@
@@ -10314,7 +10314,7 @@ index db576c3..eb38cac 100644
              if (player->isDead())
                  CastSpell(this,17251,true,NULL,NULL,player->GetGUID());
 diff --git a/src/game/Creature.h b/src/game/Creature.h
-index 941f4cf..35b4565 100644
+index 997faf6..0d4be2d 100644
 --- a/src/game/Creature.h
 +++ b/src/game/Creature.h
 @@ -53,7 +53,8 @@ enum Gossip_Option
@@ -10327,7 +10327,7 @@ index 941f4cf..35b4565 100644
  };
  
  enum Gossip_Guard
-@@ -593,6 +594,17 @@ class MANGOS_DLL_SPEC Creature : public Unit
+@@ -595,6 +596,17 @@ class MANGOS_DLL_SPEC Creature : public Unit
  
          uint32 GetGlobalCooldown() const { return m_GlobalCooldown; }
  
@@ -10345,7 +10345,7 @@ index 941f4cf..35b4565 100644
      protected:
          bool CreateFromProto(uint32 guidlow,uint32 Entry,uint32 team, const CreatureData *data = NULL);
          bool InitEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
-@@ -640,6 +652,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
+@@ -642,6 +654,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
          float CombatStartX;
          float CombatStartY;
          float CombatStartZ;
@@ -10485,7 +10485,7 @@ index 116085b..c52a114 100644
      }
  
 diff --git a/src/game/GameObject.h b/src/game/GameObject.h
-index b029bf4..e4a1177 100644
+index 0961a9c..b44b54f 100644
 --- a/src/game/GameObject.h
 +++ b/src/game/GameObject.h
 @@ -381,6 +381,7 @@ struct GameObjectData
@@ -10803,7 +10803,7 @@ index 3bb2475..49cea90 100644
          SendSysMessage(LANG_BAD_VALUE);
          SetSentErrorMessage(true);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 8d7e412..7a1a03f 100644
+index f10c9c9..9940fb7 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -10814,7 +10814,7 @@ index 8d7e412..7a1a03f 100644
  #include "InstanceSaveMgr.h"
  #include "InstanceData.h"
  
-@@ -4855,6 +4856,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
+@@ -4913,6 +4914,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
      return true;
  }
  
@@ -10907,7 +10907,7 @@ index 8d7e412..7a1a03f 100644
  bool ChatHandler::HandleBanAccountCommand(const char* args)
  {
      return HandleBanHelper(BAN_ACCOUNT,args);
-@@ -6407,6 +6494,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
+@@ -6465,6 +6552,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
      return true;
  }
  
@@ -11745,18 +11745,18 @@ index 24ce65d..84427bc 100644
 +    if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 4 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
  }
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
-index f49f0a1..0e35bd3 100644
+index 01b20bd..d02798d 100644
 --- a/src/game/ObjectMgr.cpp
 +++ b/src/game/ObjectMgr.cpp
-@@ -20,6 +20,7 @@
- #include "Database/DatabaseEnv.h"
+@@ -21,6 +21,7 @@
  #include "Database/SQLStorage.h"
+ #include "Database/SQLStorageImpl.h"
  
 +#include "AuctionHouseBot.h"
  #include "Log.h"
  #include "MapManager.h"
  #include "ObjectMgr.h"
-@@ -415,6 +416,9 @@ void ObjectMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
+@@ -416,6 +417,9 @@ void ObjectMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
  //call this method to send mail to auction owner, when auction is successful, it does not clear ram
  void ObjectMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
  {
@@ -11766,7 +11766,7 @@ index f49f0a1..0e35bd3 100644
      uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
      Player *owner = GetPlayer(owner_guid);
  
-@@ -1159,6 +1163,7 @@ void ObjectMgr::LoadGameobjects()
+@@ -1170,6 +1174,7 @@ void ObjectMgr::LoadGameobjects()
          data.spawntimesecs  = fields[11].GetInt32();
          data.animprogress   = fields[12].GetUInt32();
          data.go_state       = fields[13].GetUInt32();
@@ -11774,7 +11774,7 @@ index f49f0a1..0e35bd3 100644
          data.spawnMask      = fields[14].GetUInt8();
          int16 gameEvent     = fields[15].GetInt16();
  
-@@ -4901,6 +4906,54 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool inD
+@@ -4932,6 +4937,54 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool inD
      return true;
  }
  
@@ -11830,10 +11830,10 @@ index f49f0a1..0e35bd3 100644
  {
      mAreaTriggers.clear();                                  // need for reload case
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index 4c5a1c4..4f26adc 100644
+index 38cf68d..5c53b0b 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
-@@ -320,6 +320,8 @@ class ObjectMgr
+@@ -323,6 +323,8 @@ class ObjectMgr
          ArenaTeam* GetArenaTeamByCapitan(uint64 const& guid) const;
          void AddArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.insert( arenateam ); }
          void RemoveArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.erase( arenateam ); }
@@ -11842,7 +11842,7 @@ index 4c5a1c4..4f26adc 100644
  
          static CreatureInfo const *GetCreatureTemplate( uint32 id );
          CreatureModelInfo const *GetCreatureModelInfo( uint32 modelid );
-@@ -447,6 +449,7 @@ class ObjectMgr
+@@ -450,6 +452,7 @@ class ObjectMgr
  
          WorldSafeLocsEntry const *GetClosestGraveYard(float x, float y, float z, uint32 MapId, uint32 team);
          bool AddGraveYardLink(uint32 id, uint32 zone, uint32 team, bool inDB = true);
@@ -21290,7 +21290,7 @@ index 7673622..53257f7 100644
      if(curDestNode && curDestNode->map_id != GetPlayer()->GetMapId())
      {
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index dc9d837..8a6ec88 100644
+index 30d4f9e..0ba2626 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -41,6 +41,7 @@
@@ -24446,7 +24446,7 @@ index 9447c5d..da47cc8 100644
  
          uint32 m_state;                                     // Even derived shouldn't modify
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index db9bee3..f8a54ae 100644
+index 546cdbb..c9ab1a5 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -41,6 +41,7 @@
@@ -24466,7 +24466,7 @@ index db9bee3..f8a54ae 100644
  
  INSTANTIATE_SINGLETON_1( World );
  
-@@ -70,7 +73,9 @@ float World::m_MaxVisibleDistanceForObject    = DEFAULT_VISIBILITY_DISTANCE;
+@@ -71,7 +74,9 @@ float World::m_MaxVisibleDistanceForObject    = DEFAULT_VISIBILITY_DISTANCE;
  float World::m_MaxVisibleDistanceInFlight     = DEFAULT_VISIBILITY_DISTANCE;
  float World::m_VisibleUnitGreyDistance        = 0;
  float World::m_VisibleObjectGreyDistance      = 0;
@@ -24477,7 +24477,7 @@ index db9bee3..f8a54ae 100644
  // ServerMessages.dbc
  enum ServerMessageType
  {
-@@ -510,7 +515,17 @@ void World::LoadConfigSettings(bool reload)
+@@ -511,7 +516,17 @@ void World::LoadConfigSettings(bool reload)
          sLog.outError("DurabilityLossChance.Block (%f) must be >=0. Using 0.0 instead.",rate_values[RATE_DURABILITY_LOSS_BLOCK]);
          rate_values[RATE_DURABILITY_LOSS_BLOCK] = 0.0f;
      }
@@ -24496,7 +24496,7 @@ index db9bee3..f8a54ae 100644
      ///- Read other configuration items from the config file
  
      m_configs[CONFIG_COMPRESSION] = sConfig.GetIntDefault("Compression", 1);
-@@ -796,6 +811,13 @@ void World::LoadConfigSettings(bool reload)
+@@ -797,6 +812,13 @@ void World::LoadConfigSettings(bool reload)
      m_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfig.GetIntDefault("ListenRange.TextEmote", 25);
      m_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfig.GetIntDefault("ListenRange.Yell", 300);
  
@@ -24510,7 +24510,7 @@ index db9bee3..f8a54ae 100644
      m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
      if(m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
      {
-@@ -1164,6 +1186,9 @@ void World::SetInitialWorldSettings()
+@@ -1168,6 +1190,9 @@ void World::SetInitialWorldSettings()
      WorldDatabase.PExecute("INSERT INTO uptime (startstring, starttime, uptime) VALUES('%s', " I64FMTD ", 0)",
          isoDate, uint64(m_startTime));
  
@@ -24520,7 +24520,7 @@ index db9bee3..f8a54ae 100644
      m_timers[WUPDATE_OBJECTS].SetInterval(0);
      m_timers[WUPDATE_SESSIONS].SetInterval(0);
      m_timers[WUPDATE_WEATHERS].SetInterval(1000);
-@@ -1171,6 +1196,7 @@ void World::SetInitialWorldSettings()
+@@ -1175,6 +1200,7 @@ void World::SetInitialWorldSettings()
      m_timers[WUPDATE_UPTIME].SetInterval(m_configs[CONFIG_UPTIME_UPDATE]*MINUTE*1000);
                                                              //Update "uptime" table based on configuration entry in minutes.
      m_timers[WUPDATE_CORPSES].SetInterval(20*MINUTE*1000);  //erase corpses every 20 minutes
@@ -24528,7 +24528,7 @@ index db9bee3..f8a54ae 100644
  
      //to set mailtimer to return mails every day between 4 and 5 am
      //mailtimer is increased when updating auctions
-@@ -1192,6 +1218,10 @@ void World::SetInitialWorldSettings()
+@@ -1196,6 +1222,10 @@ void World::SetInitialWorldSettings()
      ///- Initialize Battlegrounds
      sLog.outString( "Starting BattleGround System" );
      sBattleGroundMgr.CreateInitialBattleGrounds();
@@ -24539,7 +24539,7 @@ index db9bee3..f8a54ae 100644
  
      //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
      sLog.outString( "Loading Transports..." );
-@@ -1207,6 +1237,8 @@ void World::SetInitialWorldSettings()
+@@ -1211,6 +1241,8 @@ void World::SetInitialWorldSettings()
      uint32 nextGameEvent = gameeventmgr.Initialize();
      m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
  
@@ -24548,7 +24548,7 @@ index db9bee3..f8a54ae 100644
      sLog.outString( "WORLD: World initialized" );
  }
  
-@@ -1275,6 +1307,7 @@ void World::Update(time_t diff)
+@@ -1279,6 +1311,7 @@ void World::Update(time_t diff)
      /// <ul><li> Handle auctions when the timer has passed
      if (m_timers[WUPDATE_AUCTIONS].Passed())
      {
@@ -24556,7 +24556,7 @@ index db9bee3..f8a54ae 100644
          m_timers[WUPDATE_AUCTIONS].Reset();
  
          ///- Update mails (return old mails with item, or delete them)
-@@ -1386,6 +1419,8 @@ void World::Update(time_t diff)
+@@ -1390,6 +1423,8 @@ void World::Update(time_t diff)
              ScriptsProcess();
  
          sBattleGroundMgr.Update(diff);
@@ -24565,7 +24565,7 @@ index db9bee3..f8a54ae 100644
      }
  
      // execute callbacks from sql queries that were queued recently
-@@ -1408,6 +1443,17 @@ void World::Update(time_t diff)
+@@ -1412,6 +1447,17 @@ void World::Update(time_t diff)
          m_timers[WUPDATE_EVENTS].Reset();
      }
  
@@ -24583,7 +24583,7 @@ index db9bee3..f8a54ae 100644
      /// </ul>
      ///- Move all creatures with "delayed move" and remove and delete all objects with "delayed remove"
      MapManager::Instance().DoDelayedMovesAndRemoves();
-@@ -2132,6 +2178,24 @@ void World::SendWorldText(int32 string_id, ...)
+@@ -2140,6 +2186,24 @@ void World::SendWorldText(int32 string_id, ...)
              delete data_cache[i][j];
  }
  
@@ -24608,7 +24608,7 @@ index db9bee3..f8a54ae 100644
  /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
  void World::SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self, uint32 team)
  {
-@@ -2466,6 +2530,45 @@ void World::ProcessCliCommands()
+@@ -2482,6 +2546,45 @@ void World::ProcessCliCommands()
      zprint("mangos>");
  }
  
@@ -24655,10 +24655,10 @@ index db9bee3..f8a54ae 100644
  {
      m_resultQueue = new SqlResultQueue;
 diff --git a/src/game/World.h b/src/game/World.h
-index baa36fd..e21fbb6 100644
+index b5a66e7..1eaea7d 100644
 --- a/src/game/World.h
 +++ b/src/game/World.h
-@@ -59,7 +59,8 @@ enum WorldTimers
+@@ -66,7 +66,8 @@ enum WorldTimers
      WUPDATE_UPTIME      = 4,
      WUPDATE_CORPSES     = 5,
      WUPDATE_EVENTS      = 6,
@@ -24668,7 +24668,7 @@ index baa36fd..e21fbb6 100644
  };
  
  /// Configuration elements
-@@ -160,6 +161,11 @@ enum WorldConfigs
+@@ -167,6 +168,11 @@ enum WorldConfigs
      CONFIG_LISTEN_RANGE_SAY,
      CONFIG_LISTEN_RANGE_TEXTEMOTE,
      CONFIG_LISTEN_RANGE_YELL,
@@ -24680,7 +24680,7 @@ index baa36fd..e21fbb6 100644
      CONFIG_VALUE_COUNT
  };
  
-@@ -318,6 +324,7 @@ class World
+@@ -324,6 +330,7 @@ class World
  
          WorldSession* FindSession(uint32 id) const;
          void AddSession(WorldSession *s);
@@ -24688,7 +24688,7 @@ index baa36fd..e21fbb6 100644
          bool RemoveSession(uint32 id);
          /// Get the number of current active sessions
          void UpdateMaxSessionCounters();
-@@ -381,6 +388,7 @@ class World
+@@ -387,6 +394,7 @@ class World
          void LoadConfigSettings(bool reload = false);
  
          void SendWorldText(int32 string_id, ...);
@@ -24696,7 +24696,7 @@ index baa36fd..e21fbb6 100644
          void SendGlobalMessage(WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
          void SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
          void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
-@@ -439,7 +447,10 @@ class World
+@@ -447,7 +455,10 @@ class World
          static float GetMaxVisibleDistanceInFlight()    { return m_MaxVisibleDistanceInFlight;    }
          static float GetVisibleUnitGreyDistance()       { return m_VisibleUnitGreyDistance;       }
          static float GetVisibleObjectGreyDistance()     { return m_VisibleObjectGreyDistance;     }
@@ -24708,7 +24708,7 @@ index baa36fd..e21fbb6 100644
          void ProcessCliCommands();
          void QueueCliCommand( CliCommandHolder::Print* zprintf, char const* input ) { cliCmdQueue.add(new CliCommandHolder(input, zprintf)); }
  
-@@ -503,7 +514,9 @@ class World
+@@ -513,7 +524,9 @@ class World
          static float m_MaxVisibleDistanceInFlight;
          static float m_VisibleUnitGreyDistance;
          static float m_VisibleObjectGreyDistance;

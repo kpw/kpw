@@ -1,8 +1,8 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 667)
+--- Makefile.am	(revision 738)
 +++ Makefile.am	(working copy)
-@@ -167,6 +167,7 @@
+@@ -166,6 +166,7 @@
  scripts/zone/coilfang_resevoir/underbog/boss_hungarfen.cpp \
  scripts/zone/darkshore/darkshore.cpp \
  scripts/zone/deadmines/deadmines.cpp \
@@ -12,9 +12,9 @@ Index: Makefile.am
  scripts/zone/eastern_plaguelands/eastern_plaguelands.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 667)
+--- ScriptMgr.cpp	(revision 738)
 +++ ScriptMgr.cpp	(working copy)
-@@ -264,6 +264,8 @@
+@@ -247,6 +247,8 @@
  //Darkshore
  //Darnassus
  //Deadmines
@@ -23,7 +23,7 @@ Index: ScriptMgr.cpp
  //Deadwind pass
  //Desolace
  //Dire Maul
-@@ -1367,6 +1369,8 @@
+@@ -1429,6 +1431,8 @@
      //Darkshore
      //Darnassus
      //Deadmines
@@ -34,7 +34,7 @@ Index: ScriptMgr.cpp
      //Dire Maul
 Index: scripts/zone/deadmines/deadmines.cpp
 ===================================================================
---- scripts/zone/deadmines/deadmines.cpp	(revision 667)
+--- scripts/zone/deadmines/deadmines.cpp	(revision 738)
 +++ scripts/zone/deadmines/deadmines.cpp	(working copy)
 @@ -22,3 +22,223 @@
  EndScriptData */
@@ -251,13 +251,13 @@ Index: scripts/zone/deadmines/deadmines.cpp
 +	Script *newscript;
 +	newscript = new Script;
 +	newscript->Name = "instance_deadmines";
-+	newscript->GetInstanceData = GetInstanceData_instance_deadmines;
-+	m_scripts[nrscripts++] = newscript;
++	newscript->GetInstanceData = &GetInstanceData_instance_deadmines;
++	newscript->RegisterSelf();
 +	
 +	newscript = new Script;
-+	newscript->Name="item_Defias_Gunpowder";
-+	newscript->pItemUse = ItemUse_item_Defias_Gunpowder;
-+	m_scripts[nrscripts++] = newscript;
++	newscript->Name = "item_Defias_Gunpowder";
++	newscript->pItemUse = &ItemUse_item_Defias_Gunpowder;
++	newscript->RegisterSelf();
 +
 +}
 Index: scripts/zone/deadmines/def_deadmines.h
@@ -281,7 +281,7 @@ Index: scripts/zone/deadmines/def_deadmines.h
 +#endif
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 667)
+--- VC80/80ScriptDev2.vcproj	(revision 738)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -551,6 +551,10 @@
  						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"
@@ -296,7 +296,7 @@ Index: VC80/80ScriptDev2.vcproj
  					Name="Deadwind Pass"
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 667)
+--- VC90/90ScriptDev2.vcproj	(revision 738)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -550,6 +550,10 @@
  						RelativePath="..\scripts\zone\deadmines\deadmines.cpp"

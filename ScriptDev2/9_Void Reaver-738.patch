@@ -1,6 +1,6 @@
 Index: scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp
 ===================================================================
---- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 715)
+--- scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(revision 738)
 +++ scripts/zone/tempest_keep/the_eye/boss_void_reaver.cpp	(working copy)
 @@ -121,7 +121,7 @@
                  target = Unit::GetUnit(*m_creature, (*itr)->getUnitGuid());

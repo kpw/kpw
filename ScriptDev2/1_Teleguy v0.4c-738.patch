@@ -1,8 +1,8 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 667)
+--- Makefile.am	(revision 738)
 +++ Makefile.am	(working copy)
-@@ -52,6 +52,7 @@
+@@ -51,6 +51,7 @@
  scripts/custom/custom_example.cpp \
  scripts/custom/custom_gossip_codebox.cpp \
  scripts/custom/test.cpp \
@@ -12,9 +12,9 @@ Index: Makefile.am
  scripts/guard/guard_ai.h \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 667)
+--- ScriptMgr.cpp	(revision 738)
 +++ ScriptMgr.cpp	(working copy)
-@@ -95,6 +95,7 @@
+@@ -78,6 +78,7 @@
  extern void AddSC_custom_example();
  extern void AddSC_custom_gossip_codebox();
  extern void AddSC_test();
@@ -22,7 +22,7 @@ Index: ScriptMgr.cpp
  
  // -- GO --
  extern void AddSC_go_scripts();
-@@ -1198,6 +1199,7 @@
+@@ -1260,6 +1261,7 @@
      AddSC_custom_example();
      AddSC_custom_gossip_codebox();
      AddSC_test();
@@ -34,7 +34,7 @@ Index: scripts/custom/teleguy.cpp
 ===================================================================
 --- scripts/custom/teleguy.cpp	(revision 0)
 +++ scripts/custom/teleguy.cpp	(revision 0)
-@@ -0,0 +1,512 @@
+@@ -0,0 +1,702 @@
 +#include "precompiled.h"
 +long long int money;
 +int costo;
@@ -48,6 +48,8 @@ Index: scripts/custom/teleguy.cpp
 +player->ADD_GOSSIP_ITEM( 5, "Stormwind. 5 Silver"		, GOSSIP_SENDER_MAIN, 1206);
 +player->ADD_GOSSIP_ITEM( 5, "Ironforge. 5 Silver"		, GOSSIP_SENDER_MAIN, 1224);
 +player->ADD_GOSSIP_ITEM( 5, "Gnomeregan. 5 Silver"		, GOSSIP_SENDER_MAIN, 1222);
++player->ADD_GOSSIP_ITEM( 5, "Shattrath City. 5 Silver"            , GOSSIP_SENDER_MAIN, 1287);
++player->ADD_GOSSIP_ITEM( 5, "Isle Of Quel'Danas. 5 Silver"        , GOSSIP_SENDER_MAIN, 1288);
 +player->ADD_GOSSIP_ITEM( 7, "[Instances] ->"			, GOSSIP_SENDER_MAIN, 5550);
 +
 +	}  else {
@@ -58,6 +60,8 @@ Index: scripts/custom/teleguy.cpp
 +player->ADD_GOSSIP_ITEM( 5, "Undercity. 5 Silver"		, GOSSIP_SENDER_MAIN, 1213);
 +player->ADD_GOSSIP_ITEM( 5, "Thunder Bluff. 5 Silver"	, GOSSIP_SENDER_MAIN, 1225);
 +player->ADD_GOSSIP_ITEM( 5, "Gnomeregan. 5 Silver"		, GOSSIP_SENDER_MAIN, 1222);
++player->ADD_GOSSIP_ITEM( 5, "Shattrath City. 5 Silver"            , GOSSIP_SENDER_MAIN, 1287);
++player->ADD_GOSSIP_ITEM( 5, "Isle Of Quel'Danas. 5 Silver"        , GOSSIP_SENDER_MAIN, 1288);
 +player->ADD_GOSSIP_ITEM( 7, "[Instances] ->"			, GOSSIP_SENDER_MAIN, 5550);
 +	}
 +	
@@ -105,7 +109,7 @@ Index: scripts/custom/teleguy.cpp
 +player->ADD_GOSSIP_ITEM( 5, "Ragefire Chasm. 10 Silver"			 , GOSSIP_SENDER_MAIN, 1248);
 +player->ADD_GOSSIP_ITEM( 5, "The Wailing Caverns. 10 Silver"     , GOSSIP_SENDER_MAIN, 1249);
 +player->ADD_GOSSIP_ITEM( 5, "The Stockade. 10 Silver"			 , GOSSIP_SENDER_MAIN, 1253);
-+player->ADD_GOSSIP_ITEM( 5, "Deadmines.	10 Silver"               , GOSSIP_SENDER_MAIN, 1250);
++player->ADD_GOSSIP_ITEM( 5, "Deadmines. 10 Silver"               , GOSSIP_SENDER_MAIN, 1250);
 +player->ADD_GOSSIP_ITEM( 5, "Shadowfang Keep. 10 Silver"         , GOSSIP_SENDER_MAIN, 1251);
 +player->ADD_GOSSIP_ITEM( 5, "Blackfathom Deeps. 10 Silver"       , GOSSIP_SENDER_MAIN, 1252);
 +player->ADD_GOSSIP_ITEM( 5, "Razorfen Kraul. 20 Silver"          , GOSSIP_SENDER_MAIN, 1254);
@@ -130,12 +134,33 @@ Index: scripts/custom/teleguy.cpp
 +player->ADD_GOSSIP_ITEM( 5, "Blackrock Spire. 50 Silver"           , GOSSIP_SENDER_MAIN, 1264);
 +player->ADD_GOSSIP_ITEM( 5, "Stratholme. 50 Silver"                , GOSSIP_SENDER_MAIN, 1265);
 +player->ADD_GOSSIP_ITEM( 5, "Scholomance. 50 Silver"               , GOSSIP_SENDER_MAIN, 1266);
++player->ADD_GOSSIP_ITEM( 7, "[More] ->"							   , GOSSIP_SENDER_MAIN, 5553);
 +player->ADD_GOSSIP_ITEM( 7, "<- [Back]"							   , GOSSIP_SENDER_MAIN, 5550);
 +player->ADD_GOSSIP_ITEM( 7, "<- [Main Menu]"					   , GOSSIP_SENDER_MAIN, 5552);
 +	
 +player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,_Creature->GetGUID());
 +
 +break;
++
++case 5553: //Instances 60-70
++player->ADD_GOSSIP_ITEM( 5, "Karazhan. 1 Gold"                              , GOSSIP_SENDER_MAIN, 4007);
++player->ADD_GOSSIP_ITEM( 5, "Gruul's Lair. 1 Gold"                          , GOSSIP_SENDER_MAIN, 4008);
++player->ADD_GOSSIP_ITEM( 5, "Hellfire Citadel. 1 Gold"                      , GOSSIP_SENDER_MAIN, 4009);
++player->ADD_GOSSIP_ITEM( 5, "Coilfang Reservoir. 1 Gold"                    , GOSSIP_SENDER_MAIN, 4010);
++player->ADD_GOSSIP_ITEM( 5, "Tempest Keep. 1 Gold"                          , GOSSIP_SENDER_MAIN, 4011);
++player->ADD_GOSSIP_ITEM( 5, "Caverns of Time. 1 Gold"                       , GOSSIP_SENDER_MAIN, 4012);
++player->ADD_GOSSIP_ITEM( 5, "Zul'Aman. 1 Gold"                              , GOSSIP_SENDER_MAIN, 4016);
++player->ADD_GOSSIP_ITEM( 5, "Black Temple. 1 Gold"                          , GOSSIP_SENDER_MAIN, 4013);
++player->ADD_GOSSIP_ITEM( 5, "Magister's Terrace. 2 Gold"                    , GOSSIP_SENDER_MAIN, 4017);
++player->ADD_GOSSIP_ITEM( 5, "Sunwell Plateau. 2 Gold"                       , GOSSIP_SENDER_MAIN, 4018);
++player->ADD_GOSSIP_ITEM( 7, "<- [Back]"							   , GOSSIP_SENDER_MAIN, 5550);
++player->ADD_GOSSIP_ITEM( 7, "<- [Main Menu]"					   , GOSSIP_SENDER_MAIN, 5552);
++
++
++player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,_Creature->GetGUID());
++
++break;
++
 +
 +case 5552: //Back To Main Menu
 +    if ( player->GetTeam() == ALLIANCE ) {
@@ -144,6 +169,8 @@ Index: scripts/custom/teleguy.cpp
 +player->ADD_GOSSIP_ITEM( 5, "Stormwind. 5 Silver"			, GOSSIP_SENDER_MAIN, 1206);
 +player->ADD_GOSSIP_ITEM( 5, "Ironforge. 5 Silver"			, GOSSIP_SENDER_MAIN, 1224);
 +player->ADD_GOSSIP_ITEM( 5, "Gnomeregan. 5 Silver"			, GOSSIP_SENDER_MAIN, 1222);
++player->ADD_GOSSIP_ITEM( 5, "Shattrath City. 5 Silver"            , GOSSIP_SENDER_MAIN, 1287);
++player->ADD_GOSSIP_ITEM( 5, "Isle Of Quel'Danas. 5 Silver"        , GOSSIP_SENDER_MAIN, 1288);
 +player->ADD_GOSSIP_ITEM( 7, "[Instances] ->"				, GOSSIP_SENDER_MAIN, 5550);
 +
 +	}  else {
@@ -154,6 +181,8 @@ Index: scripts/custom/teleguy.cpp
 +player->ADD_GOSSIP_ITEM( 5, "Undercity. 5 Silver"			, GOSSIP_SENDER_MAIN, 1213);
 +player->ADD_GOSSIP_ITEM( 5, "Thunder Bluff. 5 Silver"		, GOSSIP_SENDER_MAIN, 1225);
 +player->ADD_GOSSIP_ITEM( 5, "Gnomeregan. 5 Silver"			, GOSSIP_SENDER_MAIN, 1222);
++player->ADD_GOSSIP_ITEM( 5, "Shattrath City. 5 Silver"            , GOSSIP_SENDER_MAIN, 1287);
++player->ADD_GOSSIP_ITEM( 5, "Isle Of Quel'Danas. 5 Silver"        , GOSSIP_SENDER_MAIN, 1288);
 +player->ADD_GOSSIP_ITEM( 7, "[Instances] ->"				, GOSSIP_SENDER_MAIN, 5550);
 +	}
 +
@@ -513,6 +542,167 @@ Index: scripts/custom/teleguy.cpp
 +	
 +break;
 +
++case 1287:// Shattrath City
++
++if( player->getLevel() >= 58)
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(530, -1850.209961f, 5435.821777f, -10.961435f, 3.403913f);
++        player->ModifyMoney(-1*costo);
++ } else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 58!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 1288://teleport player to Isle Of Quel'Danas
++
++    if (player->getLevel() >= 65)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(530, 12947.4f,-6893.31f,5.68398f,3.09154f);
++        player->ModifyMoney(-1*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 65!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 4007:// Karazhan
++
++    if (player->getLevel() >= 70)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(0, -11118.8f, -2010.84f, 47.0807f, 0.0f);
++        player->ModifyMoney(-20*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 70!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 4008:// Gruul's Lair
++
++    if (player->getLevel() >= 65)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(530, 3539.007568f, 5082.357910f, 1.691071f, 0.0f);
++        player->ModifyMoney(-20*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 65!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 4009:// Hellfire Citadel
++player->CLOSE_GOSSIP_MENU();
++player->TeleportTo(530, -305.816223f, 3056.401611f, -2.473183f, 2.01f);
++player->ModifyMoney(-20*costo);
++break;
++
++case 4010:// Coilfang Reservoir
++player->CLOSE_GOSSIP_MENU();
++player->TeleportTo(530, 517.288025f, 6976.279785f, 32.007198f, 0.0f);
++player->ModifyMoney(-20*costo);
++break;
++
++case 4011:// Tempest Keep
++
++    if (player->getLevel() >= 70)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(530, 3089.579346f, 1399.046509f, 187.653458f, 4.794070f);
++        player->ModifyMoney(-20*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 70!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 4012:// Caverns of Time
++
++    if (player->getLevel() >= 66)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(1, -8173.66f, -4746.36f, 33.8423f, 4.93989f);
++        player->ModifyMoney(-20*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 66!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 4016:// Zul'Aman
++
++    if (player->getLevel() >= 70)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(530, 6846.95f, -7954.5f, 170.028f, 4.61501f);
++        player->ModifyMoney(-20*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 70!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 4013:// Black Temple
++
++    if (player->getLevel() >= 70)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(530, -3610.719482f, 324.987579f, 37.400028f, 3.282981f);
++        player->ModifyMoney(-20*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 70!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 4017:// magistrate
++
++    if (player->getLevel() >= 70)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(530, 12884.6f, -7317.69f, 65.5023f, 4.799f);
++        player->ModifyMoney(-40*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 70!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
++case 4018:// sunwell
++
++    if (player->getLevel() >= 70)
++        
++    {
++        player->CLOSE_GOSSIP_MENU();
++        player->TeleportTo(530, 12574.1f, -6774.81f, 15.0904f, 3.13788f);
++        player->ModifyMoney(-40*costo);
++	} else {
++        player->CLOSE_GOSSIP_MENU();
++        _Creature->Say("You must be at least level 70!", LANG_UNIVERSAL, NULL);
++    }
++    
++break;
++
 +}
 +
 +
@@ -535,7 +725,7 @@ Index: scripts/custom/teleguy.cpp
 +    Script *newscript;
 + 
 +newscript = new Script;
-+newscript->Name="teleguy";
++newscript->Name = "teleguy";
 +newscript->pGossipHello = &GossipHello_teleguy;
 +newscript->pGossipSelect = &GossipSelect_teleguy;
 +newscript->pItemHello = NULL;
@@ -545,13 +735,28 @@ Index: scripts/custom/teleguy.cpp
 +newscript->pGOQuestAccept = NULL;
 +newscript->pGOChooseReward = NULL;
 +
-+m_scripts[nrscripts++] = newscript;
++newscript->RegisterSelf();
 +}
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 667)
+--- VC80/80ScriptDev2.vcproj	(revision 738)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -465,6 +465,10 @@
+ 					>
+ 				</File>
+ 				<File
++					RelativePath="..\scripts\custom\teleguy.cpp"
++					>
++				</File>
++				<File
+ 					RelativePath="..\scripts\custom\test.cpp"
+ 					>
+ 				</File>
+Index: VC90/90ScriptDev2.vcproj
+===================================================================
+--- VC90/90ScriptDev2.vcproj	(revision 738)
++++ VC90/90ScriptDev2.vcproj	(working copy)
+@@ -464,6 +464,10 @@
  					>
  				</File>
  				<File

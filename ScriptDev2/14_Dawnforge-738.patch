@@ -1,6 +1,6 @@
 Index: scripts/zone/netherstorm/netherstorm.cpp
 ===================================================================
---- scripts/zone/netherstorm/netherstorm.cpp	(revision 728)
+--- scripts/zone/netherstorm/netherstorm.cpp	(revision 738)
 +++ scripts/zone/netherstorm/netherstorm.cpp	(working copy)
 @@ -388,7 +388,366 @@
      }
@@ -372,15 +372,15 @@ Index: scripts/zone/netherstorm/netherstorm.cpp
 @@ -418,4 +777,14 @@
      newscript->pGossipHello =   &GossipHello_npc_veronia;
      newscript->pGossipSelect =  &GossipSelect_npc_veronia;
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
 +
 +	newscript = new Script;
 +    newscript->Name = "npc_commander_dawnforge";
-+    newscript->GetAI = GetAI_npc_commander_dawnforge;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->GetAI = &GetAI_npc_commander_dawnforge;
++    newscript->RegisterSelf();
 +	
 +	newscript = new Script;
 +    newscript->Name = "mob_arcane_annihilator";
-+    newscript->GetAI = GetAI_mob_arcane_annihilator;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->GetAI = &GetAI_mob_arcane_annihilator;
++    newscript->RegisterSelf();
  }

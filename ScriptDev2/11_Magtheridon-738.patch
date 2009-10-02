@@ -1,6 +1,6 @@
 Index: scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp
 ===================================================================
---- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 728)
+--- scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(revision 738)
 +++ scripts/zone/hellfire_citadel/magtheridons_lair/boss_magtheridon.cpp	(working copy)
 @@ -179,6 +179,8 @@
                  m_creature->setFaction(14);

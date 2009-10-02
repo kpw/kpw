@@ -1,8 +1,8 @@
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 667)
+--- ScriptMgr.cpp	(revision 738)
 +++ ScriptMgr.cpp	(working copy)
-@@ -338,6 +338,7 @@
+@@ -321,6 +321,7 @@
  extern void AddSC_boss_shade_of_aran();
  extern void AddSC_boss_malchezaar();
  extern void AddSC_boss_terestian_illhoof();
@@ -10,7 +10,7 @@ Index: ScriptMgr.cpp
  extern void AddSC_netherspite_infernal();
  extern void AddSC_boss_moroes();
  extern void AddSC_bosses_opera();
-@@ -1441,6 +1442,7 @@
+@@ -1503,6 +1504,7 @@
      AddSC_boss_shade_of_aran();
      AddSC_boss_malchezaar();
      AddSC_boss_terestian_illhoof();
@@ -20,7 +20,7 @@ Index: ScriptMgr.cpp
      AddSC_bosses_opera();
 Index: scripts/zone/karazhan/boss_nightbane.cpp
 ===================================================================
---- scripts/zone/karazhan/boss_nightbane.cpp	(revision 667)
+--- scripts/zone/karazhan/boss_nightbane.cpp	(revision 738)
 +++ scripts/zone/karazhan/boss_nightbane.cpp	(working copy)
 @@ -22,12 +22,370 @@
  EndScriptData */
@@ -397,7 +397,7 @@ Index: scripts/zone/karazhan/boss_nightbane.cpp
 +{
 +    Script *newscript;
 +    newscript = new Script;
-+    newscript->Name="boss_nightbane";
-+    newscript->GetAI = GetAI_boss_nightbane;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "boss_nightbane";
++    newscript->GetAI = &GetAI_boss_nightbane;
++    newscript->RegisterSelf();
 +}

@@ -1,6 +1,6 @@
 Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
 ===================================================================
---- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 715)
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 738)
 +++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
 @@ -66,7 +66,7 @@
  #define TAINTED_ELEMENTAL           22009
@@ -48,13 +48,13 @@ Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
  
  CreatureAI* GetAI_mob_shield_generator_channel(Creature *_Creature)
 @@ -856,8 +856,8 @@
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
  
      newscript = new Script;
--    newscript->Name="mob_fathom_sporebat";
--    newscript->GetAI = GetAI_mob_fathom_sporebat;
-+    newscript->Name="mob_toxic_spore_bat";
-+    newscript->GetAI = GetAI_mob_toxic_spore_bat;
-     m_scripts[nrscripts++] = newscript;
+-    newscript->Name = "mob_fathom_sporebat";
+-    newscript->GetAI = &GetAI_mob_fathom_sporebat;
++    newscript->Name = "mob_toxic_spore_bat";
++    newscript->GetAI = &GetAI_mob_toxic_spore_bat;
+     newscript->RegisterSelf();
  
      newscript = new Script;

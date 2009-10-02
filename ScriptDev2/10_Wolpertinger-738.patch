@@ -1,6 +1,6 @@
 Index: scripts/item/item_scripts.cpp
 ===================================================================
---- scripts/item/item_scripts.cpp	(revision 682)
+--- scripts/item/item_scripts.cpp	(revision 738)
 +++ scripts/item/item_scripts.cpp	(working copy)
 @@ -393,6 +393,25 @@
  }
@@ -29,14 +29,14 @@ Index: scripts/item/item_scripts.cpp
  #####*/
  
 @@ -518,6 +537,11 @@
-     m_scripts[nrscripts++] = newscript;
+     newscript->RegisterSelf();
  
      newscript = new Script;
-+    newscript->Name="item_wolpertinger_net";
-+    newscript->pItemUse = ItemUse_item_wolpertinger_net;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "item_wolpertinger_net";
++    newscript->pItemUse = &ItemUse_item_wolpertinger_net;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-     newscript->Name="item_yehkinyas_bramble";
-     newscript->pItemUse = ItemUse_item_yehkinyas_bramble;
-     m_scripts[nrscripts++] = newscript;
+     newscript->Name = "item_yehkinyas_bramble";
+     newscript->pItemUse = &ItemUse_item_yehkinyas_bramble;
+     newscript->RegisterSelf();

@@ -1,8 +1,8 @@
 Index: scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp
 ===================================================================
---- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 667)
+--- scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(revision 738)
 +++ scripts/zone/coilfang_resevoir/serpent_shrine/boss_lady_vashj.cpp	(working copy)
-@@ -865,10 +865,19 @@
+@@ -807,10 +807,19 @@
  
              //remove this item
              player->DestroyItemCount(31088, 1, true);

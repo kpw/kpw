@@ -1,6 +1,6 @@
 Index: Makefile.am
 ===================================================================
---- Makefile.am	(revision 715)
+--- Makefile.am	(revision 738)
 +++ Makefile.am	(working copy)
 @@ -52,9 +52,18 @@
  scripts/custom/custom_gossip_codebox.cpp \
@@ -23,9 +23,9 @@ Index: Makefile.am
  scripts/npc/npc_escortAI.cpp \
 Index: ScriptMgr.cpp
 ===================================================================
---- ScriptMgr.cpp	(revision 715)
+--- ScriptMgr.cpp	(revision 738)
 +++ ScriptMgr.cpp	(working copy)
-@@ -83,6 +83,15 @@
+@@ -84,6 +84,15 @@
  
  // -- Guard --
  extern void AddSC_guards();
@@ -41,7 +41,7 @@ Index: ScriptMgr.cpp
  
  // -- Honor --
  
-@@ -1261,6 +1270,15 @@
+@@ -1266,6 +1275,15 @@
  
      // -- Guard --
      AddSC_guards();
@@ -292,9 +292,9 @@ Index: scripts/guard/ancient_of_war.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="ancient_of_war";
-+    newscript->GetAI = GetAI_ancient_of_war;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "ancient_of_war";
++    newscript->GetAI = &GetAI_ancient_of_war;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/archbishop_benedictus.cpp
 ===================================================================
@@ -636,14 +636,14 @@ Index: scripts/guard/archbishop_benedictus.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="archbishop_benedictus";
-+    newscript->GetAI = GetAI_archbishop_benedictus;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "archbishop_benedictus";
++    newscript->GetAI = &GetAI_archbishop_benedictus;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="cathedral_of_light";
-+    newscript->GetAI = GetAI_cathedral_of_light;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "cathedral_of_light";
++    newscript->GetAI = &GetAI_cathedral_of_light;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/g_marcus_jonathan.cpp
 ===================================================================
@@ -846,13 +846,13 @@ Index: scripts/guard/g_marcus_jonathan.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="g_marcus_jonathan";
-+    newscript->GetAI = GetAI_g_marcus_jonathan;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "g_marcus_jonathan";
++    newscript->GetAI = &GetAI_g_marcus_jonathan;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/guard_ai.cpp
 ===================================================================
---- scripts/guard/guard_ai.cpp	(revision 715)
+--- scripts/guard/guard_ai.cpp	(revision 738)
 +++ scripts/guard/guard_ai.cpp	(working copy)
 @@ -1,26 +1,12 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -878,7 +878,7 @@ Index: scripts/guard/guard_ai.cpp
 -/* ScriptData
 -SDName: Guard_AI
 -SD%Complete: 90
--SDComment: 
+-SDComment:
 -SDCategory: Guards
 -EndScriptData */
 +by Myav
@@ -1397,7 +1397,7 @@ Index: scripts/guard/guard_ai.cpp
      else
 Index: scripts/guard/guard_ai.h
 ===================================================================
---- scripts/guard/guard_ai.h	(revision 715)
+--- scripts/guard/guard_ai.h	(revision 738)
 +++ scripts/guard/guard_ai.h	(working copy)
 @@ -1,4 +1,4 @@
 -/* Copyright (C) 2006 - 2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -1647,9 +1647,9 @@ Index: scripts/guard/high_fire_mage.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="high_fire_mage";
-+    newscript->GetAI = GetAI_high_fire_mage;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "high_fire_mage";
++    newscript->GetAI = &GetAI_high_fire_mage;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/high_sorcerer_andromath.cpp
 ===================================================================
@@ -1857,9 +1857,9 @@ Index: scripts/guard/high_sorcerer_andromath.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="high_sorcerer_andromath";
-+    newscript->GetAI = GetAI_high_sorcerer_andromath;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "high_sorcerer_andromath";
++    newscript->GetAI = &GetAI_high_sorcerer_andromath;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/highlord_bolvar_fordragon.cpp
 ===================================================================
@@ -2088,9 +2088,9 @@ Index: scripts/guard/highlord_bolvar_fordragon.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="highlord_bolvar_fordragon";
-+    newscript->GetAI = GetAI_highlord_bolvar_fordragon;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "highlord_bolvar_fordragon";
++    newscript->GetAI = &GetAI_highlord_bolvar_fordragon;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/officers.cpp
 ===================================================================
@@ -2467,14 +2467,14 @@ Index: scripts/guard/officers.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="city_officer";
-+    newscript->GetAI = GetAI_city_officer;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "city_officer";
++    newscript->GetAI = &GetAI_city_officer;
++    newscript->RegisterSelf();
 +
 +    newscript = new Script;
-+    newscript->Name="city_guard";
-+    newscript->GetAI = GetAI_city_guard;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "city_guard";
++    newscript->GetAI = &GetAI_city_guard;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/overlord_saurfang.cpp
 ===================================================================
@@ -2712,9 +2712,9 @@ Index: scripts/guard/overlord_saurfang.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="overlord_saurfang";
-+    newscript->GetAI = GetAI_overlord_saurfang;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "overlord_saurfang";
++    newscript->GetAI = &GetAI_overlord_saurfang;
++    newscript->RegisterSelf();
 +}
 Index: scripts/guard/thrall.cpp
 ===================================================================
@@ -2995,13 +2995,13 @@ Index: scripts/guard/thrall.cpp
 +    Script *newscript;
 +
 +    newscript = new Script;
-+    newscript->Name="thrall";
-+    newscript->GetAI = GetAI_thrall;
-+    m_scripts[nrscripts++] = newscript;
++    newscript->Name = "thrall";
++    newscript->GetAI = &GetAI_thrall;
++    newscript->RegisterSelf();
 +}
 Index: VC80/80ScriptDev2.vcproj
 ===================================================================
---- VC80/80ScriptDev2.vcproj	(revision 715)
+--- VC80/80ScriptDev2.vcproj	(revision 738)
 +++ VC80/80ScriptDev2.vcproj	(working copy)
 @@ -1,7 +1,7 @@
  <?xml version="1.0" encoding="Windows-1252"?>
@@ -3064,7 +3064,7 @@ Index: VC80/80ScriptDev2.vcproj
  				Name="honor"
 Index: VC90/90ScriptDev2.vcproj
 ===================================================================
---- VC90/90ScriptDev2.vcproj	(revision 715)
+--- VC90/90ScriptDev2.vcproj	(revision 738)
 +++ VC90/90ScriptDev2.vcproj	(working copy)
 @@ -408,6 +408,18 @@
  				Name="guard"
