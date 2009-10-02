@@ -24,7 +24,7 @@ index 637410c..8995e9f 100644
  
  void
 diff --git a/src/game/ArenaTeam.cpp b/src/game/ArenaTeam.cpp
-index 06336fe..52e67b8 100644
+index 06336fe..509e975 100644
 --- a/src/game/ArenaTeam.cpp
 +++ b/src/game/ArenaTeam.cpp
 @@ -51,7 +51,7 @@ bool ArenaTeam::create(uint64 captainGuid, uint32 type, std::string ArenaTeamNam
@@ -36,7 +36,72 @@ index 06336fe..52e67b8 100644
  
      CaptainGuid = captainGuid;
      Name = ArenaTeamName;
-@@ -137,10 +137,8 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
+@@ -82,45 +82,40 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
+     std::string plName;
+     uint8 plClass;
+ 
+-    // arena team is full (can't have more than type * 2 players!)
+     if(GetMembersSize() >= GetType() * 2)
++    {
++        // arena team is full (can't have more than type * 2 players!)
++        // return false
+         return false;
++    }
++
++    if(!objmgr.GetPlayerNameByGUID(PlayerGuid, plName))     // player doesnt exist
++        return false;
++                                                            // player already in arenateam of that size
++    if(Player::GetArenaTeamIdFromDB(PlayerGuid, GetType()) != 0)
++    {
++        sLog.outError("Arena::AddMember() : player already in this sized team");
++        return false;
++    }
++
++    // remove all player signs from another petitions
++    // this will be prevent attempt joining player to many arenateams and corrupt arena team data integrity
++    Player::RemovePetitionsAndSigns(PlayerGuid, GetType());
+ 
+     Player *pl = objmgr.GetPlayer(PlayerGuid);
+     if(pl)
+     {
+-        if(pl->GetArenaTeamId(GetType()))
+-        {
+-            sLog.outError("Arena::AddMember() : player already in this sized team");
+-            return false;
+-        }
+-
+         plClass = (uint8)pl->getClass();
+-        plName = pl->GetName();
+     }
+     else
+     {
+-        //                                                     0     1
+-        QueryResult *result = CharacterDatabase.PQuery("SELECT name, class FROM characters WHERE guid='%u'", GUID_LOPART(PlayerGuid));
++        QueryResult *result = CharacterDatabase.PQuery("SELECT class FROM characters WHERE guid='%u'", GUID_LOPART(PlayerGuid));
+         if(!result)
+             return false;
+-
+-        plName = (*result)[0].GetCppString();
+-        plClass = (*result)[1].GetUInt8();
++        plClass = (*result)[0].GetUInt8();
+         delete result;
+-
+-        // check if player already in arenateam of that size
+-        if(Player::GetArenaTeamIdFromDB(PlayerGuid, GetType()) != 0)
+-        {
+-            sLog.outError("Arena::AddMember() : player already in this sized team");
+-            return false;
+-        }
+     }
+ 
+-    // remove all player signs from another petitions
+-    // this will be prevent attempt joining player to many arenateams and corrupt arena team data integrity
+-    Player::RemovePetitionsAndSigns(PlayerGuid, GetType());
+-
+     ArenaTeamMember newmember;
+     newmember.name          = plName;
+     newmember.guid          = PlayerGuid;
+@@ -137,10 +132,8 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
      {
          pl->SetInArenaTeam(Id, GetSlot());
          pl->SetArenaTeamIdInvited(0);
@@ -49,7 +114,7 @@ index 06336fe..52e67b8 100644
      }
  
      // hide promote/remove buttons
-@@ -148,18 +146,39 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
+@@ -148,18 +141,39 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
      {
          if(pl)
              pl->SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + 1 + (GetSlot() * 6), 1);
@@ -95,7 +160,7 @@ index 06336fe..52e67b8 100644
      QueryResult *result = CharacterDatabase.PQuery("SELECT arenateamid,name,captainguid,type,BackgroundColor,EmblemStyle,EmblemColor,BorderStyle,BorderColor FROM arena_team WHERE arenateamid = '%u'", ArenaTeamId);
  
      if(!result)
-@@ -179,6 +198,22 @@ bool ArenaTeam::LoadArenaTeamFromDB(uint32 ArenaTeamId)
+@@ -179,6 +193,22 @@ bool ArenaTeam::LoadArenaTeamFromDB(uint32 ArenaTeamId)
  
      delete result;
  
@@ -118,7 +183,7 @@ index 06336fe..52e67b8 100644
      return true;
  }
  
-@@ -206,7 +241,7 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
+@@ -206,7 +236,7 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
  {
      Field *fields;
  
@@ -127,7 +192,7 @@ index 06336fe..52e67b8 100644
      if(!result)
          return;
  
-@@ -215,6 +250,14 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
+@@ -215,6 +245,14 @@ void ArenaTeam::LoadMembersFromDB(uint32 ArenaTeamId)
          fields = result->Fetch();
          ArenaTeamMember newmember;
          newmember.guid          = MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER);
@@ -142,7 +207,7 @@ index 06336fe..52e67b8 100644
          LoadPlayerStats(&newmember);
          newmember.played_week   = fields[1].GetUInt32();
          newmember.wons_week     = fields[2].GetUInt32();
-@@ -275,17 +318,36 @@ void ArenaTeam::DelMember(uint64 guid)
+@@ -275,17 +313,36 @@ void ArenaTeam::DelMember(uint64 guid)
      }
  
      Player *player = objmgr.GetPlayer(guid);
@@ -182,7 +247,7 @@ index 06336fe..52e67b8 100644
  }
  
  void ArenaTeam::Disband(WorldSession *session)
-@@ -312,6 +374,7 @@ void ArenaTeam::Disband(WorldSession *session)
+@@ -312,6 +369,7 @@ void ArenaTeam::Disband(WorldSession *session)
  
      CharacterDatabase.BeginTransaction();
      CharacterDatabase.PExecute("DELETE FROM arena_team WHERE arenateamid = '%u'", Id);
@@ -190,7 +255,7 @@ index 06336fe..52e67b8 100644
      CharacterDatabase.PExecute("DELETE FROM arena_team_stats WHERE arenateamid = '%u'", Id);
      CharacterDatabase.CommitTransaction();
      objmgr.RemoveArenaTeam(this);
-@@ -341,7 +404,7 @@ void ArenaTeam::Roster(WorldSession *session)
+@@ -341,7 +399,7 @@ void ArenaTeam::Roster(WorldSession *session)
              data << uint32(itr->wons_week);                 // wins this week
              data << uint32(itr->played_season);             // played this season
              data << uint32(itr->wons_season);               // wins this season
@@ -199,7 +264,7 @@ index 06336fe..52e67b8 100644
          }
          else
          {
-@@ -355,7 +418,7 @@ void ArenaTeam::Roster(WorldSession *session)
+@@ -355,7 +413,7 @@ void ArenaTeam::Roster(WorldSession *session)
              data << uint32(itr->wons_week);                 // wins this week
              data << uint32(itr->played_season);             // played this season
              data << uint32(itr->wons_season);               // wins this season
@@ -208,7 +273,7 @@ index 06336fe..52e67b8 100644
          }
      }
      session->SendPacket(&data);
-@@ -390,6 +453,18 @@ void ArenaTeam::Stats(WorldSession *session)
+@@ -390,6 +448,18 @@ void ArenaTeam::Stats(WorldSession *session)
      session->SendPacket(&data);
  }
  
@@ -227,7 +292,7 @@ index 06336fe..52e67b8 100644
  void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
  {
      WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8+1+4*6);
-@@ -397,10 +472,20 @@ void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
+@@ -397,10 +467,20 @@ void ArenaTeam::InspectStats(WorldSession *session, uint64 guid)
      data << uint8(GetSlot());                               // slot (0...2)
      data << uint32(GetId());                                // arena team id
      data << uint32(stats.rating);                           // rating
@@ -252,7 +317,7 @@ index 06336fe..52e67b8 100644
      session->SendPacket(&data);
  }
  
-@@ -493,24 +578,211 @@ bool ArenaTeam::HaveMember( uint64 guid ) const
+@@ -493,24 +573,211 @@ bool ArenaTeam::HaveMember( uint64 guid ) const
      return false;
  }
  
@@ -1239,7 +1304,7 @@ index 0000000..04815b7
 +
 +#endif
 diff --git a/src/game/BattleGround.cpp b/src/game/BattleGround.cpp
-index 2781ef6..bdc0854 100644
+index 2781ef6..309804c 100644
 --- a/src/game/BattleGround.cpp
 +++ b/src/game/BattleGround.cpp
 @@ -24,6 +24,7 @@
@@ -10877,7 +10942,7 @@ index 9731442..eb64de8 100644
      {
          Creature* pCreature =
 diff --git a/src/game/Makefile.am b/src/game/Makefile.am
-index 03dbeef..70f4d51 100644
+index 03dbeef..f099a38 100644
 --- a/src/game/Makefile.am
 +++ b/src/game/Makefile.am
 @@ -38,6 +38,8 @@ libmangosgame_a_SOURCES = \
@@ -10925,6 +10990,81 @@ index 03dbeef..70f4d51 100644
      Path.h \
      PetAI.cpp \
      PetAI.h \
+@@ -266,7 +290,9 @@ libmangosgame_a_SOURCES = \
+     FollowerRefManager.h \
+     GroupReference.cpp \
+     GroupReference.h \
+-    GroupRefManager.h
++    GroupRefManager.h \
++    MapUpdater.h \
++    MapUpdater.cpp
+ 
+ ## Link against shared library
+ libmangosgame_a_LIBADD = ../shared/libmangosshared.a ../shared/Auth/libmangosauth.a ../shared/Config/libmangosconfig.a ../shared/Database/libmangosdatabase.a ../shared/vmap/libmangosvmaps.a
+diff --git a/src/game/Map.cpp b/src/game/Map.cpp
+index 7892138..cf6fdc4 100644
+--- a/src/game/Map.cpp
++++ b/src/game/Map.cpp
+@@ -1326,6 +1326,33 @@ void Map::AddObjectToRemoveList(WorldObject *obj)
+     //sLog.outDebug("Object (GUID: %u TypeId: %u ) added to removing list.",obj->GetGUIDLow(),obj->GetTypeId());
+ }
+ 
++void Map::UpdateCells (uint32 diff)
++{
++  MaNGOS::ObjectUpdater updater (diff);
++  // for creature
++  TypeContainerVisitor<MaNGOS::ObjectUpdater, GridTypeMapContainer > grid_object_update (updater);
++  // for pets
++  TypeContainerVisitor<MaNGOS::ObjectUpdater, WorldTypeMapContainer > world_object_update (updater);
++
++  while(!update_cells.empty ())
++ {
++   CellPair& cell_pair = update_cells.front ();
++
++   Cell cell (cell_pair);
++   cell.data.Part.reserved = CENTER_DISTRICT;
++   cell.SetNoCreate ();
++   CellLock<NullGuard> cell_lock (cell, cell_pair);
++   cell_lock->Visit (cell_lock, grid_object_update, *this);
++   cell_lock->Visit (cell_lock, world_object_update, *this);
++
++   update_cells.pop ();
++ }
++
++  //ensure cells are unmarked ,note there is one call in ObjectAccessor
++  //it needs to be removed when the old method for updating is removed
++  this->resetMarkedCells ();
++}
++
+ void Map::RemoveAllObjectsInRemoveList()
+ {
+     if(i_objectsToRemove.empty())
+diff --git a/src/game/Map.h b/src/game/Map.h
+index e4f9f58..f1a7de5 100644
+--- a/src/game/Map.h
++++ b/src/game/Map.h
+@@ -137,6 +137,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
+         template<class T> void Remove(T *, bool);
+ 
+         virtual void Update(const uint32&);
++        
++        void AddCellForUpdate(CellPair& cell) { this->update_cells.push(cell); }
++        bool NeedsUpdateCells() { return !this->update_cells.empty (); }
++        void UpdateCells (uint32 diff);
+ 
+         void MessageBroadcast(Player *, WorldPacket *, bool to_self);
+         void MessageBroadcast(WorldObject *, WorldPacket *);
+@@ -292,6 +296,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
+ 
+         std::set<WorldObject *> i_objectsToRemove;
+ 
++        //cells that need to be updated
++        typedef std::queue<CellPair> update_cells_type;
++        update_cells_type update_cells;
++
+         // Type specific code for add/remove to/from grid
+         template<class T>
+             void AddToGrid(T*, NGridType *, Cell const&);
 diff --git a/src/game/MapInstanced.cpp b/src/game/MapInstanced.cpp
 index 79a8b88..ce4be94 100644
 --- a/src/game/MapInstanced.cpp
@@ -10949,10 +11089,63 @@ index 79a8b88..ce4be94 100644
              InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), player->GetDifficulty());
              InstanceSave *pSave = pBind ? pBind->save : NULL;
 diff --git a/src/game/MapManager.cpp b/src/game/MapManager.cpp
-index e044b10..ede8e49 100644
+index 691448b..bec9f32 100644
 --- a/src/game/MapManager.cpp
 +++ b/src/game/MapManager.cpp
-@@ -107,7 +107,7 @@ MapManager::_GetBaseMap(uint32 id)
+@@ -16,6 +16,7 @@
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include "MapUpdater.h"
+ #include "MapManager.h"
+ #include "InstanceSaveMgr.h"
+ #include "Policies/SingletonImp.h"
+@@ -28,6 +29,7 @@
+ #include "DestinationHolderImp.h"
+ #include "World.h"
+ #include "CellImpl.h"
++#include "Config/ConfigEnv.h"
+ #include "Corpse.h"
+ #include "ObjectMgr.h"
+ 
+@@ -37,9 +39,11 @@ INSTANTIATE_CLASS_MUTEX(MapManager, ZThread::Mutex);
+ 
+ extern GridState* si_GridStates[];                          // debugging code, should be deleted some day
+ 
+-MapManager::MapManager() : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_INTERVAL_GRIDCLEAN))
++MapManager::MapManager() : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_INTERVAL_GRIDCLEAN)),
++i_NumThreads(0)
+ {
+     i_timer.SetInterval(sWorld.getConfig(CONFIG_INTERVAL_MAPUPDATE));
++	i_MapUpdater = new MapUpdater ();
+ }
+ 
+ MapManager::~MapManager()
+@@ -51,6 +55,7 @@ MapManager::~MapManager()
+         delete *i;
+ 
+     Map::DeleteStateMachine();
++	delete i_MapUpdater;
+ }
+ 
+ void
+@@ -68,6 +73,15 @@ MapManager::Initialize()
+     }
+ 
+     InitMaxInstanceId();
++    
++    i_NumThreads = sConfig.GetIntDefault ("Map.Threads", 0);
++
++  if (i_NumThreads > 0)
++    if (this->i_MapUpdater->activate (static_cast<size_t> (i_NumThreads)) == -1)
++      {
++        sLog.outError("Failed to start mtmap threads");
++        abort ();
++      }
+ }
+ 
+ // debugging code, should be deleted some day
+@@ -107,7 +121,7 @@ MapManager::_GetBaseMap(uint32 id)
          Guard guard(*this);
  
          const MapEntry* entry = sMapStore.LookupEntry(id);
@@ -10961,6 +11154,302 @@ index e044b10..ede8e49 100644
          {
              m = new MapInstanced(id, i_gridCleanUpDelay);
          }
+@@ -310,6 +324,38 @@ void MapManager::InitMaxInstanceId()
+     }
+ }
+ 
++void MapManager::UpdateAllMaps(uint32 diff)
++{
++  //shouldnt be called if multithreaded maps are disabled
++  assert(i_NumThreads > 0);
++
++  for (MapMapType::iterator iter = i_maps.begin (); iter != i_maps.end (); ++iter)
++    {
++      Map* map = iter->second;
++      if(map->NeedsUpdateCells ())
++        {
++          this->i_MapUpdater->schedule_update (*map,diff);
++        }
++      
++      if(map->Instanceable ())
++        {
++          MapInstanced::InstancedMaps& imaps = ((MapInstanced*)map)->GetInstancedMaps ();
++          
++            for (MapInstanced::InstancedMaps::iterator iiter = imaps.begin (); iiter != imaps.end (); ++iiter)
++              {
++                Map* imap = iiter->second;
++                
++                if(imap->NeedsUpdateCells ())
++                  {
++                    this->i_MapUpdater->schedule_update (*imap,diff);
++                  }
++              }
++        }
++    }
++  
++  this->i_MapUpdater->wait ();
++}
++
+ uint32 MapManager::GetNumInstances()
+ {
+     uint32 ret = 0;
+diff --git a/src/game/MapManager.h b/src/game/MapManager.h
+index 43ba884..ee4744a 100644
+--- a/src/game/MapManager.h
++++ b/src/game/MapManager.h
+@@ -27,6 +27,7 @@
+ #include "GridStates.h"
+ 
+ class Transport;
++class MapUpdater;
+ 
+ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockable<MapManager, ZThread::Mutex> >
+ {
+@@ -55,6 +56,10 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
+ 
+         void Initialize(void);
+         void Update(time_t);
++        
++        //update all creatures in maps in paralel
++        void UpdateAllMaps(uint32 diff);
++        bool HasUpdateAllMaps() { return this->i_NumThreads > 0;}
+ 
+         inline void SetGridCleanUpDelay(uint32 t)
+         {
+@@ -138,5 +143,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
+         IntervalTimer i_timer;
+ 
+         uint32 i_MaxInstanceId;
++        int i_NumThreads;
++        MapUpdater* i_MapUpdater;
+ };
+ #endif
+diff --git a/src/game/MapUpdater.cpp b/src/game/MapUpdater.cpp
+new file mode 100644
+index 0000000..a1b9395
+--- /dev/null
++++ b/src/game/MapUpdater.cpp
+@@ -0,0 +1,152 @@
++/*
++ * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++
++#include "MapUpdater.h"
++
++#include "DelayExecutor.h"
++#include "Map.h"
++#include "Database/DatabaseEnv.h"
++
++#include <ace/Guard_T.h>
++#include <ace/Method_Request.h>
++
++//the reason this things are here is that i want to make
++//the netcode patch and the multithreaded maps independant
++//once they are merged 1 class should be used
++class  WDBThreadStartReq1 : public ACE_Method_Request
++{
++public:
++  WDBThreadStartReq1 () { }
++  virtual int
++  call (void)
++  {
++    WorldDatabase.ThreadStart ();
++    return 0;
++  }
++};
++
++class  WDBThreadEndReq1 : public ACE_Method_Request
++{
++public:
++  WDBThreadEndReq1 () { }
++  virtual int
++  call (void)
++  {
++    WorldDatabase.ThreadEnd ();
++    return 0;
++  }
++};
++
++class MapUpdateRequest : public ACE_Method_Request
++{
++public:
++  Map& m_map;
++  MapUpdater& m_updater;
++  ACE_UINT32 m_diff;
++  MapUpdateRequest (Map& m,MapUpdater& u,ACE_UINT32 d) : m_map(m),m_updater(u),m_diff(d) { }
++  virtual int
++  call (void)
++  {
++    m_map.UpdateCells (m_diff);
++    m_updater.update_finished ();
++	return 0;
++  }
++};
++
++MapUpdater::MapUpdater () :
++m_mutex (),
++m_condition (m_mutex),
++m_executor (),
++pedning_requests (0)
++{
++  return;
++}
++
++MapUpdater::~MapUpdater ()
++{
++  this->deactivate ();
++}
++
++int
++MapUpdater::activate (size_t num_threads)
++{
++  return this->m_executor.activate (static_cast<int> (num_threads),
++                                    new WDBThreadStartReq1,
++                                    new WDBThreadEndReq1);
++}
++
++int
++MapUpdater::deactivate (void)
++{
++  this->wait ();
++  
++  return this->m_executor.deactivate ();
++}
++
++int
++MapUpdater::wait () 
++{
++  ACE_GUARD_RETURN(ACE_Thread_Mutex,guard,this->m_mutex,-1);
++  
++  while(this->pedning_requests > 0)
++    this->m_condition.wait ();
++  
++  return 0;
++}
++
++int 
++MapUpdater::schedule_update(Map& map, ACE_UINT32 diff)
++{
++  ACE_GUARD_RETURN(ACE_Thread_Mutex,guard,this->m_mutex,-1);
++  
++  ++this->pedning_requests;
++  
++  if( this->m_executor.execute (new MapUpdateRequest(map,*this,diff)) == -1)
++    {
++      ACE_DEBUG ((LM_ERROR,
++                  ACE_TEXT ("(%t) \n"),
++                  ACE_TEXT ("Failed to schedule Map Update")));
++      
++      --this->pedning_requests;
++      return -1;
++    }
++  
++  return 0;
++}
++
++void
++MapUpdater::update_finished ()
++{
++  ACE_GUARD (ACE_Thread_Mutex, guard, this->m_mutex);
++
++  if (this->pedning_requests == 0)
++    {
++      ACE_ERROR ((LM_ERROR,
++                  ACE_TEXT ("(%t)\n"),
++                  ACE_TEXT ("MapUpdater::update_finished BUG, report to devs")));
++
++      return;
++    }
++
++  --this->pedning_requests;
++  
++  //TODO can more than one thread call wait (), it shouldnt happen
++  //however I ensure if in future more than 1 thread call it by
++  //using broadcast instead of signal ()
++  this->m_condition.broadcast ();
++}
+diff --git a/src/game/MapUpdater.h b/src/game/MapUpdater.h
+new file mode 100644
+index 0000000..4e97dbf
+--- /dev/null
++++ b/src/game/MapUpdater.h
+@@ -0,0 +1,62 @@
++/*
++ * Copyright (C) 2005-2008 MaNGOS <http://getmangos.com/>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ */
++
++#ifndef _MAP_UPDATER_H_INCLUDED
++#define _MAP_UPDATER_H_INCLUDED
++
++
++#include <ace/Thread_Mutex.h>
++#include <ace/Condition_Thread_Mutex.h>
++
++#include "DelayExecutor.h"
++
++class Map;
++
++class MapUpdater
++{
++public:
++  MapUpdater ();
++  virtual ~MapUpdater ();
++  
++  friend class MapUpdateRequest;
++
++  /// schedule update on a map, the update will start
++  /// as soon as possible ,
++  /// it may even start before the call returns
++  int schedule_update(Map& map, ACE_UINT32 diff);
++  
++  /// Wait untill all pending updates finish
++  int wait ();
++  
++  /// Start the worker threads
++  int activate (size_t num_threads);
++  
++  /// Stop the worker threads
++  int deactivate (void);
++  
++private:
++  /// hook called by worker threads
++  void update_finished ();
++  
++  DelayExecutor m_executor;
++  ACE_Condition_Thread_Mutex m_condition;
++  ACE_Thread_Mutex m_mutex;
++  size_t pedning_requests;
++};
++
++#endif //_MAP_UPDATER_H_INCLUDED
 diff --git a/src/game/MiscHandler.cpp b/src/game/MiscHandler.cpp
 index 5c40964..f348d64 100644
 --- a/src/game/MiscHandler.cpp
@@ -11679,6 +12168,45 @@ index 24ce65d..84427bc 100644
      UpdateGroundPositionZ(x,y,z);                           // update to LOS height if available
 +    if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 4 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
  }
+diff --git a/src/game/ObjectAccessor.cpp b/src/game/ObjectAccessor.cpp
+index 586f84a..6751b24 100644
+--- a/src/game/ObjectAccessor.cpp
++++ b/src/game/ObjectAccessor.cpp
+@@ -558,18 +558,29 @@ ObjectAccessor::Update(uint32 diff)
+                     {
+                         CellPair cell_pair(x,y);
+                         map->markCell(cell_id);
+-                        Cell cell(cell_pair);
++
++                    if (!MapManager::Instance ().HasUpdateAllMaps ())
++                      {
++                        Cell cell (cell_pair);
+                         cell.data.Part.reserved = CENTER_DISTRICT;
+-                        cell.SetNoCreate();
+-                        CellLock<NullGuard> cell_lock(cell, cell_pair);
+-                        cell_lock->Visit(cell_lock, grid_object_update,  *map);
+-                        cell_lock->Visit(cell_lock, world_object_update, *map);
++                        cell.SetNoCreate ();
++                        CellLock<NullGuard> cell_lock (cell, cell_pair);
++                        cell_lock->Visit (cell_lock, grid_object_update, *map);
++                        cell_lock->Visit (cell_lock, world_object_update, *map);
++                      }
++                    else
++                      {
++                          map->AddCellForUpdate (cell_pair);
++                      }
+                     }
+                 }
+             }
+         }
+     }
+ 
++  if (MapManager::Instance ().HasUpdateAllMaps ())
++    MapManager::Instance ().UpdateAllMaps (diff);
++
+     _update();
+ }
+ 
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
 index f49f0a1..0e35bd3 100644
 --- a/src/game/ObjectMgr.cpp
@@ -17354,7 +17882,7 @@ index 144b2d7..b16877a 100644
          }
      }
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index 8d80991..b646246 100644
+index 8d80991..620e12f 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -52,7 +52,10 @@
@@ -17548,7 +18076,47 @@ index 8d80991..b646246 100644
              victim_rank = 19;                               // HK: Leader
          }
      }
-@@ -6085,6 +6131,7 @@ void Player::UpdateArea(uint32 newArea)
+@@ -6014,13 +6060,32 @@ uint32 Player::GetRankFromDB(uint64 guid)
+ 
+ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
+ {
+-    QueryResult *result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", GUID_LOPART(guid), type);
+-    if(!result)
+-        return 0;
+-
+-    uint32 id = (*result)[0].GetUInt32();
+-    delete result;
+-    return id;
++     // need fix it!
++     QueryResult *result = CharacterDatabase.PQuery("SELECT arenateamid FROM arena_team_member WHERE guid='%u'", GUID_LOPART(guid));
++     if(result)
++     {
++         // init id to 0, check the arena type before assigning a value to id
++         uint32 id = 0;
++         do
++         {
++             QueryResult *result2 = CharacterDatabase.PQuery("SELECT type FROM arena_team WHERE arenateamid='%u'", id);
++             if(result2)
++             {
++                 uint8 dbtype = (*result2)[0].GetUInt32();
++                 delete result2;
++                 if(dbtype == type)
++                 {
++                     // if the type matches, we've found the id
++                     id = (*result)[0].GetUInt32();
++                     break;
++                 }
++             }
++         } while(result->NextRow());
++         delete result;
++         return id;
++     }
++     // no arenateam for the specified guid, return 0
++     return 0;
+ }
+ 
+ uint32 Player::GetZoneIdFromDB(uint64 guid)
+@@ -6085,6 +6150,7 @@ void Player::UpdateArea(uint32 newArea)
  
  void Player::UpdateZone(uint32 newZone)
  {
@@ -17556,7 +18124,7 @@ index 8d80991..b646246 100644
      m_zoneUpdateId    = newZone;
      m_zoneUpdateTimer = ZONE_UPDATE_INTERVAL;
  
-@@ -6095,6 +6142,13 @@ void Player::UpdateZone(uint32 newZone)
+@@ -6095,6 +6161,13 @@ void Player::UpdateZone(uint32 newZone)
      if(!zone)
          return;
  
@@ -17570,7 +18138,7 @@ index 8d80991..b646246 100644
      if (sWorld.getConfig(CONFIG_WEATHER))
      {
          Weather *wth = sWorld.FindWeather(zone->ID);
-@@ -6228,6 +6282,11 @@ void Player::CheckDuelDistance(time_t currTime)
+@@ -6228,6 +6301,11 @@ void Player::CheckDuelDistance(time_t currTime)
      }
  }
  
@@ -17582,7 +18150,7 @@ index 8d80991..b646246 100644
  void Player::DuelComplete(DuelCompleteType type)
  {
      // duel not requested
-@@ -6583,7 +6642,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attac
+@@ -6583,7 +6661,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attac
  
      if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
      {
@@ -17591,7 +18159,7 @@ index 8d80991..b646246 100644
      }
  }
  
-@@ -6617,7 +6676,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType att
+@@ -6617,7 +6695,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType att
  
      if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
      {
@@ -17600,7 +18168,7 @@ index 8d80991..b646246 100644
      }
  }
  
-@@ -7039,6 +7098,14 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
+@@ -7039,6 +7117,14 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
          if(go->getLootState() == GO_READY)
          {
              uint32 lootid =  go->GetLootId();
@@ -17615,7 +18183,7 @@ index 8d80991..b646246 100644
  
              if(lootid)
              {
-@@ -7116,6 +7183,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
+@@ -7116,6 +7202,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
              bones->lootForBody = true;
              uint32 pLevel = bones->loot.gold;
              bones->loot.clear();
@@ -17624,7 +18192,7 @@ index 8d80991..b646246 100644
              // It may need a better formula
              // Now it works like this: lvl10: ~6copper, lvl70: ~9silver
              bones->loot.gold = (uint32)( urand(50, 150) * 0.016f * pow( ((float)pLevel)/5.76f, 2.5f) * sWorld.getRate(RATE_DROP_MONEY) );
-@@ -7322,13 +7391,17 @@ void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
+@@ -7322,13 +7410,17 @@ void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
      GetSession()->SendPacket(&data);
  }
  
@@ -17644,7 +18212,7 @@ index 8d80991..b646246 100644
      uint32 areaid = GetAreaId();
      sLog.outDebug("Sending SMSG_INIT_WORLD_STATES to Map:%u, Zone: %u", mapid, zoneid);
      // may be exist better way to do this...
-@@ -7353,6 +7426,12 @@ void Player::SendInitWorldStates()
+@@ -7353,6 +7445,12 @@ void Player::SendInitWorldStates()
          case 2918:
              NumberOfFields = 6;
              break;
@@ -17657,7 +18225,7 @@ index 8d80991..b646246 100644
          case 2597:
              NumberOfFields = 81;
              break;
-@@ -7364,7 +7443,10 @@ void Player::SendInitWorldStates()
+@@ -7364,7 +7462,10 @@ void Player::SendInitWorldStates()
              NumberOfFields = 38;
              break;
          case 3483:
@@ -17669,7 +18237,7 @@ index 8d80991..b646246 100644
              break;
          case 3519:
              NumberOfFields = 36;
-@@ -7414,82 +7496,149 @@ void Player::SendInitWorldStates()
+@@ -7414,82 +7515,149 @@ void Player::SendInitWorldStates()
          case 1537:
          case 2257:
              break;
@@ -17894,7 +18462,7 @@ index 8d80991..b646246 100644
              break;
          case 3277:                                          // WS
              if (bg && bg->GetTypeID() == BATTLEGROUND_WS)
-@@ -7585,92 +7734,180 @@ void Player::SendInitWorldStates()
+@@ -7585,92 +7753,180 @@ void Player::SendInitWorldStates()
                  // and some more ... unknown
              }
              break;
@@ -18150,7 +18718,43 @@ index 8d80991..b646246 100644
              break;
          case 3703:                                          // Shattrath City
              break;
-@@ -13016,7 +13253,8 @@ bool Player::HasQuestForItem( uint32 itemid ) const
+@@ -11577,7 +11833,7 @@ void Player::SendPreparedQuest( uint64 guid )
+             else if( status == DIALOG_STATUS_INCOMPLETE )
+                 PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, false, true );
+             // Send completable on repeatable quest if player don't have quest
+-            else if( pQuest->IsRepeatable() )
++            else if( pQuest->IsRepeatable() && !pQuest->IsDaily() )
+                 PlayerTalkClass->SendQuestGiverRequestItems( pQuest, guid, CanCompleteRepeatableQuest(pQuest), true );
+             else
+                 PlayerTalkClass->SendQuestGiverQuestDetails( pQuest, guid, true );
+@@ -11819,7 +12075,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, bool msg )
+     if(!pQuest->IsAutoComplete() && GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
+         return false;
+ 
+-    // daily quest can't be rewarded (10 daily quest already completed)
++    // daily quest can't be rewarded (25 daily quest already completed)
+     if(!SatisfyQuestDay(pQuest,true))
+         return false;
+ 
+@@ -12421,9 +12677,16 @@ bool Player::SatisfyQuestExclusiveGroup( Quest const* qInfo, bool msg )
+             continue;
+ 
+         QuestStatusMap::iterator i_exstatus = mQuestStatus.find( exclude_Id );
++		Quest const* Nquest = objmgr.GetQuestTemplate(exclude_Id);
+ 
+         // alternative quest already started or completed
+-        if( i_exstatus != mQuestStatus.end()
++        if( !SatisfyQuestDay(Nquest, false) )
++		{
++			if( msg )
++                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
++            return false;
++		}
++		else if( i_exstatus != mQuestStatus.end()
+             && (i_exstatus->second.m_status == QUEST_STATUS_COMPLETE || i_exstatus->second.m_status == QUEST_STATUS_INCOMPLETE) )
+         {
+             if( msg )
+@@ -13016,7 +13279,8 @@ bool Player::HasQuestForItem( uint32 itemid ) const
  
              // hide quest if player is in raid-group and quest is no raid quest
              if(GetGroup() && GetGroup()->isRaidGroup() && qinfo->GetType() != QUEST_TYPE_RAID)
@@ -18160,7 +18764,17 @@ index 8d80991..b646246 100644
  
              // There should be no mixed ReqItem/ReqSource drop
              // This part for ReqItem drop
-@@ -14729,8 +14967,10 @@ void Player::SaveToDB()
+@@ -14266,7 +14530,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
+                 // add to quest log
+                 if( slot < MAX_QUEST_LOG_SIZE &&
+                     ( questStatusData.m_status==QUEST_STATUS_INCOMPLETE ||
+-                    questStatusData.m_status==QUEST_STATUS_COMPLETE && !questStatusData.m_rewarded ) )
++                    questStatusData.m_status==QUEST_STATUS_COMPLETE && 
++					(!questStatusData.m_rewarded || pQuest->IsDaily()) ) )
+                 {
+                     SetQuestSlot(slot,quest_id,quest_time);
+ 
+@@ -14729,8 +14994,10 @@ void Player::SaveToDB()
      // first save/honor gain after midnight will also update the player's honor fields
      UpdateHonorFields();
  
@@ -18173,7 +18787,7 @@ index 8d80991..b646246 100644
          return;
  
      int is_save_resting = HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0;
-@@ -15528,7 +15768,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
+@@ -15528,7 +15795,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
      if(!pet)
          pet = GetPet();
  
@@ -18182,7 +18796,7 @@ index 8d80991..b646246 100644
      {
          //returning of reagents only for players, so best done here
          uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
-@@ -17509,7 +17749,8 @@ bool Player::InArena() const
+@@ -17509,7 +17776,8 @@ bool Player::InArena() const
  
  bool Player::GetBGAccessByLevel(uint32 bgTypeId) const
  {
@@ -18192,7 +18806,7 @@ index 8d80991..b646246 100644
      if(!bg)
          return false;
  
-@@ -17538,6 +17779,7 @@ uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
+@@ -17538,6 +17806,7 @@ uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
      return 10*(queue_id+2)-1;
  }
  
@@ -18200,7 +18814,7 @@ index 8d80991..b646246 100644
  uint32 Player::GetBattleGroundQueueIdFromLevel() const
  {
      uint32 level = getLevel();
-@@ -17703,6 +17945,11 @@ void Player::AutoUnequipOffhandIfNeed()
+@@ -17703,6 +17972,11 @@ void Player::AutoUnequipOffhandIfNeed()
      }
  }
  
@@ -18212,7 +18826,7 @@ index 8d80991..b646246 100644
  bool Player::HasItemFitToSpellReqirements(SpellEntry const* spellInfo, Item const* ignoreItem)
  {
      if(spellInfo->EquippedItemClass < 0)
-@@ -18188,9 +18435,34 @@ bool Player::isAllowUseBattleGroundObject()
+@@ -18188,9 +18462,34 @@ bool Player::isAllowUseBattleGroundObject()
  {
      return ( //InBattleGround() &&                            // in battleground - not need, check in other cases
               !IsMounted() &&                                  // not mounted
@@ -18505,7 +19119,7 @@ index 907cceb..ca2ce17 100644
  };
  
 diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
-index b42c59e..adc945d 100644
+index b42c59e..d16d6ff 100644
 --- a/src/game/Spell.cpp
 +++ b/src/game/Spell.cpp
 @@ -306,6 +306,8 @@ Spell::Spell( Unit* Caster, SpellEntry const *info, bool triggered, uint64 origi
@@ -18877,7 +19491,20 @@ index b42c59e..adc945d 100644
          {
              TagUnitMap.push_back(m_caster);
              break;
-@@ -1664,11 +1930,11 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+@@ -1268,6 +1534,12 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+         }
+         case TARGET_CHAIN_DAMAGE:
+         {
++            // Charge casted on self
++            if (m_spellInfo->Effect[i] == SPELL_EFFECT_CHARGE)
++            {
++                TagUnitMap.push_back(m_caster);
++                break;
++            }
+             if (EffectChainTarget <= 1)
+             {
+                 Unit* pUnitTarget = SelectMagnetTarget();
+@@ -1664,11 +1936,11 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                      // IsHostileTo check duel and controlled by enemy
                      if(Target && Target->GetSubGroup()==subgroup && !m_caster->IsHostileTo(Target))
                      {
@@ -18891,7 +19518,7 @@ index b42c59e..adc945d 100644
                                  TagUnitMap.push_back(pet);
                      }
                  }
-@@ -1683,7 +1949,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+@@ -1683,7 +1955,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                  TagUnitMap.push_back(pTarget);
  
                  if(Pet* pet = pTarget->GetPet())
@@ -18900,7 +19527,7 @@ index b42c59e..adc945d 100644
                          TagUnitMap.push_back(pet);
              }
  
-@@ -1809,9 +2075,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
+@@ -1809,9 +2081,7 @@ void Spell::SetTargetMap(uint32 i,uint32 cur,std::list<Unit*> &TagUnitMap)
                      Player* Target = itr->getSource();
  
                      // IsHostileTo check duel and controlled by enemy
@@ -18911,7 +19538,7 @@ index b42c59e..adc945d 100644
                      {
                          TagUnitMap.push_back(Target);
                      }
-@@ -1951,6 +2215,9 @@ void Spell::prepare(SpellCastTargets * targets, Aura* triggeredByAura)
+@@ -1951,6 +2221,9 @@ void Spell::prepare(SpellCastTargets * targets, Aura* triggeredByAura)
          return;
      }
  
@@ -18921,7 +19548,7 @@ index b42c59e..adc945d 100644
      // calculate cast time (calculated after first CanCast check to prevent charge counting for first CanCast fail)
      m_casttime = GetSpellCastTime(m_spellInfo, this);
  
-@@ -2096,15 +2363,6 @@ void Spell::cast(bool skipCheck)
+@@ -2096,15 +2369,6 @@ void Spell::cast(bool skipCheck)
      SendCastResult(castResult);
      SendSpellGo();                                          // we must send smsg_spell_go packet before m_castItem delete in TakeCastItem()...
  
@@ -18937,11 +19564,22 @@ index b42c59e..adc945d 100644
      // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
      if (m_spellInfo->speed > 0.0f)
      {
-@@ -2490,7 +2748,24 @@ void Spell::finish(bool ok)
+@@ -2483,14 +2747,32 @@ void Spell::finish(bool ok)
+ 
+     m_spellState = SPELL_STATE_FINISHED;
+ 
+-    //remove spell mods
+-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+-        ((Player*)m_caster)->RemoveSpellMods(this);
+-
      // other code related only to successfully finished spells
      if(!ok)
          return;
--
+ 
++    //remove spell mods
++    if (m_caster->GetTypeId() == TYPEID_PLAYER)
++        ((Player*)m_caster)->RemoveSpellMods(this);
++
 +    //holy nova heal
 +    if(m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellIconID == 1874)
 +    {
@@ -18963,7 +19601,7 @@ index b42c59e..adc945d 100644
      //handle SPELL_AURA_ADD_TARGET_TRIGGER auras
      Unit::AuraList const& targetTriggers = m_caster->GetAurasByType(SPELL_AURA_ADD_TARGET_TRIGGER);
      for(Unit::AuraList::const_iterator i = targetTriggers.begin(); i != targetTriggers.end(); ++i)
-@@ -2510,12 +2785,20 @@ void Spell::finish(bool ok)
+@@ -2510,12 +2792,20 @@ void Spell::finish(bool ok)
                      int32 chance = m_caster->CalculateSpellDamage(auraSpellInfo, auraSpellIdx, (*i)->GetBasePoints(),unit);
  
                      if(roll_chance_i(chance))
@@ -18985,7 +19623,7 @@ index b42c59e..adc945d 100644
      if (IsMeleeAttackResetSpell())
      {
          m_caster->resetAttackTimer(BASE_ATTACK);
-@@ -3267,23 +3550,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3267,23 +3557,6 @@ uint8 Spell::CanCast(bool strict)
              }
          }
  
@@ -19009,7 +19647,7 @@ index b42c59e..adc945d 100644
          if(IsPositiveSpell(m_spellInfo->Id))
          {
              if(target->IsImmunedToSpell(m_spellInfo,false))
-@@ -3478,8 +3744,9 @@ uint8 Spell::CanCast(bool strict)
+@@ -3478,8 +3751,9 @@ uint8 Spell::CanCast(bool strict)
          }
      }
  
@@ -19021,7 +19659,7 @@ index b42c59e..adc945d 100644
  
      {
          if(uint8 castResult = CheckPower())
-@@ -3850,6 +4117,26 @@ uint8 Spell::CanCast(bool strict)
+@@ -3850,6 +4124,26 @@ uint8 Spell::CanCast(bool strict)
  
                  break;
              }
@@ -19048,7 +19686,7 @@ index b42c59e..adc945d 100644
              case SPELL_EFFECT_SUMMON_PET:
              {
                  if(m_caster->GetPetGUID())                  //let warlock do a replacement summon
-@@ -3898,19 +4185,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3898,19 +4192,6 @@ uint8 Spell::CanCast(bool strict)
              case SPELL_EFFECT_LEAP:
              case SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER:
              {
@@ -19068,7 +19706,7 @@ index b42c59e..adc945d 100644
                  // not allow use this effect at battleground until battleground start
                  if(m_caster->GetTypeId()==TYPEID_PLAYER)
                      if(BattleGround const *bg = ((Player*)m_caster)->GetBattleGround())
-@@ -4057,22 +4331,23 @@ int16 Spell::PetCanCast(Unit* target)
+@@ -4057,22 +4338,23 @@ int16 Spell::PetCanCast(Unit* target)
              if(!_target->isAlive())
                  return SPELL_FAILED_BAD_TARGETS;
  
@@ -19102,7 +19740,7 @@ index b42c59e..adc945d 100644
                  }
              }
          }
-@@ -4092,9 +4367,16 @@ uint8 Spell::CheckCasterAuras() const
+@@ -4092,9 +4374,16 @@ uint8 Spell::CheckCasterAuras() const
  {
      // Flag drop spells totally immuned to caster auras
      // FIXME: find more nice check for all totally immuned spells
@@ -20288,7 +20926,7 @@ index ea4f25f..c58ebf2 100644
          void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
          void SetAuraFlag(uint32 slot, bool add);
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index a681589..207856e 100644
+index a681589..b1108f0 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -48,6 +48,7 @@
@@ -20619,11 +21257,48 @@ index a681589..207856e 100644
      }
  }
  
+@@ -5539,10 +5480,14 @@ void Spell::EffectCharge(uint32 /*i*/)
+     if(!unitTarget || !m_caster)
+         return;
+ 
++    Unit *chargeTarget = m_targets.getUnitTarget();
++    if (!chargeTarget)
++        return;
++
+     float x, y, z;
+-    unitTarget->GetContactPoint(m_caster, x, y, z);
+-    if(unitTarget->GetTypeId() != TYPEID_PLAYER)
+-        ((Creature *)unitTarget)->StopMoving();
++    chargeTarget->GetContactPoint(m_caster, x, y, z);
++    if(chargeTarget->GetTypeId() != TYPEID_PLAYER)
++        ((Creature *)chargeTarget)->StopMoving();
+ 
+     // Only send MOVEMENTFLAG_WALK_MODE, client has strange issues with other move flags
+     m_caster->SendMonsterMove(x, y, z, 0, MOVEMENTFLAG_WALK_MODE, 1);
+@@ -5552,7 +5497,7 @@ void Spell::EffectCharge(uint32 /*i*/)
+ 
+     // not all charge effects used in negative spells
+     if ( !IsPositiveSpell(m_spellInfo->Id))
+-        m_caster->Attack(unitTarget,true);
++        m_caster->Attack(chargeTarget,true);
+ }
+ 
+ void Spell::EffectSummonCritter(uint32 i)
 diff --git a/src/game/SpellMgr.cpp b/src/game/SpellMgr.cpp
-index 044b327..247865f 100644
+index 044b327..2faba42 100644
 --- a/src/game/SpellMgr.cpp
 +++ b/src/game/SpellMgr.cpp
-@@ -530,6 +530,17 @@ bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellI
+@@ -310,6 +310,9 @@ bool IsPositiveEffect(uint32 spellId, uint32 effIndex)
+         case SPELL_EFFECT_ENERGIZE_PCT:
+             return true;
+ 
++        // Charge casted on self to run - so must be positive
++        case SPELL_EFFECT_CHARGE:
++            return true;
+             // non-positive aura use
+         case SPELL_EFFECT_APPLY_AURA:
+         case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+@@ -530,6 +533,17 @@ bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellI
      return false;
  }
  
@@ -20641,7 +21316,7 @@ index 044b327..247865f 100644
  uint8 GetErrorAtShapeshiftedCast (SpellEntry const *spellInfo, uint32 form)
  {
      // talents that learn spells can have stance requirements that need ignore
-@@ -806,8 +817,8 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -806,8 +820,8 @@ void SpellMgr::LoadSpellProcEvents()
  
      uint32 count = 0;
  
@@ -20652,7 +21327,7 @@ index 044b327..247865f 100644
      if( !result )
      {
  
-@@ -821,7 +832,7 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -821,7 +835,7 @@ void SpellMgr::LoadSpellProcEvents()
      }
  
      barGoLink bar( result->GetRowCount() );
@@ -20661,7 +21336,7 @@ index 044b327..247865f 100644
      do
      {
          Field *fields = result->Fetch();
-@@ -830,7 +841,8 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -830,7 +844,8 @@ void SpellMgr::LoadSpellProcEvents()
  
          uint16 entry = fields[0].GetUInt16();
  
@@ -20671,7 +21346,7 @@ index 044b327..247865f 100644
          {
              sLog.outErrorDb("Spell %u listed in `spell_proc_event` does not exist", entry);
              continue;
-@@ -839,23 +851,35 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -839,23 +854,35 @@ void SpellMgr::LoadSpellProcEvents()
          SpellProcEventEntry spe;
  
          spe.schoolMask      = fields[1].GetUInt32();
@@ -20714,7 +21389,7 @@ index 044b327..247865f 100644
  
      /*
      // Commented for now, as it still produces many errors (still quite many spells miss spell_proc_event)
-@@ -887,6 +911,7 @@ void SpellMgr::LoadSpellProcEvents()
+@@ -887,6 +914,7 @@ void SpellMgr::LoadSpellProcEvents()
      */
  }
  
@@ -20722,7 +21397,7 @@ index 044b327..247865f 100644
  bool SpellMgr::IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spellProcEvent, SpellEntry const * procSpell, uint32 procFlags )
  {
      if((procFlags & spellProcEvent->procFlags) == 0)
-@@ -925,6 +950,73 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spell
+@@ -925,6 +953,73 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy( SpellProcEventEntry const * spell
  
      return true;
  }
@@ -21078,7 +21753,7 @@ index 7673622..53257f7 100644
      if(curDestNode && curDestNode->map_id != GetPlayer()->GetMapId())
      {
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index dc9d837..b1d3c83 100644
+index dc9d837..8a6ec88 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -41,6 +41,7 @@
@@ -23454,7 +24129,7 @@ index dc9d837..b1d3c83 100644
      //FIX ME this hack: don't get feared if stunned
      if (spellInfo->Mechanic == MECHANIC_FEAR )
      {
-@@ -7994,7 +9271,6 @@ bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
+@@ -7994,15 +9271,14 @@ bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
              return true;
      }
  
@@ -23462,15 +24137,17 @@ index dc9d837..b1d3c83 100644
      SpellImmuneList const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
      for(SpellImmuneList::const_iterator itr = dispelList.begin(); itr != dispelList.end(); ++itr)
          if(itr->type == spellInfo->Dispel)
-@@ -8002,7 +9278,6 @@ bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
+             return true;
  
-     if( !(spellInfo->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE))               // unaffected by school immunity
+-    if( !(spellInfo->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE))               // unaffected by school immunity
++    if( !(spellInfo->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE) &&         // unaffected by school immunity
++        !(spellInfo->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY))              // can remove immune (by dispell or immune it)
      {
 -        // not have spells with charges currently
          SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
          for(SpellImmuneList::const_iterator itr = schoolList.begin(); itr != schoolList.end(); ++itr)
              if( !(IsPositiveSpell(itr->spellId) && IsPositiveSpell(spellInfo->Id)) &&
-@@ -8010,30 +9285,11 @@ bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
+@@ -8010,30 +9286,11 @@ bool Unit::IsImmunedToSpell(SpellEntry const* spellInfo, bool useCharges)
                  return true;
      }
  
@@ -23501,7 +24178,7 @@ index dc9d837..b1d3c83 100644
              return true;
          }
      }
-@@ -8091,7 +9347,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8091,7 +9348,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageDoneCreature = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
      for(AuraList::const_iterator i = mDamageDoneCreature.begin();i != mDamageDoneCreature.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -23510,7 +24187,7 @@ index dc9d837..b1d3c83 100644
  
      // ..done
      // SPELL_AURA_MOD_DAMAGE_DONE included in weapon damage
-@@ -8106,7 +9362,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8106,7 +9363,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
          AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_RANGED_ATTACK_POWER_VERSUS);
          for(AuraList::const_iterator i = mCreatureAttackPower.begin();i != mCreatureAttackPower.end(); ++i)
              if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -23519,7 +24196,7 @@ index dc9d837..b1d3c83 100644
      }
      else
      {
-@@ -8116,7 +9372,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8116,7 +9373,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
          AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS);
          for(AuraList::const_iterator i = mCreatureAttackPower.begin();i != mCreatureAttackPower.end(); ++i)
              if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -23528,7 +24205,7 @@ index dc9d837..b1d3c83 100644
      }
  
      if (APbonus!=0)                                         // Can be negative
-@@ -8141,7 +9397,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8141,7 +9398,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
      for(AuraList::const_iterator i = mDamageTaken.begin();i != mDamageTaken.end(); ++i)
          if((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask())
@@ -23537,7 +24214,7 @@ index dc9d837..b1d3c83 100644
  
      if(attType!=RANGED_ATTACK)
          TakenFlatBenefit += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN);
-@@ -8159,13 +9415,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8159,13 +9416,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
      for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -23553,7 +24230,7 @@ index dc9d837..b1d3c83 100644
  
      // .. taken pct: dummy auras
      AuraList const& mDummyAuras = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
-@@ -8223,13 +9479,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8223,13 +9480,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      {
          AuraList const& mModMeleeDamageTakenPercent = pVictim->GetAurasByType(SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT);
          for(AuraList::const_iterator i = mModMeleeDamageTakenPercent.begin(); i != mModMeleeDamageTakenPercent.end(); ++i)
@@ -23569,7 +24246,7 @@ index dc9d837..b1d3c83 100644
      }
  
      float tmpDamage = float(int32(*pdamage) + DoneFlatBenefit) * DoneTotalMod;
-@@ -9975,6 +11231,7 @@ bool Unit::isFrozen() const
+@@ -9975,6 +11232,7 @@ bool Unit::isFrozen() const
      return false;
  }
  
@@ -23577,7 +24254,7 @@ index dc9d837..b1d3c83 100644
  struct ProcTriggeredData
  {
      ProcTriggeredData(Aura* _triggeredByAura, uint32 _cooldown)
-@@ -10148,6 +11405,371 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
+@@ -10148,6 +11406,371 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
          }
      }
  }
@@ -23949,7 +24626,7 @@ index dc9d837..b1d3c83 100644
  
  SpellSchoolMask Unit::GetMeleeDamageSchoolMask() const
  {
-@@ -10752,60 +12374,83 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id)
+@@ -10752,60 +12375,83 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id)
      return pet;
  }
  
@@ -24551,7 +25228,7 @@ index 4fd1efd..78836a9 100644
 +    return true;
 +}
 diff --git a/src/mangosd/mangosd.conf.dist.in b/src/mangosd/mangosd.conf.dist.in
-index 4c69f2d..4eec7ed 100644
+index 4c69f2d..09a02ea 100644
 --- a/src/mangosd/mangosd.conf.dist.in
 +++ b/src/mangosd/mangosd.conf.dist.in
 @@ -294,6 +294,78 @@ GmLogTimestamp = 0
@@ -24633,7 +25310,7 @@ index 4c69f2d..4eec7ed 100644
  ###################################################################################################################
  # SERVER SETTINGS
  #
-@@ -1047,6 +1119,22 @@ Network.OutUBuff = 65536
+@@ -1047,6 +1119,34 @@ Network.OutUBuff = 65536
  Network.TcpNodelay = 1
  
  ###################################################################################################################
@@ -24653,10 +25330,22 @@ index 4c69f2d..4eec7ed 100644
 +Anticheat.Movement.TeleportToPlaneAlarms = 50
 +
 +###################################################################################################################
++#
++# MULTITHREADED MAPS CONFIG
++#
++#    Map.Threads
++#         Number of threads for maps, recommend 1 thread for 1 CPU.
++#         Default: 1
++#
++###################################################################################################################
++
++Map.Threads = 1
++
++###################################################################################################################
  # CONSOLE AND REMOTE ACCESS
  #
  #    Console.Enable
-@@ -1079,3 +1167,226 @@ Ra.IP = 0.0.0.0
+@@ -1079,3 +1179,226 @@ Ra.IP = 0.0.0.0
  Ra.Port = 3443
  Ra.MinLevel = 3
  Ra.Secure = 1
@@ -24927,8 +25616,205 @@ index e8a944f..c08fd4e 100644
          return true;
      }
      else
+diff --git a/src/shared/DelayExecutor.cpp b/src/shared/DelayExecutor.cpp
+new file mode 100644
+index 0000000..2e4d526
+--- /dev/null
++++ b/src/shared/DelayExecutor.cpp
+@@ -0,0 +1,131 @@
++
++#include <ace/Singleton.h>
++#include <ace/Thread_Mutex.h>
++
++#include "DelayExecutor.h"
++
++#include <ace/Log_Msg.h>
++
++DelayExecutor*
++DelayExecutor::instance ()
++{
++  return ACE_Singleton<DelayExecutor, ACE_Thread_Mutex>::instance ();
++}
++
++DelayExecutor::DelayExecutor () :
++activated_ (false),
++pre_svc_hook_ (0),
++post_svc_hook_ (0) { }
++
++DelayExecutor::~DelayExecutor ()
++{
++  if (pre_svc_hook_)
++    delete pre_svc_hook_;
++
++  if (post_svc_hook_)
++    delete post_svc_hook_;
++
++  this->deactivate ();
++
++  //todo probably free the queue ??
++}
++
++int
++DelayExecutor::deactivate ()
++{
++  if (!this->activated ())
++    return -1;
++
++  this->activated (false);
++
++  this->queue_.queue ()->deactivate ();
++
++  this->wait ();
++
++  return 0;
++}
++
++int
++DelayExecutor::svc (void)
++{
++  if (pre_svc_hook_)
++    pre_svc_hook_->call ();
++
++  for (;;)
++    {
++      ACE_Method_Request* rq = this->queue_.dequeue ();
++
++      if (!rq)
++        break;
++
++      rq->call ();
++
++      delete rq;
++    }
++
++  if (post_svc_hook_)
++    post_svc_hook_->call ();
++
++  return 0;
++}
++
++int
++DelayExecutor::activate (int num_threads,
++                         ACE_Method_Request* pre_svc_hook,
++                         ACE_Method_Request* post_svc_hook)
++{
++  if (this->activated ())
++    return -1;
++
++  if (num_threads < 1)
++    return -1;
++
++  if (pre_svc_hook_)
++    delete pre_svc_hook_;
++
++  if (post_svc_hook_)
++    delete post_svc_hook_;
++
++  this->pre_svc_hook_ = pre_svc_hook;
++  this->post_svc_hook_ = post_svc_hook;
++
++  this->queue_.queue ()->activate ();
++
++  if( ACE_Task_Base::activate (THR_NEW_LWP | THR_JOINABLE | THR_INHERIT_SCHED,
++                                  num_threads) == -1)
++    return -1;
++  
++  this->activated(true);
++  
++  return true;
++}
++
++int 
++DelayExecutor::execute (ACE_Method_Request* new_req)
++{
++  if(new_req == NULL)
++    return -1;
++  
++  if(this->queue_.enqueue (new_req,
++                           (ACE_Time_Value*)&ACE_Time_Value::zero) == -1)
++    {
++      delete new_req;
++      ACE_ERROR_RETURN ((LM_ERROR,
++                         ACE_TEXT ("(%t) %p\n"),
++                         ACE_TEXT ("DelayExecutor::execute enqueue")),
++                        -1);
++    }
++  return 0;
++}
++
++bool
++DelayExecutor::activated ()
++{
++  return this->activated_;
++}
++
++void
++DelayExecutor::activated (bool s)
++{
++  this->activated_ = s;
++}
+diff --git a/src/shared/DelayExecutor.h b/src/shared/DelayExecutor.h
+new file mode 100644
+index 0000000..0a7b77e
+--- /dev/null
++++ b/src/shared/DelayExecutor.h
+@@ -0,0 +1,39 @@
++#ifndef _M_DELAY_EXECUTOR_H
++#define	_M_DELAY_EXECUTOR_H
++
++#include <ace/Task.h>
++#include <ace/Activation_Queue.h>
++#include <ace/Method_Request.h>
++
++class DelayExecutor : protected ACE_Task_Base
++{
++public:
++  DelayExecutor ();
++  virtual ~DelayExecutor ();
++
++  static DelayExecutor* instance ();
++
++  /// example
++  /// DelayExecutor::instance ()->execute(new MyRequest(myarg));
++  /// returns -1 on failures
++  int execute (ACE_Method_Request* new_req);
++
++  int activate (int num_threads = 1,
++                ACE_Method_Request* pre_svc_hook = 0,
++                ACE_Method_Request* post_svc_hook = 0);
++
++  int deactivate ();
++
++  bool activated ();
++
++  virtual int svc (void);
++private:
++  ACE_Activation_Queue queue_;
++  ACE_Method_Request* pre_svc_hook_;
++  ACE_Method_Request* post_svc_hook_;
++
++  void activated (bool s);
++  bool activated_;
++};
++
++#endif // _M_DELAY_EXECUTOR_H
+diff --git a/src/shared/Makefile.am b/src/shared/Makefile.am
+index c393e68..83f8cf8 100644
+--- a/src/shared/Makefile.am
++++ b/src/shared/Makefile.am
+@@ -47,7 +47,9 @@ libmangosshared_a_SOURCES = \
+     Util.h \
+     WorldPacket.h \
+     revision_nr.h \
+-    revision.h
++    revision.h \
++    DelayExecutor.h \
++    DelayExecutor.cpp
+ 
+ # Get revision (git or svn)
+ REVISION_FILE = revision.h
 diff --git a/win/VC71/game.vcproj b/win/VC71/game.vcproj
-index d131d0f..eea524a 100644
+index d131d0f..11e7d9d 100644
 --- a/win/VC71/game.vcproj
 +++ b/win/VC71/game.vcproj
 @@ -240,6 +240,18 @@
@@ -25049,8 +25935,38 @@ index d131d0f..eea524a 100644
  				RelativePath="..\..\src\game\Pet.cpp">
  			</File>
  			<File
+@@ -848,6 +938,12 @@
+ 				RelativePath="..\..\src\game\GroupRefManager.h">
+ 			</File>
+ 			<File
++				RelativePath="..\..\src\game\MapUpdater.cpp">
++			</File>
++			<File
++				RelativePath="..\..\src\game\MapUpdater.h">
++			</File>
++			<File
+ 				RelativePath="..\..\src\game\HostilRefManager.cpp">
+ 			</File>
+ 			<File
+diff --git a/win/VC71/shared.vcproj b/win/VC71/shared.vcproj
+index 5321788..060bcfb 100644
+--- a/win/VC71/shared.vcproj
++++ b/win/VC71/shared.vcproj
+@@ -415,6 +415,12 @@
+ 			<File
+ 				RelativePath="..\..\src\shared\vmap\VMapTools.h">
+ 			</File>
++			<File
++				RelativePath="..\..\src\shared\DelayExecutor.cpp">
++			</File>
++			<File
++			        RelativePath="..\..\src\shared\DelayExecutor.h">
++			</File>
+ 		</Filter>
+ 		<File
+ 			RelativePath="..\..\src\shared\Common.cpp">
 diff --git a/win/VC80/game.vcproj b/win/VC80/game.vcproj
-index 80aa58b..2f99c9e 100644
+index 80aa58b..707f4a2 100644
 --- a/win/VC80/game.vcproj
 +++ b/win/VC80/game.vcproj
 @@ -494,6 +494,22 @@
@@ -25177,8 +26093,42 @@ index 80aa58b..2f99c9e 100644
  				RelativePath="..\..\src\game\Pet.cpp"
  				>
  			</File>
+@@ -1303,6 +1399,14 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath="..\..\src\game\MapUpdater.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\..\src\game\MapUpdater.h"
++				>
++			</File>
++			<File
+ 				RelativePath="..\..\src\game\HostilRefManager.cpp"
+ 				>
+ 			</File>
+diff --git a/win/VC80/shared.vcproj b/win/VC80/shared.vcproj
+index 291b4e9..0a24870 100644
+--- a/win/VC80/shared.vcproj
++++ b/win/VC80/shared.vcproj
+@@ -762,6 +762,14 @@
+ 			>
+ 		</File>
+ 		<File
++			RelativePath="..\..\src\shared\DelayExecutor.cpp"
++			>
++		</File>
++		<File
++			RelativePath="..\..\src\shared\DelayExecutor.h"
++			>
++		</File>
++		<File
+ 			RelativePath="..\..\src\shared\revision.h"
+ 			>
+ 			<FileConfiguration
 diff --git a/win/VC90/game.vcproj b/win/VC90/game.vcproj
-index 19b0ae4..33010e1 100644
+index 19b0ae4..56ecf96 100644
 --- a/win/VC90/game.vcproj
 +++ b/win/VC90/game.vcproj
 @@ -496,6 +496,22 @@
@@ -25305,3 +26255,37 @@ index 19b0ae4..33010e1 100644
  				RelativePath="..\..\src\game\Pet.cpp"
  				>
  			</File>
+@@ -1304,6 +1400,14 @@
+ 				>
+ 			</File>
+ 			<File
++				RelativePath="..\..\src\game\MapUpdater.cpp"
++				>
++			</File>
++			<File
++				RelativePath="..\..\src\game\MapUpdater.h"
++				>
++			</File>
++			<File
+ 				RelativePath="..\..\src\game\HostilRefManager.cpp"
+ 				>
+ 			</File>
+diff --git a/win/VC90/shared.vcproj b/win/VC90/shared.vcproj
+index f6ad561..bc7a3ab 100644
+--- a/win/VC90/shared.vcproj
++++ b/win/VC90/shared.vcproj
+@@ -810,6 +810,14 @@
+ 			>
+ 		</File>
+ 		<File
++			RelativePath="..\..\src\shared\DelayExecutor.cpp"
++			>
++		</File>
++		<File
++			RelativePath="..\..\src\shared\DelayExecutor.h"
++			>
++		</File>
++		<File
+ 			RelativePath="..\..\src\shared\ServiceWin32.cpp"
+ 			>
+ 		</File>

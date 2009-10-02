@@ -1,0 +1,273 @@
+diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
+index 068476c..1e5e964 100644
+--- a/src/game/Chat.cpp
++++ b/src/game/Chat.cpp
+@@ -536,6 +536,9 @@ ChatCommand * ChatHandler::getCommandTable()
+         { "sendmessage",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
+         { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
+         { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
++        { "jail",           SEC_GAMEMASTER,     false, &ChatHandler::HandleJailCommand,                "", NULL },
++        { "unjail",         SEC_GAMEMASTER,     false, &ChatHandler::HandleUnjailCommand,              "", NULL },
++        { "listjail",       SEC_GAMEMASTER,     false, &ChatHandler::HandleListjailCommand,            "", NULL },
+ 
+         { NULL,             0,                  false, NULL,                                           "", NULL }
+     };
+diff --git a/src/game/Chat.h b/src/game/Chat.h
+index 77a9d51..f22e031 100644
+--- a/src/game/Chat.h
++++ b/src/game/Chat.h
+@@ -416,6 +416,9 @@ class ChatHandler
+         bool HandleSendMessageCommand(const char * args);
+         bool HandleRepairitemsCommand(const char* args);
+         bool HandleWaterwalkCommand(const char* args);
++        bool HandleJailCommand(const char *args);
++        bool HandleUnjailCommand(const char *args);
++        bool HandleListjailCommand(const char* args);
+ 
+         //! Development Commands
+         bool HandleSetValue(const char* args);
+diff --git a/src/game/GroupHandler.cpp b/src/game/GroupHandler.cpp
+index ad56314..3529f2b 100644
+--- a/src/game/GroupHandler.cpp
++++ b/src/game/GroupHandler.cpp
+@@ -99,6 +99,13 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
+         return;
+     }
+ 
++    // Jailed player - not allowed
++    if(player->IsInJail() || GetPlayer()->IsInJail())
++    {
++        SendPartyResult(PARTY_OP_INVITE, membername, PARTY_RESULT_TARGET_UNFRIENDLY);
++        return;
++    }
++
+     // player already in another group or invited
+     if(player->GetGroup() || player->GetGroupInvite() )
+     {
+diff --git a/src/game/Level2.cpp b/src/game/Level2.cpp
+index f22458b..2504974 100644
+--- a/src/game/Level2.cpp
++++ b/src/game/Level2.cpp
+@@ -4177,3 +4177,178 @@ bool ChatHandler::HandleNpcTameCommand(const char* /*args*/)
+ 
+     return true;
+ }
++
++/*** SIMPLE JAIL ***/
++bool ChatHandler::HandleJailCommand(const char *args)
++{
++	if(!*args)
++		return false;
++
++	std::string name = args;
++
++	if(!normalizePlayerName(name))
++    {
++        SendSysMessage(LANG_PLAYER_NOT_FOUND);
++        SetSentErrorMessage(true);
++        return false;
++    }
++
++	Player *player = objmgr.GetPlayer(name.c_str());
++
++	if(player)
++	{
++		// GMs cannot be jailed
++		if(player->GetSession()->GetSecurity() != SEC_PLAYER)
++		{
++			PSendSysMessage("%s is a GM and cannot be jailed", name.c_str());
++			return true;
++		}
++
++		if(player->IsBeingTeleported())
++		{
++			PSendSysMessage(LANG_IS_TELEPORTED, player->GetName());
++			return true;
++		}
++
++		// Stop flight if player using taxi
++		if(player->isInFlight())
++		{
++			player->GetMotionMaster()->MovementExpired();
++			player->m_taxi.ClearTaxiDestinations();
++		}
++
++        // Remove player from group
++        if(player->GetGroup())
++            player->RemoveFromGroup();
++
++		if(player->IsInJail())
++		{
++			PSendSysMessage("Player %s is already in jail.", name.c_str());
++			return true;
++		}
++
++		// Teleport player to jail - Current position is in a huge box (zone 3817)
++		//                 map  X  Y    Z   orient.
++		player->TeleportTo( 13, 7, 1, -144, 3 );
++		ChatHandler(player).PSendSysMessage("You have been jailed!");
++
++		PSendSysMessage("Player %s is now in jail.", name.c_str());
++	}
++	else if(uint64 guid = objmgr.GetPlayerGUIDByName(name)) // if player is offline
++	{
++		PSendSysMessage("Player %s is now in jail (offline)", name.c_str());
++
++		Player::SavePositionInDB(13, 7, 1, -144, 3, 3817, guid);
++		return true;
++	}
++	else
++	{
++		PSendSysMessage(LANG_NO_PLAYER, args);
++		return true;
++	}
++
++	return true;
++}
++
++bool ChatHandler::HandleUnjailCommand(const char *args)
++{
++	if(!*args)
++		return false;
++
++	std::string name = args;
++
++	if(!normalizePlayerName(name))
++    {
++        SendSysMessage(LANG_PLAYER_NOT_FOUND);
++        SetSentErrorMessage(true);
++        return false;
++    }
++
++	Player *player = objmgr.GetPlayer(name.c_str());
++
++	if(player)
++	{
++		if(!player->IsInJail())
++		{
++			PSendSysMessage("Player %s is not in jail and cannot be unjailed.", name.c_str());
++			return true;
++		}
++
++		// Teleport to player's homebind when unjailed
++		player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0);
++
++		PSendSysMessage("Player %s is now unjailed.", name.c_str());
++		ChatHandler(player).PSendSysMessage("You have been removed from the jail.");
++		return true;
++	}
++	else if(uint64 guid = objmgr.GetPlayerGUIDByName(name)) // player is offline
++	{
++		// Load homebind location from DB
++		QueryResult *result = CharacterDatabase.PQuery("SELECT map,zone,position_x,position_y,position_z FROM character_homebind WHERE guid = '%u'", guid);
++		if (result)
++		{
++			Field *fields = result->Fetch();
++
++			uint16 hb_map = fields[0].GetUInt32();
++			uint16 hb_zone = fields[1].GetUInt16();
++			float hb_x = fields[2].GetFloat();
++			float hb_y = fields[3].GetFloat();
++			float hb_z = fields[4].GetFloat();
++			delete result;
++
++			// save homebind position
++			Player::SavePositionInDB(hb_map, hb_x, hb_y, hb_z, 0, hb_zone, guid);
++
++			PSendSysMessage("Player %s is now unjailed.", name.c_str());
++		}
++		else
++		{
++			PSendSysMessage("Player doesnt have homebind and cannot be unjailed");
++			return true;
++		}
++	}
++	else
++		PSendSysMessage(LANG_NO_PLAYER, args);
++
++	return true;
++}
++
++bool ChatHandler::HandleListjailCommand(const char* /*args*/)
++{
++	// Save all players for updated positions
++	ObjectAccessor::Instance().SaveAllPlayers();
++
++	QueryResult *result = CharacterDatabase.PQuery("SELECT name,online FROM characters WHERE zone = '3817'");
++
++	if(result)
++	{
++
++		PSendSysMessage("Current Jailed Players:");
++
++		PSendSysMessage("-----------------------");
++
++		do
++        {
++
++            Field *fields = result->Fetch();
++
++			std::string name = fields[0].GetCppString();
++			uint8 online = fields[1].GetUInt8();
++
++			if(online == 0)
++				PSendSysMessage("%20s (offline)", name.c_str() );
++			else
++				PSendSysMessage("%20s", name.c_str() );
++
++		}while( result->NextRow() );
++
++		PSendSysMessage("-----------------------");
++
++        delete result;
++
++	}
++	else
++		PSendSysMessage("Jail empty.");
++
++	return true;
++}
+diff --git a/src/game/Player.h b/src/game/Player.h
+index 3308c08..8f92816 100644
+--- a/src/game/Player.h
++++ b/src/game/Player.h
+@@ -922,6 +922,14 @@ class MANGOS_DLL_SPEC Player : public Unit
+         bool IsInWater() const { return m_isInWater; }
+         bool IsUnderWater() const;
+ 
++		bool Player::IsInJail()
++		{
++			if(GetZoneId() == 3817)
++				return true;
++			else
++				return false;
++		}
++
+         void SendInitialPacketsBeforeAddToMap();
+         void SendInitialPacketsAfterAddToMap();
+         void SendTransferAborted(uint32 mapid, uint16 reason);
+diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
+index b42c59e..3647081 100644
+--- a/src/game/Spell.cpp
++++ b/src/game/Spell.cpp
+@@ -3160,6 +3160,10 @@ void Spell::TriggerSpell()
+ 
+ uint8 Spell::CanCast(bool strict)
+ {
++	// Not allow spells in jail
++	if( ((Player*)m_caster)->IsInJail() )
++		return SPELL_FAILED_NOT_HERE;
++
+     // check cooldowns to prevent cheating
+     if(m_caster->GetTypeId()==TYPEID_PLAYER && ((Player*)m_caster)->HasSpellCooldown(m_spellInfo->Id))
+     {
+@@ -3879,7 +3883,8 @@ uint8 Spell::CanCast(bool strict)
+                     return SPELL_FAILED_BAD_TARGETS;
+ 
+                 Player* target = objmgr.GetPlayer(((Player*)m_caster)->GetSelection());
+-                if( !target || ((Player*)m_caster)==target || !target->IsInSameRaidWith((Player*)m_caster) )
++				// Not allow summon jailed player
++                if( !target || ((Player*)m_caster)==target || !target->IsInSameRaidWith((Player*)m_caster) || target->IsInJail() )
+                     return SPELL_FAILED_BAD_TARGETS;
+ 
+                 // check if our map is dungeon

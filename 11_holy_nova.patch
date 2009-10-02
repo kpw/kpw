@@ -1,12 +1,11 @@
 diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
-index 544432d..d7a421c 100644
+index b42c59e..91d1588 100644
 --- a/src/game/Spell.cpp
 +++ b/src/game/Spell.cpp
-@@ -2479,7 +2479,24 @@ void Spell::finish(bool ok)
-     // other code related only to successfully finished spells
+@@ -2491,6 +2491,25 @@ void Spell::finish(bool ok)
      if(!ok)
          return;
--
+ 
 +    //holy nova heal
 +    if(m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellIconID == 1874)
 +    {
@@ -25,6 +24,7 @@ index 544432d..d7a421c 100644
 +        if(holy_nova_heal)
 +            m_caster->CastSpell(m_caster, holy_nova_heal, true);
 +    }
++
      //handle SPELL_AURA_ADD_TARGET_TRIGGER auras
      Unit::AuraList const& targetTriggers = m_caster->GetAurasByType(SPELL_AURA_ADD_TARGET_TRIGGER);
      for(Unit::AuraList::const_iterator i = targetTriggers.begin(); i != targetTriggers.end(); ++i)

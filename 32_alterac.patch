@@ -1,5 +1,21 @@
+diff --git a/src/game/AggressorAI.cpp b/src/game/AggressorAI.cpp
+index 637410c..3fdf24f 100644
+--- a/src/game/AggressorAI.cpp
++++ b/src/game/AggressorAI.cpp
+@@ -109,6 +109,11 @@ void AggressorAI::EnterEvadeMode()
+     i_victimGuid = 0;
+     i_creature.CombatStop();
+     i_creature.SetLootRecipient(NULL);
++    if(i_creature.GetDeleteAfterNoAggro())
++    {
++        i_creature.CleanupsBeforeDelete();
++        i_creature.AddObjectToRemoveList();
++    }
+ }
+ 
+ void
 diff --git a/src/game/BattleGround.cpp b/src/game/BattleGround.cpp
-index 2781ef6..faca69a 100644
+index 2781ef6..02a8e49 100644
 --- a/src/game/BattleGround.cpp
 +++ b/src/game/BattleGround.cpp
 @@ -290,6 +290,23 @@ void BattleGround::CastSpellOnTeam(uint32 SpellID, uint32 TeamID)
@@ -35,7 +51,16 @@ index 2781ef6..faca69a 100644
  
          PlaySoundToAll(SOUND_ALLIANCE_WINS);                // alliance wins sound
  
-@@ -932,6 +949,22 @@ void BattleGround::DoorOpen(uint32 type)
+@@ -870,6 +887,8 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float
+         sLog.outErrorDb("Gameobject template %u not found in database! BattleGround not created!", entry);
+         return false;
+     }
++    //if( x==0 && y==0 && z==0 )
++        //return true; //0,0,0 is a placeholder in alteracvalley
+ 
+     uint32 guid = objmgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT);
+ 
+@@ -932,6 +951,22 @@ void BattleGround::DoorOpen(uint32 type)
      }
  }
  
@@ -58,7 +83,7 @@ index 2781ef6..faca69a 100644
  void BattleGround::SpawnBGObject(uint32 type, uint32 respawntime)
  {
      if( respawntime == 0 )
-@@ -983,6 +1016,16 @@ Creature* BattleGround::AddCreature(uint32 entry, uint32 type, uint32 teamval, f
+@@ -983,6 +1018,16 @@ Creature* BattleGround::AddCreature(uint32 entry, uint32 type, uint32 teamval, f
          return NULL;
      }
  
@@ -70,12 +95,22 @@ index 2781ef6..faca69a 100644
 +    data.posY           = y;
 +    data.posZ           = z;
 +    data.orientation    = o;
-+    data.spawndist      = 15; //rooted creatures or spiritguides can get 0 but i think, this isn't important..
++    data.spawndist      = 15;
 +
      pCreature->AIM_Initialize();
  
      //pCreature->SetDungeonDifficulty(0);
-@@ -1151,3 +1194,16 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
+@@ -1000,8 +1045,7 @@ bool BattleGround::DelCreature(uint32 type)
+         sLog.outError("Can't find creature guid: %u",GUID_LOPART(m_BgCreatures[type]));
+         return false;
+     }
+-    cr->CleanupsBeforeDelete();
+-    cr->AddObjectToRemoveList();
++    cr->SetDeleteAfterNoAggro(true);
+     m_BgCreatures[type] = 0;
+     return true;
+ }
+@@ -1151,3 +1195,16 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
      // to be able to remove insignia
      player->SetFlag( UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE );
  }
@@ -130,10 +165,10 @@ index 9e41e66..7f6370c 100644
          void DoorOpen(uint32 type);
          void DoorClose(uint32 type);
 diff --git a/src/game/BattleGroundAV.cpp b/src/game/BattleGroundAV.cpp
-index 9421e97..f84a865 100644
+index 9421e97..debb7dd 100644
 --- a/src/game/BattleGroundAV.cpp
 +++ b/src/game/BattleGroundAV.cpp
-@@ -16,27 +16,426 @@
+@@ -16,27 +16,453 @@
   * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   */
  
@@ -149,6 +184,7 @@ index 9421e97..f84a865 100644
  #include "MapManager.h"
  #include "Language.h"
 +#include "SpellAuras.h"
++#include "Formulas.h"
  
  BattleGroundAV::BattleGroundAV()
  {
@@ -163,17 +199,14 @@ index 9421e97..f84a865 100644
 +
 +const uint16 BattleGroundAV::GetBonusHonor(uint8 kills) //TODO: move this function to Battleground.cpp (needs to find a way to get m_MaxLevel)
 +{
-+    if(m_MaxLevel==70)
-+        return 21*kills;
-+    else
-+        return 14*kills;
++    return MaNGOS::Honor::hk_honor_at_level(m_MaxLevel, kills);
 +}
 +
 +void BattleGroundAV::HandleKillPlayer(Player *player, Player *killer)
 +{
 +    if(GetStatus() != STATUS_IN_PROGRESS)
 +        return;
-+
+ 
 +    BattleGround::HandleKillPlayer(player, killer);
 +	UpdateScore(player->GetTeam(),-1);
 +}
@@ -188,23 +221,27 @@ index 9421e97..f84a865 100644
 +    {
 +        CastSpellOnTeam(23658,HORDE); //this is a spell which finishes a quest where a player has to kill the boss
 +        RewardReputationToTeam(729,BG_AV_REP_BOSS,HORDE);
-+        RewardHonorToTeam(BG_AV_HONOR_BOSS,HORDE);
++        RewardHonorToTeam(GetBonusHonor(BG_AV_KILL_BOSS),HORDE);
 +        EndBattleGround(HORDE);
 +    }
 +    else if ( entry == BG_AV_CreatureInfo[AV_NPC_H_BOSS][0] )
 +    {
 +        CastSpellOnTeam(23658,ALLIANCE); //this is a spell which finishes a quest where a player has to kill the boss
-+        m_CaptainAlive[1]=false;
 +        RewardReputationToTeam(730,BG_AV_REP_BOSS,ALLIANCE);
-+        RewardHonorToTeam(BG_AV_HONOR_BOSS,ALLIANCE);
++        RewardHonorToTeam(GetBonusHonor(BG_AV_KILL_BOSS),ALLIANCE);
 +        EndBattleGround(ALLIANCE);
 +    }
 +    else if(entry == BG_AV_CreatureInfo[AV_NPC_A_CAPTAIN][0])
 +    {
++        if(!m_CaptainAlive[0])
++        {
++            sLog.outError("Killed a Captain twice, please report this bug, if you haven't done \".respawn\"");
++            return;
++        }
 +        m_CaptainAlive[0]=false;
 +        RewardReputationToTeam(729,BG_AV_REP_CAPTAIN,HORDE);
 +        RewardHonorToTeam(GetBonusHonor(BG_AV_KILL_CAPTAIN),HORDE);
-+	    UpdateScore(ALLIANCE,(-1)*BG_AV_RES_CAPTAIN);
++        UpdateScore(ALLIANCE,(-1)*BG_AV_RES_CAPTAIN);
 +        //spawn destroyed aura
 +        for(uint8 i=0; i<=9; i++)
 +            SpawnBGObject(BG_AV_OBJECT_BURN_BUILDING_ALLIANCE+i,RESPAWN_IMMEDIATELY);
@@ -215,9 +252,15 @@ index 9421e97..f84a865 100644
 +    }
 +    else if ( entry == BG_AV_CreatureInfo[AV_NPC_H_CAPTAIN][0] )
 +    {
++        if(!m_CaptainAlive[1])
++        {
++            sLog.outError("Killed a Captain twice, please report this bug, if you haven't done \".respawn\"");
++            return;
++        }
++        m_CaptainAlive[1]=false;
 +        RewardReputationToTeam(730,BG_AV_REP_CAPTAIN,ALLIANCE);
 +        RewardHonorToTeam(GetBonusHonor(BG_AV_KILL_CAPTAIN),ALLIANCE);
-+    	UpdateScore(HORDE,(-1)*BG_AV_RES_CAPTAIN);
++        UpdateScore(HORDE,(-1)*BG_AV_RES_CAPTAIN);
 +        //spawn destroyed aura
 +        for(uint8 i=0; i<=9; i++)
 +            SpawnBGObject(BG_AV_OBJECT_BURN_BUILDING_HORDE+i,RESPAWN_IMMEDIATELY);
@@ -358,19 +401,19 @@ index 9421e97..f84a865 100644
 +    }
 +}
 +
-+
-+Creature* BattleGroundAV::AddAVCreature(uint8 cinfoid, uint16 type )
++Creature* BattleGroundAV::AddAVCreature(uint16 cinfoid, uint16 type )
 +{
 +    uint32 level;
++    bool isStatic=false;
 +    Creature* creature = NULL;
 +    assert(type <= AV_CPLACE_MAX + AV_STATICCPLACE_MAX);
 +    if(type>=AV_CPLACE_MAX) //static
 +    {
-+        type-=(AV_CPLACE_MAX);
++        type-=AV_CPLACE_MAX;
 +        cinfoid=int(BG_AV_StaticCreaturePos[type][4]);
-+
 +        creature = AddCreature(BG_AV_StaticCreatureInfo[cinfoid][0],(type+AV_CPLACE_MAX),BG_AV_StaticCreatureInfo[cinfoid][1],BG_AV_StaticCreaturePos[type][0],BG_AV_StaticCreaturePos[type][1],BG_AV_StaticCreaturePos[type][2],BG_AV_StaticCreaturePos[type][3]);
 +        level = ( BG_AV_StaticCreatureInfo[cinfoid][2] == BG_AV_StaticCreatureInfo[cinfoid][3] ) ? BG_AV_StaticCreatureInfo[cinfoid][2] : urand(BG_AV_StaticCreatureInfo[cinfoid][2],BG_AV_StaticCreatureInfo[cinfoid][3]);
++        isStatic=true;
 +    }
 +    else
 +    {
@@ -379,8 +422,27 @@ index 9421e97..f84a865 100644
 +    }
 +    if(!creature)
 +        return NULL;
- 
-+//    creature->LoadCreaturesAddon(true); //currently it's only for the bowman, so they have the entangling-aura.. but later it's needed for the watchdogs
++    if(creature->GetEntry() == BG_AV_CreatureInfo[AV_NPC_A_CAPTAIN][0] || creature->GetEntry() == BG_AV_CreatureInfo[AV_NPC_H_CAPTAIN][0])
++        creature->SetRespawnDelay(RESPAWN_ONE_DAY); // TODO: look if this can be done by database + also add this for the wingcommanders
++
++    if((isStatic && cinfoid>=10 && cinfoid<=14) || (!isStatic && ((cinfoid >= AV_NPC_A_GRAVEDEFENSE0 && cinfoid<=AV_NPC_A_GRAVEDEFENSE3) ||
++        (cinfoid>=AV_NPC_H_GRAVEDEFENSE0 && cinfoid<=AV_NPC_H_GRAVEDEFENSE3))))
++    {
++        if(!isStatic && ((cinfoid>=AV_NPC_A_GRAVEDEFENSE0 && cinfoid<=AV_NPC_A_GRAVEDEFENSE3)
++            || (cinfoid>=AV_NPC_H_GRAVEDEFENSE0 && cinfoid<=AV_NPC_H_GRAVEDEFENSE3)))
++        {
++            CreatureData &data = objmgr.NewOrExistCreatureData(creature->GetDBTableGUIDLow());
++            data.spawndist      = 5;
++        }
++        //else spawndist will be 15, so creatures move maximum=10
++        creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
++        creature->GetMotionMaster()->Initialize();
++        creature->setDeathState(JUST_DIED);
++        creature->Respawn();
++        //TODO: find a way to add a motionmaster without killing the creature (i
++        //just copied this code from a gm-command
++    }
++
 +    if(level != 0)
 +        level += m_MaxLevel-60; //maybe we can do this more generic for custom level-range.. actually it's blizzlike
 +    creature->SetLevel(level);
@@ -561,7 +623,7 @@ index 9421e97..f84a865 100644
  }
  
  void BattleGroundAV::AddPlayer(Player *plr)
-@@ -44,15 +443,26 @@ void BattleGroundAV::AddPlayer(Player *plr)
+@@ -44,15 +470,66 @@ void BattleGroundAV::AddPlayer(Player *plr)
      BattleGround::AddPlayer(plr);
      //create score and add it to map, default values are set in constructor
      BattleGroundAVScore* sc = new BattleGroundAVScore;
@@ -573,9 +635,48 @@ index 9421e97..f84a865 100644
  }
  
 -void BattleGroundAV::RemovePlayer(Player* /*plr*/,uint64 /*guid*/)
-+void BattleGroundAV::RemovePlayer(Player* plr,uint64 /*guid*/)
++void BattleGroundAV::EndBattleGround(uint32 winner)
  {
--
++    //calculate bonuskills for both teams:
++    //first towers:
++    uint8 kills[2]={0,0}; //0=ally 1=horde
++    uint8 rep[2]={0,0}; //0=ally 1=horde
++    for(BG_AV_Nodes i = BG_AV_NODES_DUNBALDAR_SOUTH; i <= BG_AV_NODES_FROSTWOLF_WTOWER; ++i)
++    {
++            if(m_Nodes[i].State == POINT_CONTROLED)
++            {
++                if(m_Nodes[i].Owner == ALLIANCE)
++                {
++                    rep[0]   += BG_AV_REP_SURVIVING_TOWER;
++                    kills[0] += BG_AV_KILL_SURVIVING_TOWER;
++                }
++                else
++                {
++                    rep[0]   += BG_AV_KILL_SURVIVING_TOWER;
++                    kills[1] += BG_AV_KILL_SURVIVING_TOWER;
++                }
++            }
++    }
+ 
++    for(int i=0; i<=1; i++) //0=ally 1=horde
++    {
++        if(m_CaptainAlive[i])
++        {
++            kills[i] += BG_AV_KILL_SURVIVING_CAPTAIN;
++            rep[i]   += BG_AV_REP_SURVIVING_CAPTAIN;
++        }
++        if(rep[i] != 0)
++            RewardReputationToTeam((i == 0)?730:729,rep[i],(i == 0)?ALLIANCE:HORDE);
++        if(kills[i] != 0)
++            RewardHonorToTeam(GetBonusHonor(kills[i]),(i == 0)?ALLIANCE:HORDE);
++    }
++
++    //TODO add enterevademode for all attacking creatures
++    BattleGround::EndBattleGround(winner);
++}
++
++void BattleGroundAV::RemovePlayer(Player* plr,uint64 /*guid*/)
++{
 +   if(!plr)
 +    {
 +        sLog.outError("bg_AV no player at remove");
@@ -591,7 +692,7 @@ index 9421e97..f84a865 100644
  void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
  {
      // this is wrong way to implement these things. On official it done by gameobject spell cast.
-@@ -63,18 +473,29 @@ void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
+@@ -63,18 +540,29 @@ void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
      switch(Trigger)
      {
          case 95:
@@ -624,7 +725,7 @@ index 9421e97..f84a865 100644
              break;
      }
  
-@@ -118,3 +539,840 @@ void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
+@@ -118,3 +606,842 @@ void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
              break;
      }
  }
@@ -819,7 +920,9 @@ index 9421e97..f84a865 100644
 +
 +    }
 +    for(uint8 i=0; i<4; i++)
-+        AddAVCreature(creatureid,c_place+i);
++    {
++        Creature* cr = AddAVCreature(creatureid,c_place+i);
++    }
 +}
 +void BattleGroundAV::DePopulateNode(BG_AV_Nodes node)
 +{
@@ -1466,38 +1569,41 @@ index 9421e97..f84a865 100644
 +}
 +
 diff --git a/src/game/BattleGroundAV.h b/src/game/BattleGroundAV.h
-index 11bd08b..79951bc 100644
+index 11bd08b..dcfcb36 100644
 --- a/src/game/BattleGroundAV.h
 +++ b/src/game/BattleGroundAV.h
-@@ -21,6 +21,1459 @@
+@@ -21,6 +21,1462 @@
  
  class BattleGround;
  
 +#define LANG_BG_AV_A_CAPTAIN_BUFF       "Begone. Uncouth scum! The Alliance shall prevail in Alterac Valley!"
 +#define LANG_BG_AV_H_CAPTAIN_BUFF       "Now is the time to attack! For the Horde!"
-+
 +#define LANG_BG_AV_S_MINE_BOSS_CLAIMS   "Snivvle is here! Snivvle claims the Coldtooth Mine!"
 +
-+#define SEND_MSG_NEAR_LOSE               120
-+#define BG_AV_SPIRITGUIDE_ENTRY_A        13116
 +#define BG_AV_CAPTIME                    240000  //4:00
 +#define BG_AV_SNOWFALL_FIRSTCAP          300000  //5:00 but i also have seen 4:05
++
 +#define BG_AV_SCORE_INITIAL_POINTS       600
-+#define BG_AV_BANNER_RESPAWN_TIMER       3000
++#define SEND_MSG_NEAR_LOSE               120
 +
-+#define BG_AV_REP_BOSS                  100 //not sure
-+#define BG_AV_HONOR_BOSS                80 //not sure (4kills)
-+#define BG_AV_REP_CAPTAIN               125 //not sure
++#define BG_AV_KILL_BOSS                 4
++#define BG_AV_REP_BOSS                  350
++
 +#define BG_AV_KILL_CAPTAIN              3
++#define BG_AV_REP_CAPTAIN               125
 +#define BG_AV_RES_CAPTAIN               100
-+#define BG_AV_REP_TOWER                 12
-+#define BG_AV_KILL_TOWER                 3
-+#define BG_AV_RES_TOWER                 75
-+#define BG_AV_KILL_COMMANDER            1 //for a safely returned wingcommander
-+//bonushonor at the end
-+#define BG_AV_SURVIVING_TOWER           2
-+#define BG_AV_SURVIVING_CAPTAIN         2
 +
++#define BG_AV_KILL_TOWER                3
++#define BG_AV_REP_TOWER                 12
++#define BG_AV_RES_TOWER                 75
++
++#define BG_AV_GET_COMMANDER            1 //for a safely returned wingcommander
++//bonushonor at the end
++#define BG_AV_KILL_SURVIVING_TOWER      2
++#define BG_AV_REP_SURVIVING_TOWER       12
++
++#define BG_AV_KILL_SURVIVING_CAPTAIN    2
++#define BG_AV_REP_SURVIVING_CAPTAIN     125
 +
 +enum BG_AV_Sounds
 +{ //TODO: get out if there comes a sound when neutral team captures mine
@@ -1549,7 +1655,7 @@ index 11bd08b..79951bc 100644
 +
 +enum BG_AV_OTHER_VALUES
 +{
-+    AV_STATICCPLACE_MAX        = 128,
++    AV_STATICCPLACE_MAX        = 123,
 +    AV_NORTH_MINE              = 0,
 +    AV_SOUTH_MINE              = 1,
 +    AV_MINE_TICK_TIMER         = 45000,
@@ -2393,57 +2499,57 @@ index 11bd08b..79951bc 100644
 +enum BG_AV_CreatureIds
 +{
 +
-+	AV_NPC_A_GRAVEDEFENSE0 = 0,		// stormpike Defender
-+	AV_NPC_A_GRAVEDEFENSE1 = 1,		// seasoned defender
-+	AV_NPC_A_GRAVEDEFENSE2 = 2,		// veteran defender
-+    AV_NPC_A_GRAVEDEFENSE3 = 3,      // champion defender
-+    AV_NPC_A_TOWERDEFENSE  = 4,      // stormpike bowman
-+    AV_NPC_A_CAPTAIN       = 5,      // balinda
-+    AV_NPC_A_BOSS          = 6,      // vanndar
++    AV_NPC_A_GRAVEDEFENSE0 = 0,     // stormpike Defender
++    AV_NPC_A_GRAVEDEFENSE1 = 1,     // seasoned defender
++    AV_NPC_A_GRAVEDEFENSE2 = 2,     // veteran defender
++    AV_NPC_A_GRAVEDEFENSE3 = 3,     // champion defender
++    AV_NPC_A_TOWERDEFENSE  = 4,     // stormpike bowman
++    AV_NPC_A_CAPTAIN       = 5,     // balinda
++    AV_NPC_A_BOSS          = 6,     // vanndar
 +
-+    AV_NPC_H_GRAVEDEFENSE0 = 7,      // frostwolf guardian
-+	AV_NPC_H_GRAVEDEFENSE1 = 8,      // seasoned guardian
-+	AV_NPC_H_GRAVEDEFENSE2 = 9,      // veteran guardian
-+    AV_NPC_H_GRAVEDEFENSE3 = 10,     // champion guardian
-+    AV_NPC_H_TOWERDEFENSE  = 11,     // frostwolf bowman
-+    AV_NPC_H_CAPTAIN       = 12,     // galvangar
-+    AV_NPC_H_BOSS          = 13,      // drek thar
++    AV_NPC_H_GRAVEDEFENSE0 = 7,     // frostwolf guardian
++    AV_NPC_H_GRAVEDEFENSE1 = 8,     // seasoned guardian
++    AV_NPC_H_GRAVEDEFENSE2 = 9,     // veteran guardian
++    AV_NPC_H_GRAVEDEFENSE3 = 10,    // champion guardian
++    AV_NPC_H_TOWERDEFENSE  = 11,    // frostwolf bowman
++    AV_NPC_H_CAPTAIN       = 12,    // galvangar
++    AV_NPC_H_BOSS          = 13,    // drek thar
 +
-+    AV_NPC_A_MARSHAL_SOUTH       = 14,
-+    AV_NPC_MARSHAL_NORTH       = 15,
-+    AV_NPC_A_MARSHAL_ICE         = 16,
-+    AV_NPC_A_MARSHAL_STONE       = 17,
-+    AV_NPC_H_MARSHAL_ICE         = 18,
-+    AV_NPC_H_MARSHAL_TOWER       = 19,
-+    AV_NPC_MARSHAL_ETOWER      = 20,
-+    AV_NPC_H_MARSHAL_WTOWER      = 21,
-+    AV_NPC_N_MINE_N_1           = 22,
-+    AV_NPC_N_MINE_N_2           = 23,
-+    AV_NPC_N_MINE_N_3           = 24,
-+    AV_NPC_N_MINE_N_4           = 25,
-+    AV_NPC_N_MINE_A_1           = 26,
-+    AV_NPC_N_MINE_A_2           = 27,
-+    AV_NPC_N_MINE_A_3           = 28,
-+    AV_NPC_N_MINE_A_4           = 29,
-+    AV_NPC_N_MINE_H_1           = 30,
-+    AV_NPC_N_MINE_H_2           = 31,
-+    AV_NPC_N_MINE_H_3           = 32,
-+    AV_NPC_N_MINE_H_4           = 33,
-+    AV_NPC_S_MINE_N_1           = 34,
-+    AV_NPC_S_MINE_N_2           = 35,
-+    AV_NPC_S_MINE_N_3           = 36,
-+    AV_NPC_S_MINE_N_4           = 37,
-+    AV_NPC_S_MINE_N_S           = 38,
-+    AV_NPC_S_MINE_A_1           = 39,
-+    AV_NPC_S_MINE_A_2           = 40,
-+    AV_NPC_S_MINE_A_3           = 41,
-+    AV_NPC_S_MINE_A_4           = 42,
-+    AV_NPC_S_MINE_H_1           = 43,
-+    AV_NPC_S_MINE_H_2           = 44,
-+    AV_NPC_S_MINE_H_3           = 45,
-+    AV_NPC_S_MINE_H_4           = 46,
-+    AV_NPC_HERALD               = 47,
-+    AV_NPC_INFO_MAX              = 48
++    AV_NPC_A_MARSHAL_SOUTH = 14,
++    AV_NPC_MARSHAL_NORTH   = 15,
++    AV_NPC_A_MARSHAL_ICE   = 16,
++    AV_NPC_A_MARSHAL_STONE = 17,
++    AV_NPC_H_MARSHAL_ICE   = 18,
++    AV_NPC_H_MARSHAL_TOWER = 19,
++    AV_NPC_MARSHAL_ETOWER  = 20,
++    AV_NPC_H_MARSHAL_WTOWER= 21,
++    AV_NPC_N_MINE_N_1      = 22,
++    AV_NPC_N_MINE_N_2      = 23,
++    AV_NPC_N_MINE_N_3      = 24,
++    AV_NPC_N_MINE_N_4      = 25,
++    AV_NPC_N_MINE_A_1      = 26,
++    AV_NPC_N_MINE_A_2      = 27,
++    AV_NPC_N_MINE_A_3      = 28,
++    AV_NPC_N_MINE_A_4      = 29,
++    AV_NPC_N_MINE_H_1      = 30,
++    AV_NPC_N_MINE_H_2      = 31,
++    AV_NPC_N_MINE_H_3      = 32,
++    AV_NPC_N_MINE_H_4      = 33,
++    AV_NPC_S_MINE_N_1      = 34,
++    AV_NPC_S_MINE_N_2      = 35,
++    AV_NPC_S_MINE_N_3      = 36,
++    AV_NPC_S_MINE_N_4      = 37,
++    AV_NPC_S_MINE_N_S      = 38,
++    AV_NPC_S_MINE_A_1      = 39,
++    AV_NPC_S_MINE_A_2      = 40,
++    AV_NPC_S_MINE_A_3      = 41,
++    AV_NPC_S_MINE_A_4      = 42,
++    AV_NPC_S_MINE_H_1      = 43,
++    AV_NPC_S_MINE_H_2      = 44,
++    AV_NPC_S_MINE_H_3      = 45,
++    AV_NPC_S_MINE_H_4      = 46,
++    AV_NPC_HERALD          = 47,
++    AV_NPC_INFO_MAX        = 48
 +
 +};
 +
@@ -2929,7 +3035,7 @@ index 11bd08b..79951bc 100644
  class BattleGroundAVScore : public BattleGroundScore
  {
      public:
-@@ -49,11 +1502,74 @@ class BattleGroundAV : public BattleGround
+@@ -49,11 +1505,75 @@ class BattleGroundAV : public BattleGround
  
          void RemovePlayer(Player *plr,uint64 guid);
          void HandleAreaTrigger(Player *Source, uint32 Trigger);
@@ -2951,6 +3057,7 @@ index 11bd08b..79951bc 100644
 +        bool PlayerCanDoMineQuest(int32 GOId,uint32 team);
 +
 +
++        void EndBattleGround(uint32 winner);
 +
 +        virtual WorldSafeLocsEntry const* GetClosestGraveYard(float x, float y, float z, uint32 team);
  
@@ -2984,7 +3091,7 @@ index 11bd08b..79951bc 100644
 +        void UpdateNodeWorldState(BG_AV_Nodes node);
 +
 +        /*general */
-+        Creature* AddAVCreature(uint8 cinfoid, uint16 type);
++        Creature* AddAVCreature(uint16 cinfoid, uint16 type);
 +        const uint16 GetBonusHonor(uint8 kills); //TODO remove this when mangos handles this right
 +
 +        /*variables */
@@ -3008,7 +3115,7 @@ index 11bd08b..79951bc 100644
 +
  #endif
 diff --git a/src/game/Creature.cpp b/src/game/Creature.cpp
-index db576c3..c9147b3 100644
+index db576c3..579286c 100644
 --- a/src/game/Creature.cpp
 +++ b/src/game/Creature.cpp
 @@ -508,6 +508,7 @@ bool Creature::Create (uint32 guidlow, Map *map, uint32 Entry, uint32 team, cons
@@ -3019,6 +3126,60 @@ index db576c3..c9147b3 100644
  
      //oX = x;     oY = y;    dX = x;    dY = y;    m_moveTime = 0;    m_startMove = 0;
      const bool bResult = CreateFromProto(guidlow, Entry, team, data);
+@@ -534,7 +535,7 @@ bool Creature::Create (uint32 guidlow, Map *map, uint32 Entry, uint32 team, cons
+         }
+         LoadCreaturesAddon();
+     }
+-
++    m_deleteAfterNoAggro = false;
+     return bResult;
+ }
+ 
+diff --git a/src/game/Creature.h b/src/game/Creature.h
+index 941f4cf..b945142 100644
+--- a/src/game/Creature.h
++++ b/src/game/Creature.h
+@@ -593,6 +593,17 @@ class MANGOS_DLL_SPEC Creature : public Unit
+ 
+         uint32 GetGlobalCooldown() const { return m_GlobalCooldown; }
+ 
++       void SetDeleteAfterNoAggro(bool set) {
++           if(set && !m_attacking) //if creature not in fight, delete it now..
++           {
++               CleanupsBeforeDelete();
++               AddObjectToRemoveList();
++           }
++           else if(set)
++               m_deleteAfterNoAggro=set;
++       }
++       bool GetDeleteAfterNoAggro() { return m_deleteAfterNoAggro; }
++
+     protected:
+         bool CreateFromProto(uint32 guidlow,uint32 Entry,uint32 team, const CreatureData *data = NULL);
+         bool InitEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
+@@ -640,6 +651,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
+         float CombatStartX;
+         float CombatStartY;
+         float CombatStartZ;
++
++        bool m_deleteAfterNoAggro;
++
+     private:
+         GridReference<Creature> m_gridRef;
+         CreatureInfo const* m_creatureInfo;                 // in heroic mode can different from ObjMgr::GetCreatureTemplate(GetEntry())
+diff --git a/src/game/Formulas.h b/src/game/Formulas.h
+index 5ba6ffd..43e77d3 100644
+--- a/src/game/Formulas.h
++++ b/src/game/Formulas.h
+@@ -27,7 +27,7 @@ namespace MaNGOS
+     {
+         inline uint32 hk_honor_at_level(uint32 level, uint32 count=1)
+         {
+-            return ceil(count*(-0.53177f + 0.59357f * exp((level +23.54042f) / 26.07859f )));
++            return (uint32)ceil(count*(-0.53177f + 0.59357f * exp((level +23.54042f) / 26.07859f )));
+         }
+     }
+     namespace XP
 diff --git a/src/game/GameObject.cpp b/src/game/GameObject.cpp
 index 116085b..3544c4b 100644
 --- a/src/game/GameObject.cpp
@@ -3047,7 +3208,7 @@ index 116085b..3544c4b 100644
          }
          case GAMEOBJECT_TYPE_GOOBER:
 diff --git a/src/game/Language.h b/src/game/Language.h
-index 9f279c0..f6923b6 100644
+index ad5a2b4..9ae99f6 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
 @@ -645,7 +645,45 @@ enum MangosStrings
@@ -3119,7 +3280,7 @@ index 9731442..eb64de8 100644
      {
          Creature* pCreature =
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index dcf3ae2..abe16d5 100644
+index 8d80991..120869a 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -52,6 +52,7 @@
@@ -3335,7 +3496,7 @@ index dcf3ae2..abe16d5 100644
  
              // There should be no mixed ReqItem/ReqSource drop
              // This part for ReqItem drop
-@@ -17510,6 +17527,7 @@ uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
+@@ -17538,6 +17555,7 @@ uint32 Player::GetMaxLevelForBattleGroundQueueId(uint32 queue_id)
      return 10*(queue_id+2)-1;
  }
  
@@ -3382,7 +3543,7 @@ index a681589..f7be599 100644
                  return;
              }
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index 0f5ef86..d00ac1d 100644
+index 425e0a7..c91003b 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
 @@ -605,25 +605,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
@@ -3411,47 +3572,45 @@ index 0f5ef86..d00ac1d 100644
          DEBUG_LOG("DealDamage: victim just died");
  
          // find player: owner of controlled `this` or `this` itself maybe
-@@ -763,6 +744,43 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -762,6 +743,41 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+ 
              he->DuelComplete(DUEL_INTERUPTED);
          }
-     }
 +
-+    // battleground things (do this at the end, so the death state flag will be properly set to handle in the bg->handlekill)
-+    if(pVictim->GetTypeId() == TYPEID_PLAYER && (((Player*)pVictim)->InBattleGround()))
-+    {
-+        Player *killed = ((Player*)pVictim);
-+        Player *killer = NULL;
-+        if(GetTypeId() == TYPEID_PLAYER)
-+            killer = ((Player*)this);
-+        else if(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
++        // battleground things (do this at the end, so the death state flag will be properly set to handle in the bg->handlekill)
++        if(pVictim->GetTypeId() == TYPEID_PLAYER && (((Player*)pVictim)->InBattleGround()))
 +        {
-+            Unit *owner = GetOwner();
-+            if(owner && owner->GetTypeId() == TYPEID_PLAYER)
-+                killer = ((Player*)owner);
-+        }
-+
-+        if(killer)
-+            if(BattleGround *bg = killed->GetBattleGround())
-+                bg->HandleKillPlayer(killed, killer);   // drop flags and etc
-+    }
-+    else if(pVictim->GetTypeId() == TYPEID_UNIT)
-+    {
-+        Player *killer = NULL;
-+        if(GetTypeId() == TYPEID_PLAYER)
-+            killer = ((Player*)this);
-+        else if(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
-+        {
-+            if(Unit *owner = GetOwner())
-+                if(owner->GetTypeId() == TYPEID_PLAYER)
++            Player *killed = ((Player*)pVictim);
++            Player *killer = NULL;
++            if(GetTypeId() == TYPEID_PLAYER)
++                killer = ((Player*)this);
++            else if(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
++            {
++                Unit *owner = GetOwner();
++                if(owner && owner->GetTypeId() == TYPEID_PLAYER)
 +                    killer = ((Player*)owner);
++            }
++
++            if(killer)
++                if(BattleGround *bg = killed->GetBattleGround())
++                    bg->HandleKillPlayer(killed, killer);   // drop flags and etc
 +        }
++        else if(pVictim->GetTypeId() == TYPEID_UNIT)
++        {
++            Player *killer = NULL;
++            if(GetTypeId() == TYPEID_PLAYER)
++                killer = ((Player*)this);
++            else if(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->isPet())
++            {
++                if(Unit *owner = GetOwner())
++                    if(owner->GetTypeId() == TYPEID_PLAYER)
++                        killer = ((Player*)owner);
++            }
 +
-+        if(killer)
-+            if(BattleGround *bg = killer->GetBattleGround())
-+                bg->HandleKillUnit((Creature*)pVictim,killer);
-+    }
-+
-+
++            if(killer)
++                if(BattleGround *bg = killer->GetBattleGround())
++                    bg->HandleKillUnit((Creature*)pVictim,killer);
++        }
+     }
      else                                                    // if (health <= damage)
      {
-         DEBUG_LOG("DealDamageAlive");

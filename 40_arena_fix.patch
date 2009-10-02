@@ -1,0 +1,113 @@
+diff --git a/src/game/ArenaTeam.cpp b/src/game/ArenaTeam.cpp
+index 06336fe..dbb776d 100644
+--- a/src/game/ArenaTeam.cpp
++++ b/src/game/ArenaTeam.cpp
+@@ -82,45 +82,40 @@ bool ArenaTeam::AddMember(uint64 PlayerGuid)
+     std::string plName;
+     uint8 plClass;
+ 
+-    // arena team is full (can't have more than type * 2 players!)
+     if(GetMembersSize() >= GetType() * 2)
++    {
++        // arena team is full (can't have more than type * 2 players!)
++        // return false
++        return false;
++    }
++
++    if(!objmgr.GetPlayerNameByGUID(PlayerGuid, plName))     // player doesnt exist
++        return false;
++                                                            // player already in arenateam of that size
++    if(Player::GetArenaTeamIdFromDB(PlayerGuid, GetType()) != 0)
++    {
++        sLog.outError("Arena::AddMember() : player already in this sized team");
+         return false;
++    }
++
++    // remove all player signs from another petitions
++    // this will be prevent attempt joining player to many arenateams and corrupt arena team data integrity
++    Player::RemovePetitionsAndSigns(PlayerGuid, GetType());
+ 
+     Player *pl = objmgr.GetPlayer(PlayerGuid);
+     if(pl)
+     {
+-        if(pl->GetArenaTeamId(GetType()))
+-        {
+-            sLog.outError("Arena::AddMember() : player already in this sized team");
+-            return false;
+-        }
+-
+         plClass = (uint8)pl->getClass();
+-        plName = pl->GetName();
+     }
+     else
+     {
+-        //                                                     0     1
+-        QueryResult *result = CharacterDatabase.PQuery("SELECT name, class FROM characters WHERE guid='%u'", GUID_LOPART(PlayerGuid));
++        QueryResult *result = CharacterDatabase.PQuery("SELECT class FROM characters WHERE guid='%u'", GUID_LOPART(PlayerGuid));
+         if(!result)
+             return false;
+-
+-        plName = (*result)[0].GetCppString();
+-        plClass = (*result)[1].GetUInt8();
++        plClass = (*result)[0].GetUInt8();
+         delete result;
+-
+-        // check if player already in arenateam of that size
+-        if(Player::GetArenaTeamIdFromDB(PlayerGuid, GetType()) != 0)
+-        {
+-            sLog.outError("Arena::AddMember() : player already in this sized team");
+-            return false;
+-        }
+     }
+ 
+-    // remove all player signs from another petitions
+-    // this will be prevent attempt joining player to many arenateams and corrupt arena team data integrity
+-    Player::RemovePetitionsAndSigns(PlayerGuid, GetType());
+-
+     ArenaTeamMember newmember;
+     newmember.name          = plName;
+     newmember.guid          = PlayerGuid;
+diff --git a/src/game/Player.cpp b/src/game/Player.cpp
+index 8d80991..3464cd1 100644
+--- a/src/game/Player.cpp
++++ b/src/game/Player.cpp
+@@ -6014,13 +6014,32 @@ uint32 Player::GetRankFromDB(uint64 guid)
+ 
+ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
+ {
+-    QueryResult *result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", GUID_LOPART(guid), type);
+-    if(!result)
+-        return 0;
+-
+-    uint32 id = (*result)[0].GetUInt32();
+-    delete result;
+-    return id;
++     // need fix it!
++     QueryResult *result = CharacterDatabase.PQuery("SELECT arenateamid FROM arena_team_member WHERE guid='%u'", GUID_LOPART(guid));
++     if(result)
++     {
++         // init id to 0, check the arena type before assigning a value to id
++         uint32 id = 0;
++         do
++         {
++             QueryResult *result2 = CharacterDatabase.PQuery("SELECT type FROM arena_team WHERE arenateamid='%u'", id);
++             if(result2)
++             {
++                 uint8 dbtype = (*result2)[0].GetUInt32();
++                 delete result2;
++                 if(dbtype == type)
++                 {
++                     // if the type matches, we've found the id
++                     id = (*result)[0].GetUInt32();
++                     break;
++                 }
++             }
++         } while(result->NextRow());
++         delete result;
++         return id;
++     }
++     // no arenateam for the specified guid, return 0
++     return 0;
+ }
+ 
+ uint32 Player::GetZoneIdFromDB(uint64 guid)

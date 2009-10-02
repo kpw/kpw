@@ -51,7 +51,7 @@ VALUES ('1', '17306', '33', '0', '5', '15',  '6', '67', '0'),
 
 -- language
 
-delete from mangos_string where entry>716 and entry<748;
+delete from mangos_string where entry>716 and entry<750;
 INSERT INTO mangos_string VALUES
 (717,'Alliance',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (718,'Horde',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -253,3 +253,6 @@ INSERT INTO `gameobject` (`id` ,`map`,position_x,position_y,position_z,orientati
 INSERT INTO `gameobject` (`id` ,`map`,position_x,position_y,position_z,orientation,spawntimesecs) VALUES (179437,30,618.748,-52.1126,42.1122,-0.0698131,60);
 INSERT INTO `gameobject` (`id` ,`map`,position_x,position_y,position_z,orientation,spawntimesecs) VALUES (179438,30,-1181.1,-370.747,53.6246,2.68781,60);
 
+-- nest 2 gos were inserted by hand..
+INSERT INTO `mangos`.`gameobject` (`id` ,`map`,position_x,position_y,position_z,orientation,spawntimesecs) VALUES (179024,30,40.0913,0.0153897,-4.0962,0.96131,120);
+INSERT INTO `mangos`.`gameobject` (`id` ,`map`,position_x,position_y,position_z,orientation,spawntimesecs) VALUES (179025,30,-1552.55, -359.738, 66.948,2.8875,120);

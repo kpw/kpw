@@ -5609,7 +5609,7 @@ index 23c90a7..53c67c1 100644
      const char *message = "";
      uint8 type = 0;
 diff --git a/src/game/CharacterHandler.cpp b/src/game/CharacterHandler.cpp
-index 700f4f8..6e7bbaa 100644
+index 0d55aa0..d7a1c87 100644
 --- a/src/game/CharacterHandler.cpp
 +++ b/src/game/CharacterHandler.cpp
 @@ -36,6 +36,7 @@
@@ -5621,7 +5621,7 @@ index 700f4f8..6e7bbaa 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 1f2bcdd..5f38d29 100644
+index 068476c..3fdf712 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
 @@ -169,6 +169,7 @@ ChatCommand * ChatHandler::getCommandTable()
@@ -5632,7 +5632,7 @@ index 1f2bcdd..5f38d29 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
  
-@@ -484,6 +485,8 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -485,6 +486,8 @@ ChatCommand * ChatHandler::getCommandTable()
          { "gps",            SEC_MODERATOR,      false, &ChatHandler::HandleGPSCommand,                 "", NULL },
          { "guid",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGUIDCommand,                "", NULL },
          { "help",           SEC_PLAYER,         true,  &ChatHandler::HandleHelpCommand,                "", NULL },
@@ -5641,7 +5641,7 @@ index 1f2bcdd..5f38d29 100644
          { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", NULL },
          { "cooldown",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleCooldownCommand,            "", NULL },
          { "unlearn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnLearnCommand,             "", NULL },
-@@ -530,6 +533,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -533,6 +536,7 @@ ChatCommand * ChatHandler::getCommandTable()
          { "damage",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDamageCommand,              "", NULL },
          { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
          { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterDeleteCommand,     "", NULL },
@@ -5650,10 +5650,10 @@ index 1f2bcdd..5f38d29 100644
          { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
          { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 28d1b3c..37e0c26 100644
+index 77a9d51..7dbf7ff 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
-@@ -149,6 +149,8 @@ class ChatHandler
+@@ -151,6 +151,8 @@ class ChatHandler
          bool HandleLookupSkillCommand(const char* args);
          bool HandleLookupSpellCommand(const char* args);
          bool HandleLookupTeleCommand(const char * args);
@@ -5662,7 +5662,7 @@ index 28d1b3c..37e0c26 100644
  
          bool HandleModifyKnownTitlesCommand(const char* args);
          bool HandleModifyHPCommand(const char* args);
-@@ -411,6 +413,7 @@ class ChatHandler
+@@ -414,6 +416,7 @@ class ChatHandler
          bool HandleComeToMeCommand(const char *args);
          bool HandleCombatStopCommand(const char *args);
          bool HandleSendMessageCommand(const char * args);
@@ -5670,7 +5670,7 @@ index 28d1b3c..37e0c26 100644
          bool HandleRepairitemsCommand(const char* args);
          bool HandleWaterwalkCommand(const char* args);
  
-@@ -425,6 +428,7 @@ class ChatHandler
+@@ -428,6 +431,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
          bool HandleGetLootRecipient(const char * args);
@@ -7191,7 +7191,7 @@ index cb03eda..ebf4916 100644
  //============== Roll ===============================
  //===================================================
 diff --git a/src/game/Group.h b/src/game/Group.h
-index 3368cbf..1a03b8a 100644
+index 6160fd0..52a1188 100644
 --- a/src/game/Group.h
 +++ b/src/game/Group.h
 @@ -234,6 +234,7 @@ class MANGOS_DLL_SPEC Group
@@ -7216,7 +7216,7 @@ index 5672f14..b07146d 100644
      }
  }
 diff --git a/src/game/Language.h b/src/game/Language.h
-index 7dcee62..13c9693 100644
+index ad5a2b4..ad8a0f1 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
 @@ -21,6 +21,8 @@
@@ -7261,7 +7261,7 @@ index 7dcee62..13c9693 100644
      // in game strings
      //                                  = 800, not used
 diff --git a/src/game/Level1.cpp b/src/game/Level1.cpp
-index 37b8b14..dbbaaec 100644
+index 3bb2475..49cea90 100644
 --- a/src/game/Level1.cpp
 +++ b/src/game/Level1.cpp
 @@ -351,7 +351,14 @@ bool ChatHandler::HandleNamegoCommand(const char* args)
@@ -7319,7 +7319,7 @@ index 37b8b14..dbbaaec 100644
          SendSysMessage(LANG_BAD_VALUE);
          SetSentErrorMessage(true);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 2a12a53..7f4e888 100644
+index 8d7e412..7a1a03f 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -7329,8 +7329,8 @@ index 2a12a53..7f4e888 100644
 +#include "BattleGroundMgr.h"
  #include "InstanceSaveMgr.h"
  #include "InstanceData.h"
- #include "AccountMgr.h"
-@@ -4846,6 +4847,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
+ 
+@@ -4855,6 +4856,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
      return true;
  }
  
@@ -7423,44 +7423,7 @@ index 2a12a53..7f4e888 100644
  bool ChatHandler::HandleBanAccountCommand(const char* args)
  {
      return HandleBanHelper(BAN_ACCOUNT,args);
-@@ -5356,24 +5443,30 @@ bool ChatHandler::HandleFlyModeCommand(const char* args)
-     if(!args)
-         return false;
- 
--    Unit *unit = getSelectedUnit();
--    if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
--        unit = m_session->GetPlayer();
-+    Player *pl = m_session->GetPlayer();
-+    if(!pl)
-+        return false;
- 
-     WorldPacket data(12);
-     if (strncmp(args, "on", 3) == 0)
-+    {
-         data.SetOpcode(SMSG_MOVE_SET_CAN_FLY);
-+        pl->SetCanFly(true); 
-+    }
-     else if (strncmp(args, "off", 4) == 0)
-+    {
-         data.SetOpcode(SMSG_MOVE_UNSET_CAN_FLY);
-+        pl->SetCanFly(false);
-+    }
-     else
-     {
-         SendSysMessage(LANG_USE_BOL);
-         return false;
-     }
--    data.append(unit->GetPackGUID());
-+    data.append(pl->GetPackGUID());
-     data << uint32(0);                                      // unknown
--    unit->SendMessageToSet(&data, true);
--    PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, unit->GetName(), args);
-+    pl->SendMessageToSet(&data, true);
-+    PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, pl->GetName(), args);
-     return true;
- }
- 
-@@ -6159,6 +6252,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
+@@ -6407,6 +6494,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
      return true;
  }
  
@@ -7521,7 +7484,7 @@ index 79a8b88..ce4be94 100644
              InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), player->GetDifficulty());
              InstanceSave *pSave = pBind ? pBind->save : NULL;
 diff --git a/src/game/MapManager.cpp b/src/game/MapManager.cpp
-index 691448b..878b845 100644
+index e044b10..ede8e49 100644
 --- a/src/game/MapManager.cpp
 +++ b/src/game/MapManager.cpp
 @@ -107,7 +107,7 @@ MapManager::_GetBaseMap(uint32 id)
@@ -7534,7 +7497,7 @@ index 691448b..878b845 100644
              m = new MapInstanced(id, i_gridCleanUpDelay);
          }
 diff --git a/src/game/MiscHandler.cpp b/src/game/MiscHandler.cpp
-index 2d77c73..70293e6 100644
+index 5c40964..7c3cf98 100644
 --- a/src/game/MiscHandler.cpp
 +++ b/src/game/MiscHandler.cpp
 @@ -661,6 +661,10 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
@@ -7549,10 +7512,30 @@ index 2d77c73..70293e6 100644
      if(!GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
          return;
 diff --git a/src/game/MovementHandler.cpp b/src/game/MovementHandler.cpp
-index 8ebae23..422e03b 100644
+index a171e7b..e516115 100644
 --- a/src/game/MovementHandler.cpp
 +++ b/src/game/MovementHandler.cpp
-@@ -130,22 +130,28 @@ void WorldSession::HandleMoveWorldportAckOpcode()
+@@ -30,6 +30,9 @@
+ #include "WaypointMovementGenerator.h"
+ #include "InstanceSaveMgr.h"
+ 
++/*Movement anticheat DEBUG defines */
++//#define MOVEMENT_ANTICHEAT_DEBUG true
++/*end Movement anticheate defines*/
+ void WorldSession::HandleMoveWorldportAckOpcode( WorldPacket & /*recv_data*/ )
+ {
+     sLog.outDebug( "WORLD: got MSG_MOVE_WORLDPORT_ACK." );
+@@ -47,7 +50,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
+         LogoutPlayer(false);
+         return;
+     }
+-
++    //reset falltimer at teleport
++    GetPlayer()->m_anti_justteleported = 1;
+     // get the destination map entry, not the current one, this will fix homebind and reset greeting
+     MapEntry const* mEntry = sMapStore.LookupEntry(loc.mapid);
+     InstanceTemplate const* mInstance = objmgr.GetInstanceTemplate(loc.mapid);
+@@ -130,22 +134,28 @@ void WorldSession::HandleMoveWorldportAckOpcode()
          _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
  
      // battleground state prepare
@@ -7585,36 +7568,77 @@ index 8ebae23..422e03b 100644
                  }
              }
          }
-@@ -175,6 +181,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
-     if(GetPlayer()->GetDontMove())
-         return;
+@@ -172,8 +182,13 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+ {
+     CHECK_PACKET_SIZE(recv_data, 4+1+4+4+4+4+4);
  
+-    if(GetPlayer()->GetDontMove())
++    if(GetPlayer()->GetDontMove()){
++        GetPlayer()->m_anti_justteleported = 1;
+         return;
++    }
++
 +    //get opcode
-+    uint16 opcode = recv_data.GetOpcode();    
++    uint16 opcode = recv_data.GetOpcode();
+ 
      /* extract packet */
      MovementInfo movementInfo;
-     uint32 MovementFlags;
-@@ -258,6 +266,8 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
-             movementInfo.z+movementInfo.t_z, movementInfo.o+movementInfo.t_o) )
+@@ -251,47 +266,77 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+     {
+         // transports size limited
+         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
+-        if( movementInfo.t_x > 50 || movementInfo.t_y > 50 || movementInfo.t_z > 50 )
++        if( movementInfo.t_x > 60 || movementInfo.t_y > 60 || movementInfo.t_z > 60 )
              return;
  
-+       if ((GetPlayer()->m_anti_transportGUID == 0) && (movementInfo.t_guid !=0)) 
-+       {
-         // if we boarded a transport, add us to it
-         if (!GetPlayer()->m_transport)
+         if( !MaNGOS::IsValidMapCoord(movementInfo.x+movementInfo.t_x, movementInfo.y+movementInfo.t_y,
+             movementInfo.z+movementInfo.t_z, movementInfo.o+movementInfo.t_o) )
+             return;
+-
+-        // if we boarded a transport, add us to it
+-        if (!GetPlayer()->m_transport)
++        if ((GetPlayer()->m_anti_transportGUID == 0) && (movementInfo.t_guid !=0))
          {
-@@ -275,16 +285,21 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+-            // elevators also cause the client to send MOVEMENTFLAG_ONTRANSPORT - just unmount if the guid can be found in the transport list
+-            for (MapManager::TransportSet::iterator iter = MapManager::Instance().m_Transports.begin(); iter != MapManager::Instance().m_Transports.end(); ++iter)
++            // if we boarded a transport, add us to it
++            if (!GetPlayer()->m_transport)
+             {
+-                if ((*iter)->GetGUID() == movementInfo.t_guid)
++                // elevators also cause the client to send MOVEMENTFLAG_ONTRANSPORT - just unmount if the guid can be found in the transport list
++                for (MapManager::TransportSet::iterator iter = MapManager::Instance().m_Transports.begin(); iter != MapManager::Instance().m_Transports.end(); ++iter)
+                 {
+-                    // unmount before boarding
+-                    _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+-
+-                    GetPlayer()->m_transport = (*iter);
+-                    (*iter)->AddPassenger(GetPlayer());
+-                    break;
++                    if ((*iter)->GetGUID() == movementInfo.t_guid)
++                    {
++                        // unmount before boarding
++                        _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
++
++                        GetPlayer()->m_transport = (*iter);
++                        (*iter)->AddPassenger(GetPlayer());
++                        break;
++                    }
                  }
              }
++            ///GetPlayer()->m_anti_transportGUID = GUID_LOPART(movementInfo.t_guid);
++            //Correct finding GO guid in DB (thanks to GriffonHeart)
++            GameObject *obj = HashMapHolder<GameObject>::Find(movementInfo.t_guid);
++            if(obj)
++                GetPlayer()->m_anti_transportGUID = obj->GetDBTableGUIDLow();
++            else
++                GetPlayer()->m_anti_transportGUID = GUID_LOPART(movementInfo.t_guid);
          }
-+        GetPlayer()->m_anti_transportGUID = movementInfo.t_guid;
-+      }
      }
 -    else if (GetPlayer()->m_transport)                      // if we were on a transport, leave
--    {
++    else if (GetPlayer()->m_anti_transportGUID != 0)
+     {
 -        GetPlayer()->m_transport->RemovePassenger(GetPlayer());
 -        GetPlayer()->m_transport = NULL;
-+    else if (GetPlayer()->m_anti_transportGUID != 0) { 
 +        if (GetPlayer()->m_transport)                      // if we were on a transport, leave
 +        {
 +            GetPlayer()->m_transport->RemovePassenger(GetPlayer());
@@ -7625,128 +7649,229 @@ index 8ebae23..422e03b 100644
          movementInfo.t_z = 0.0f;
          movementInfo.t_o = 0.0f;
          movementInfo.t_time = 0;
-+        GetPlayer()->m_anti_transportGUID = 0; 
++        GetPlayer()->m_anti_transportGUID = 0;
      }
  
-     // fall damage generation (ignore in flight case that can be triggred also at lags in moment teleportation to another map).
-@@ -349,36 +364,165 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
-     }
- 
-     /*----------------------*/
+     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
+     if (recv_data.GetOpcode() == MSG_MOVE_FALL_LAND && !GetPlayer()->isInFlight())
+     {
+         Player *target = GetPlayer();
 -
-+     // ---- anti-cheat features -->>>
-+     bool kicked = true; 
-+     if ((GetPlayer()->m_anti_transportGUID == 0) && sWorld.GetEnableMvAnticheat()) //&& !GetPlayer()->isInFlight()
-+     {
-+         UnitMoveType move_type; 
-+  
-+         if (MovementFlags & MOVEMENTFLAG_FLYING) move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_FLYBACK : MOVE_FLY;
-+         else if (MovementFlags & MOVEMENTFLAG_SWIMMING) move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_SWIMBACK : MOVE_SWIM; 
-+         else if (MovementFlags & MOVEMENTFLAG_WALK_MODE) move_type = MOVE_WALK;
-+         //hmm... in first time after login player has MOVE_SWIMBACK instead MOVE_WALKBACK  
-+         else move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_SWIMBACK : MOVE_RUN;
-+ 
-+         //if (GetPlayer()->IsMounted() && (move_type == MOVE_RUN)) move_type = MOVE_MOUNTED; 
-+  
-+         float allowed_delta= 0;
-+         float current_speed = GetPlayer()->GetSpeed(move_type);
-+         float delta_x = GetPlayer()->GetPositionX() - movementInfo.x;
-+         float delta_y = GetPlayer()->GetPositionY() - movementInfo.y; // + 0.002f Some vibration for HyperJump detect =)
-+         float delta_z = GetPlayer()->GetPositionZ() - movementInfo.z;
-+         float real_delta = delta_x * delta_x + delta_y * delta_y;
-+         float tg_z = -99999; //tangens
-+         float time_delta = movementInfo.time - GetPlayer()->m_anti_lastmovetime;
-+         if (time_delta > 0) {
-+             GetPlayer()->m_anti_lastmovetime = movementInfo.time;
-+         } else {time_delta = 0;}
-+         time_delta = (time_delta < 1500) ? time_delta/1000 : 1.5f; //normalize time - 2 second allowed for heavy loaded server
-+ 
-+         if (!(MovementFlags & (MOVEMENTFLAG_FLYING | MOVEMENTFLAG_SWIMMING)))
-+           tg_z = (real_delta !=0) ? (delta_z*delta_z / real_delta) : -99999;
-+         
-+         if (current_speed < GetPlayer()->m_anti_last_hspeed)
-+         {
-+             allowed_delta = GetPlayer()->m_anti_last_hspeed;
-+             if (GetPlayer()->m_anti_lastspeed_changetime == 0 ) 
-+                 GetPlayer()->m_anti_lastspeed_changetime = movementInfo.time + (uint32)floor(((GetPlayer()->m_anti_last_hspeed / current_speed) * 1000)) + 100; //100ms above for random fluctuating =))) 
-+         } else allowed_delta = current_speed;
-+ 
-+         allowed_delta = allowed_delta * time_delta;
-+         allowed_delta = allowed_delta * allowed_delta + 2;
-+     
-+         //static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "Walkback", "Swim", "Swimback", "Turn", "Fly", "Flyback" };
-+         //sLog.outBasic("%s newcoord: tm:%d ftm:%d | %f,%f,%fo(%f) [%X][%s]$%s",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,movementInfo.flags, LookupName(opcode,g_worldOpcodeNames),move_type_name[move_type]);
-+         //sLog.outBasic("%f",tg_z);
-+ 
-+         if ((real_delta > allowed_delta) && (delta_z < 1))
-+         {
-+             sLog.outDebug("Movement anticheat: %s is speed exception. {real_delta=%f allowed_delta=%f | current_speed=%f preview_speed=%f time=%f}(%f %f %f %d)[%s]",GetPlayer()->GetName(),real_delta, allowed_delta, current_speed, GetPlayer()->m_anti_last_hspeed,time_delta,GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId(),LookupOpcodeName(opcode));
-+             kicked = false;
-+         }
-+         if ((real_delta>4900.0f) && !(real_delta < allowed_delta)) 
-+         {
-+             sLog.outDebug("Movement anticheat: %s is teleport exception. {real_delta=%f allowed_delta=%f | current_speed=%f preview_speed=%f time=%f}(%f %f %f %d)",GetPlayer()->GetName(),real_delta, allowed_delta, current_speed, GetPlayer()->m_anti_last_hspeed,time_delta,GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
-+             kicked = false;
-+         }
-+  
-+         if (movementInfo.time>GetPlayer()->m_anti_lastspeed_changetime) 
-+         {
-+             GetPlayer()->m_anti_last_hspeed = current_speed; // store current speed
-+             GetPlayer()->m_anti_last_vspeed = -3.2f;
-+             if (GetPlayer()->m_anti_lastspeed_changetime != 0) GetPlayer()->m_anti_lastspeed_changetime = 0;
-+         }
-+ 
-+         if ((tg_z > 1.56f) && (delta_z < GetPlayer()->m_anti_last_vspeed))
-+         {
-+             sLog.outDebug("Movement anticheat: %s is mountain exception. {tg_z=%f} (%f %f %f %d)",GetPlayer()->GetName(),tg_z, GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
-+             kicked = false;
-+         }   
-+         if (((MovementFlags & MOVEMENTFLAG_SWIMMING) == 0) && ((MovementFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2)) != 0) && !GetPlayer()->isGameMaster() && !(GetPlayer()->CanFly()))
-+         {
-+            sLog.outDebug("Movement anticheat: %s is fly exception. [%X]{SPELL_AURA_FLY=[%X]}", GetPlayer()->GetName(), MovementFlags,GetPlayer()->HasAuraType(SPELL_AURA_FLY));
-+            kicked = false;
-+         } 
-+         if (((MovementFlags & MOVEMENTFLAG_WATERWALKING) != 0) && !GetPlayer()->isGameMaster() && !(GetPlayer()->HasAuraType(SPELL_AURA_WATER_WALK) | GetPlayer()->HasAuraType(SPELL_AURA_GHOST)))
-+         {
++        //movement anticheat "No Fall Damage"
++        if (target->m_anti_beginfalltime != 0)
++        {
++            #ifdef MOVEMENT_ANTICHEAT_DEBUG
++            sLog.outDebug("Movement anticheat: alternate FallTime %d | client falltime %d | m_anti_justteleported = %d",movementInfo.time - GetPlayer()->m_anti_beginfalltime, movementInfo.fallTime, GetPlayer()->m_anti_justteleported );
++            #endif
++            if (target->m_anti_justteleported != 1){
++                uint32 alt_falltime = movementInfo.time - target->m_anti_beginfalltime;
++                movementInfo.fallTime = (alt_falltime < movementInfo.fallTime) ? movementInfo.fallTime : alt_falltime;
++            } else {
++                target->m_anti_justteleported = 0;
++            }
++            target->m_anti_beginfalltime = 0;
++        }
++        #ifdef MOVEMENT_ANTICHEAT_DEBUG
++        sLog.outError("Movement anticheat: FallTime %d", movementInfo.fallTime);
++        #endif
++        //end movement anticheate
+         //Players with Feather Fall or low fall time, or physical immunity (charges used) are ignored
+         if (movementInfo.fallTime > 1100 && !target->isDead() && !target->isGameMaster() &&
+             !target->HasAuraType(SPELL_AURA_HOVER) && !target->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
+@@ -348,37 +393,243 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
+         GetPlayer()->SetInWater( !GetPlayer()->IsInWater() || GetPlayer()->GetBaseMap()->IsUnderWater(movementInfo.x, movementInfo.y, movementInfo.z) );
+     }
+ 
++    #ifdef MOVEMENT_ANTICHEAT_DEBUG
++    sLog.outBasic("%s newcoord: tm:%d ftm:%d | %f,%f,%fo(%f) [%X][%s]| transport: %f,%f,%fo(%f)",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,MovementFlags, LookupOpcodeName(opcode),movementInfo.t_x,movementInfo.t_y,movementInfo.t_z,movementInfo.t_o);
++    sLog.outBasic("Transport: %d |  tguid: %d - %d", GetPlayer()->m_anti_transportGUID, GUID_LOPART(movementInfo.t_guid), GUID_HIPART(movementInfo.t_guid));
++    #endif
+     /*----------------------*/
++    //---- anti-cheat features -->>>
++    bool check_passed = true;
++    uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination(); //check taxi flight
++    if ((GetPlayer()->m_anti_transportGUID == 0) && World::GetEnableMvAnticheat() && !curDest)
++    {
++        UnitMoveType move_type;
++
++        if (MovementFlags & MOVEMENTFLAG_FLYING) move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_FLYBACK : MOVE_FLY;
++        else if (MovementFlags & MOVEMENTFLAG_SWIMMING) move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_SWIMBACK : MOVE_SWIM;
++        else if (MovementFlags & MOVEMENTFLAG_WALK_MODE) move_type = MOVE_WALK;
++        //hmm... in first time after login player has MOVE_SWIMBACK instead MOVE_WALKBACK
++        else move_type = MovementFlags & MOVEMENTFLAG_BACKWARD ? MOVE_SWIMBACK : MOVE_RUN;
++
++        float allowed_delta= 0;
++        float current_speed = GetPlayer()->GetSpeed(move_type);
++        float delta_x = GetPlayer()->GetPositionX() - movementInfo.x;
++        float delta_y = GetPlayer()->GetPositionY() - movementInfo.y;
++        float delta_z = GetPlayer()->GetPositionZ() - movementInfo.z;
++        float real_delta = delta_x * delta_x + delta_y * delta_y;
++        float tg_z = -99999; //tangens
++        float time_delta = movementInfo.time - GetPlayer()->m_anti_lastmovetime;
++        if (time_delta > 0) {
++            GetPlayer()->m_anti_lastmovetime = movementInfo.time;
++        } else {time_delta = 0;}
++        time_delta = (time_delta < 1500) ? time_delta/1000 : 1.5f; //normalize time - 1.5 second allowed for heavy loaded server
++
++        if (!(MovementFlags & (MOVEMENTFLAG_FLYING | MOVEMENTFLAG_SWIMMING)))
++          tg_z = (real_delta !=0) ? (delta_z*delta_z / real_delta) : -99999;
++
++        //antiOFF fall-damage, MOVEMENTFLAG_UNK4 seted by client if player try movement when falling and unset in this case the MOVEMENTFLAG_FALLING flag.
++        if (MovementFlags & (MOVEMENTFLAG_FALLING | MOVEMENTFLAG_UNK4 | MOVEMENTFLAG_JUMPING))
++        {
++            if (GetPlayer()->m_anti_beginfalltime == 0)
++            {
++                GetPlayer()->m_anti_beginfalltime = movementInfo.time;
++                #ifdef MOVEMENT_ANTICHEAT_DEBUG
++                sLog.outDebug("Movement anticheat: begin fall-time %d",GetPlayer()->m_anti_beginfalltime);
++                #endif
++            }
++        } else {
++            if (GetPlayer()->m_anti_beginfalltime != 0)
++            {
++                GetPlayer()->m_anti_beginfalltime = 0; // reset timer if we landed without MSG_MOVE_FALL_LAND opcode
++                #ifdef MOVEMENT_ANTICHEAT_DEBUG
++                sLog.outDebug("Movement anticheat: end fall-time %d",GetPlayer()->m_anti_beginfalltime);
++                #endif
++            }
++        }
++        if (current_speed < GetPlayer()->m_anti_last_hspeed)
++        {
++            allowed_delta = GetPlayer()->m_anti_last_hspeed;
++            if (GetPlayer()->m_anti_lastspeed_changetime == 0 )
++                GetPlayer()->m_anti_lastspeed_changetime = movementInfo.time + (uint32)floor(((GetPlayer()->m_anti_last_hspeed / current_speed) * 1000)) + 100; //100ms above for random fluctuating =)))
++        } else allowed_delta = current_speed;
++        allowed_delta = allowed_delta * time_delta;
++        allowed_delta = allowed_delta * allowed_delta + 2;
++
++       // static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "Walkback", "Swim", "Swimback", "Turn", "Fly", "Flyback" };
++       // sLog.outBasic("%s newcoord: tm:%d ftm:%d | %f,%f,%fo(%f) [%X][%s]$%s",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,MovementFlags, LookupOpcodeName(opcode),move_type_name[move_type]);
++       // sLog.outBasic("%f",tg_z);
++
++        if ((real_delta > allowed_delta)) //&& (delta_z < 1)
++        {
++            #ifdef MOVEMENT_ANTICHEAT_DEBUG
++            sLog.outDebug("Movement anticheat: %s is speed exception. {real_delta=%f allowed_delta=%f | current_speed=%f preview_speed=%f time=%f}(%f %f %f %d)[%s]",GetPlayer()->GetName(),real_delta, allowed_delta, current_speed, GetPlayer()->m_anti_last_hspeed,time_delta,GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId(),LookupOpcodeName(opcode));
++            #endif
++            check_passed = false;
++        }
++        if ((real_delta>4900.0f) && !(real_delta < allowed_delta))
++        {
++            #ifdef MOVEMENT_ANTICHEAT_DEBUG
++            sLog.outDebug("Movement anticheat: %s is teleport exception. {real_delta=%f allowed_delta=%f | current_speed=%f preview_speed=%f time=%f}(%f %f %f %d)",GetPlayer()->GetName(),real_delta, allowed_delta, current_speed, GetPlayer()->m_anti_last_hspeed,time_delta,GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
++            #endif
++            check_passed = false;
++        }
++        if (movementInfo.time>GetPlayer()->m_anti_lastspeed_changetime)
++        {
++            GetPlayer()->m_anti_last_hspeed = current_speed; // store current speed
++            GetPlayer()->m_anti_last_vspeed = -3.2f;
++            if (GetPlayer()->m_anti_lastspeed_changetime != 0) GetPlayer()->m_anti_lastspeed_changetime = 0;
++        }
+ 
++        if ((tg_z > 1.56f) && (delta_z < GetPlayer()->m_anti_last_vspeed))
++        {
++            #ifdef MOVEMENT_ANTICHEAT_DEBUG
++            sLog.outDebug("Movement anticheat: %s is mountain exception. {tg_z=%f} (%f %f %f %d)",GetPlayer()->GetName(),tg_z, GetPlayer()->GetPositionX(),GetPlayer()->GetPositionY(),GetPlayer()->GetPositionZ(), GetPlayer()->GetMapId());
++            #endif
++            check_passed = false;
++        }
++        if (((MovementFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2)) != 0) && !GetPlayer()->isGameMaster() && !(GetPlayer()->HasAuraType(SPELL_AURA_FLY) || GetPlayer()->HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED)))
++        {
++            #ifdef MOVEMENT_ANTICHEAT_DEBUG
++            sLog.outDebug("Movement anticheat: %s is fly cheater. {SPELL_AURA_FLY=[%X]} {SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED=[%X]} {SPELL_AURA_MOD_SPEED_FLIGHT=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS=[%X]} {SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK=[%X]}",
++               GetPlayer()->GetName(),
++               GetPlayer()->HasAuraType(SPELL_AURA_FLY), GetPlayer()->HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED),
++               GetPlayer()->HasAuraType(SPELL_AURA_MOD_SPEED_FLIGHT), GetPlayer()->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS),
++               GetPlayer()->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK));
++            #endif
++            check_passed = false;
++        }
++        if (((MovementFlags & MOVEMENTFLAG_WATERWALKING) != 0) && !GetPlayer()->isGameMaster() && !(GetPlayer()->HasAuraType(SPELL_AURA_WATER_WALK) | GetPlayer()->HasAuraType(SPELL_AURA_GHOST)))
++        {
++            #ifdef MOVEMENT_ANTICHEAT_DEBUG
 +            sLog.outDebug("Movement anticheat: %s is water-walk exception. [%X]{SPELL_AURA_WATER_WALK=[%X]}", GetPlayer()->GetName(), MovementFlags, GetPlayer()->HasAuraType(SPELL_AURA_WATER_WALK));
-+            kicked = false;
-+         }
-+         if(movementInfo.z < 0.0001f && movementInfo.z > -0.0001f && ((MovementFlags & MOVEMENTFLAG_SWIMMING) == 0) && ((MovementFlags & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2)) == 0) && !GetPlayer()->isGameMaster() )
-+         {
-+             // Prevent using TeleportToPlan.
-+             Map *map = GetPlayer()->GetMap();
-+             if(map && map->GetHeight(movementInfo.x, movementInfo.y, MAX_HEIGHT) != movementInfo.z)
-+             {
-+                 sLog.outDebug("Movement anticheat: %s is teleport to plan exception. [%X]", GetPlayer()->GetName(), MovementFlags);
-+                 kicked = false;
-+             }
-+         }
-+     } else if (MovementFlags & MOVEMENTFLAG_ONTRANSPORT)
-+         {
-+             float trans_rad = movementInfo.t_x*movementInfo.t_x + movementInfo.t_y*movementInfo.t_y + movementInfo.t_z*movementInfo.t_z;
-+             if (trans_rad > 3600.0f) // transport radius = 60 yards //cheater with on_transport_flag
-+             {
-+                 if (GetPlayer()->m_transport)
-+                 {
-+                     GetPlayer()->m_transport->RemovePassenger(GetPlayer());
-+                     GetPlayer()->m_transport = NULL;
-+                 }
-+                 movementInfo.t_x = 0.0f;
-+                 movementInfo.t_y = 0.0f;
-+                 movementInfo.t_z = 0.0f;
-+                 movementInfo.t_o = 0.0f;
-+                 movementInfo.t_time = 0;
-+                 GetPlayer()->m_anti_transportGUID = 0;
-+             }
-+         }
-+    // <<---- anti-cheat features
++            #endif
++            check_passed = false;
++        }
++        if(movementInfo.z < 0.0001f && movementInfo.z > -0.0001f && ((MovementFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_FLYING | MOVEMENTFLAG_FLYING2)) == 0) && !GetPlayer()->isGameMaster() )
++        {
++            // Prevent using TeleportToPlan.
++            Map *map = GetPlayer()->GetMap();
++            if (map){
++                float plane_z = map->GetHeight(movementInfo.x, movementInfo.y, MAX_HEIGHT) - movementInfo.z;
++                plane_z = (plane_z < -500.0f) ? 0 : plane_z; //check holes in heigth map
++                if(plane_z > 0.1f || plane_z < -0.1f)
++                {
++                    GetPlayer()->m_anti_teletoplane_count++;
++                    check_passed = false;
++                    #ifdef MOVEMENT_ANTICHEAT_DEBUG
++                    sLog.outDebug("Movement anticheat: %s is teleport to plan exception. plane_z: %f ", GetPlayer()->GetName(), plane_z);
++                    #endif
++                    if (GetPlayer()->m_anti_teletoplane_count > World::GetTeleportToPlaneAlarms())
++                    {
++                        GetPlayer()->GetSession()->KickPlayer();
++                        sLog.outError("Movement anticheat: %s is teleport to plan exception. Exception count: %d ", GetPlayer()->GetName(), GetPlayer()->m_anti_teletoplane_count);
++                    }
++                }
++            }
++        } else {
++            if (GetPlayer()->m_anti_teletoplane_count !=0)
++                GetPlayer()->m_anti_teletoplane_count = 0;
++        }
++    } else if (MovementFlags & MOVEMENTFLAG_ONTRANSPORT) {
++            //antiwrap =)
++        if (GetPlayer()->m_transport)
++        {
++            float trans_rad = movementInfo.t_x*movementInfo.t_x + movementInfo.t_y*movementInfo.t_y + movementInfo.t_z*movementInfo.t_z;
++            if (trans_rad > 3600.0f)
++                check_passed = false;
++        } else {
++            if (GameObjectData const* go_data = objmgr.GetGOData(GetPlayer()->m_anti_transportGUID))
++            {
++                float delta_gox = go_data->posX - movementInfo.x;
++                float delta_goy = go_data->posY - movementInfo.y;
++                float delta_goz = go_data->posZ - movementInfo.z;
++                int mapid = go_data->mapid;
++                #ifdef MOVEMENT_ANTICHEAT_DEBUG
++                sLog.outDebug("Movement anticheat: %s on some transport. xyzo: %f,%f,%f", GetPlayer()->GetName(), go_data->posX,go_data->posY,go_data->posZ);
++                #endif
++                if (GetPlayer()->GetMapId() != mapid){
++                    check_passed = false;
++                } else if (mapid !=369) {
++                    float delta_go = delta_gox*delta_gox + delta_goy*delta_goy;
++                    if (delta_go > 3600.0f)
++                        check_passed = false;
++                }
++
++            } else {
++                #ifdef MOVEMENT_ANTICHEAT_DEBUG
++                sLog.outDebug("Movement anticheat: %s on undefined transport.", GetPlayer()->GetName());
++                #endif
++                check_passed = false;
++            }
++        }
++        if (!check_passed){
++            if (GetPlayer()->m_transport)
++                {
++                    GetPlayer()->m_transport->RemovePassenger(GetPlayer());
++                    GetPlayer()->m_transport = NULL;
++                }
++                movementInfo.t_x = 0.0f;
++                movementInfo.t_y = 0.0f;
++                movementInfo.t_z = 0.0f;
++                movementInfo.t_o = 0.0f;
++                movementInfo.t_time = 0;
++                GetPlayer()->m_anti_transportGUID = 0;
++        }
++    }
      /* process position-change */
 -    recv_data.put<uint32>(5, getMSTime());                  // offset flags(4) + unk(1)
 -    WorldPacket data(recv_data.GetOpcode(), (GetPlayer()->GetPackGUID().size()+recv_data.size()));
 -    data.append(GetPlayer()->GetPackGUID());
 -    data.append(recv_data.contents(), recv_data.size());
 -    GetPlayer()->SendMessageToSet(&data, false);
-+    if (kicked)
++    if (check_passed)
 +    {
 +        recv_data.put<uint32>(5, getMSTime());                  // offset flags(4) + unk(1)
 +        WorldPacket data(recv_data.GetOpcode(), (GetPlayer()->GetPackGUID().size()+recv_data.size()));
@@ -7764,46 +7889,44 @@ index 8ebae23..422e03b 100644
 +        if(GetPlayer()->isMovingOrTurning())
 +            GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
  
--    if(movementInfo.z < -500.0f)
--    {
+     if(movementInfo.z < -500.0f)
+     {
 -        // NOTE: this is actually called many times while falling
 -        // even after the player has been teleported away
 -        // TODO: discard movement packets after the player is rooted
 -        if(GetPlayer()->isAlive())
-+        if(movementInfo.z < -500.0f)
++        if(GetPlayer()->InBattleGround() 
++            && GetPlayer()->GetBattleGround() 
++            && GetPlayer()->GetBattleGround()->HandlePlayerUnderMap(_player))
          {
 -            GetPlayer()->EnvironmentalDamage(GetPlayer()->GetGUID(),DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
 -            // change the death state to CORPSE to prevent the death timer from
 -            // starting in the next player update
 -            GetPlayer()->KillPlayer();
 -            GetPlayer()->BuildPlayerRepop();
--        }
-+            if(GetPlayer()->InBattleGround()
-+                && GetPlayer()->GetBattleGround()
-+                && GetPlayer()->GetBattleGround()->HandlePlayerUnderMap(_player))
-+                {
-+                    // do nothing, the handle already did if returned true
-+                }
-+            else
++            // do nothing, the handle already did if returned true
+         }
++        else
++        {
++            // NOTE: this is actually called many times while falling
++            // even after the player has been teleported away
++            // TODO: discard movement packets after the player is rooted
++            if(GetPlayer()->isAlive())
 +            {
-+                // NOTE: this is actually called many times while falling
-+                // even after the player has been teleported away
-+                // TODO: discard movement packets after the player is rooted
-+                if(GetPlayer()->isAlive())
-+                {
-+                    GetPlayer()->EnvironmentalDamage(GetPlayer()->GetGUID(),DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
-+                    // change the death state to CORPSE to prevent the death timer from
-+                    // starting in the next player update
-+                    GetPlayer()->KillPlayer();
-+                    GetPlayer()->BuildPlayerRepop();
-+                }
++                GetPlayer()->EnvironmentalDamage(GetPlayer()->GetGUID(),DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
++                // change the death state to CORPSE to prevent the death timer from
++                // starting in the next player update
++                GetPlayer()->KillPlayer();
++                GetPlayer()->BuildPlayerRepop();
++            }
  
 -        // cancel the death timer here if started
 -        GetPlayer()->RepopAtGraveyard();
-+                // cancel the death timer here if started
-+                GetPlayer()->RepopAtGraveyard();
-+            }
++            // cancel the death timer here if started
++            GetPlayer()->RepopAtGraveyard();
 +        }
++    }
++
 +        if (GetPlayer()->m_anti_alarmcount > 0){
 +            sLog.outError("Movement anticheat: %s produce %d anticheat alarms",GetPlayer()->GetName(),GetPlayer()->m_anti_alarmcount);
 +            GetPlayer()->m_anti_alarmcount = 0;
@@ -7819,17 +7942,81 @@ index 8ebae23..422e03b 100644
      }
  }
  
-@@ -498,7 +642,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recv_data)
-         }
-         else                                                // must be lesser - cheating
-         {
--            sLog.outBasic("Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
-+            sLog.outError("KickPlayer!!!Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
-                 _player->GetName(),_player->GetSession()->GetAccountId(),_player->GetSpeed(move_type), newspeed);
-             _player->GetSession()->KickPlayer();
-         }
+@@ -529,34 +780,60 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
+     GetPlayer()->SendMessageToSet(&data, false);
+ }
+ 
+-void WorldSession::HandleMoveKnockBackAck( WorldPacket & /*recv_data*/ )
++void WorldSession::HandleMoveKnockBackAck( WorldPacket & recv_data )
+ {
+     // CHECK_PACKET_SIZE(recv_data,?);
+     sLog.outDebug("CMSG_MOVE_KNOCK_BACK_ACK");
+     // Currently not used but maybe use later for recheck final player position
+     // (must be at call same as into "recv_data >> x >> y >> z >> orientation;"
+ 
+-    /*
+-    uint32 flags, time;
+-    float x, y, z, orientation;
++    CHECK_PACKET_SIZE(recv_data, 8+4+4+1+4+4+4+4+4);
++    MovementInfo movementInfo;
++
+     uint64 guid;
+     uint32 sequence;
++    uint32 MovementFlags;
+     uint32 ukn1;
+     float xdirection,ydirection,hspeed,vspeed;
+ 
+-    recv_data >> guid;
+-    recv_data >> sequence;
+-    recv_data >> flags >> time;
+-    recv_data >> x >> y >> z >> orientation;
+-    recv_data >> ukn1; //unknown
+-    recv_data >> vspeed >> xdirection >> ydirection >> hspeed;
++    recv_data >> guid;          //8
++    recv_data >> sequence;      //4
++    recv_data >> MovementFlags >> movementInfo.unk1 >> movementInfo.time; //4+1+4
++    recv_data >> movementInfo.x >> movementInfo.y >> movementInfo.z >> movementInfo.o; //4+4+4+4
++
++    //Save movement flags
++    _player->SetUnitMovementFlags(MovementFlags);
++
++    if(MovementFlags & MOVEMENTFLAG_ONTRANSPORT)
++    {
++        // recheck
++        CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+8+4+4+4+4+4);
++
++        recv_data >> movementInfo.t_guid;
++        recv_data >> movementInfo.t_x;
++        recv_data >> movementInfo.t_y;
++        recv_data >> movementInfo.t_z;
++        recv_data >> movementInfo.t_o;
++        recv_data >> movementInfo.t_time;
++    }
++
++    CHECK_PACKET_SIZE(recv_data, recv_data.rpos()+4+4+4+4+4);
++    recv_data >> ukn1; //unknown //4
++    recv_data >> vspeed >> xdirection >> ydirection >> hspeed; //4+4+4+4
++
++    #ifdef MOVEMENT_ANTICHEAT_DEBUG
++    sLog.outDebug("%s CMSG_MOVE_KNOCK_BACK_ACK: tm:%d ftm:%d | %f,%f,%fo(%f) [%X]",GetPlayer()->GetName(),movementInfo.time,movementInfo.fallTime,movementInfo.x,movementInfo.y,movementInfo.z,movementInfo.o,MovementFlags);
++    sLog.outDebug("%s CMSG_MOVE_KNOCK_BACK_ACK additional: vspeed:%f, hspeed:%f, xdir:%f ydir:%f",GetPlayer()->GetName(), vspeed, hspeed, xdirection, ydirection);
++    #endif
+ 
+     // skip not personal message;
+     if(GetPlayer()->GetGUID()!=guid)
+         return;
+ 
+-    // check code
+-    */
++    GetPlayer()->m_movementInfo = movementInfo;
++    GetPlayer()->m_anti_last_hspeed = hspeed;
++    GetPlayer()->m_anti_last_vspeed = vspeed < 3.2f ? vspeed - 1.0f : 3.2f;
++    GetPlayer()->m_anti_lastspeed_changetime = movementInfo.time + 1750;
+ }
+ 
+ void WorldSession::HandleMoveHoverAck( WorldPacket& /*recv_data*/ )
 diff --git a/src/game/Object.cpp b/src/game/Object.cpp
-index 0b6bb20..301bc1e 100644
+index 24ce65d..9536aaa 100644
 --- a/src/game/Object.cpp
 +++ b/src/game/Object.cpp
 @@ -1125,7 +1125,7 @@ void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
@@ -7960,7 +8147,7 @@ index 0b6bb20..301bc1e 100644
 +    if(localDebug) sLog.outError("WorldObject::GetNearPoint: RETURN POINT 4 (angle = %f, map_id = %u, x = %f, y = %f, z = %f)", angle, GetMapId(), x, y, z);
  }
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
-index 7740f83..5bd7e8a 100644
+index f49f0a1..6462dec 100644
 --- a/src/game/ObjectMgr.cpp
 +++ b/src/game/ObjectMgr.cpp
 @@ -20,6 +20,7 @@
@@ -7982,10 +8169,10 @@ index 7740f83..5bd7e8a 100644
      Player *owner = GetPlayer(owner_guid);
  
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index a849df1..184dd42 100644
+index 4c5a1c4..7a5ee92 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
-@@ -313,6 +313,8 @@ class ObjectMgr
+@@ -320,6 +320,8 @@ class ObjectMgr
          ArenaTeam* GetArenaTeamByCapitan(uint64 const& guid) const;
          void AddArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.insert( arenateam ); }
          void RemoveArenaTeam(ArenaTeam* arenateam) { mArenaTeamSet.erase( arenateam ); }
@@ -8041,7 +8228,7 @@ index 6855e21..f682c2e 100644
  }
  
 diff --git a/src/game/Pet.cpp b/src/game/Pet.cpp
-index b0ac1f6..677c87f 100644
+index e72e29e..63d6c2b 100644
 --- a/src/game/Pet.cpp
 +++ b/src/game/Pet.cpp
 @@ -367,6 +367,10 @@ bool Pet::LoadPetFromDB( Unit* owner, uint32 petentry, uint32 petnumber, bool cu
@@ -8078,7 +8265,7 @@ index 144b2d7..b16877a 100644
          }
      }
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index bdda338..b14556d 100644
+index 8d80991..4a9ed98 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -346,8 +346,8 @@ Player::Player (WorldSession *session): Unit()
@@ -8101,24 +8288,27 @@ index bdda338..b14556d 100644
      ////////////////////Rest System/////////////////////
      time_inn_enter=0;
      inn_pos_mapid=0;
-@@ -375,6 +377,16 @@ Player::Player (WorldSession *session): Unit()
+@@ -375,7 +377,18 @@ Player::Player (WorldSession *session): Unit()
      m_rest_bonus=0;
      rest_type=REST_TYPE_NO;
      ////////////////////Rest System/////////////////////
+-
 +    //movement anticheat
-+    m_anti_lastmovetime = 0;   //last movement time 
-+    m_anti_transportGUID = 0;  //current transport GUID
-+    m_anti_last_hspeed = 7.0f; //horizontal speed, default RUN speed
++    m_anti_lastmovetime = 0;     //last movement time
++    m_anti_transportGUID = 0;    //current transport GUID
++    m_anti_last_hspeed = 7.0f;   //horizontal speed, default RUN speed
 +    m_anti_lastspeed_changetime = 0; //last speed change time
-+    m_anti_last_vspeed = -3.2f;//vertical speed, default max jump height
++    m_anti_last_vspeed = -2.0f;  //vertical speed, default max jump height
++    m_anti_beginfalltime = 0;    //alternative falling begin time
++    m_anti_justteleported = 0;   //seted when player was teleported
++    m_anti_teletoplane_count = 0;//Teleport To Plane alarm counter
 +
-+    m_anti_lastalarmtime = 0;    //last time when alarm generated
 +    m_anti_alarmcount = 0;       //alarm counter
-+    ///////////////////////////////// 
- 
++    /////////////////////////////////
      m_mailsLoaded = false;
      m_mailsUpdated = false;
-@@ -766,7 +778,7 @@ void Player::HandleDrowning()
+     unReadMails = 0;
+@@ -766,7 +779,7 @@ void Player::HandleDrowning()
  
      AuraList const& mModWaterBreathing = GetAurasByType(SPELL_AURA_MOD_WATER_BREATHING);
      for(AuraList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
@@ -8127,7 +8317,16 @@ index bdda338..b14556d 100644
  
      if ((m_isunderwater & 0x01) && !(m_isunderwater & 0x80) && isAlive())
      {
-@@ -1439,7 +1451,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
+@@ -1432,14 +1445,16 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
+         sLog.outError("TeleportTo: invalid map %d or absent instance template.", mapid);
+         return false;
+     }
+-
++    //reset falltimer at teleport
++    m_anti_justteleported = 1;
+     // preparing unsummon pet if lost (we must get pet before teleportation or will not find it later)
+     Pet* pet = GetPet();
+ 
      MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
  
      // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
@@ -8137,7 +8336,7 @@ index bdda338..b14556d 100644
          return false;
  
      // client without expansion support
-@@ -1554,7 +1567,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
+@@ -1554,7 +1569,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
      else
      {
          // far teleport to another map
@@ -8146,7 +8345,7 @@ index bdda338..b14556d 100644
          // check if we can enter before stopping combat / removing pet / totems / interrupting spells
  
          // Check enter rights before map getting to avoid creating instance copy for player
-@@ -1796,7 +1809,7 @@ void Player::Regenerate(Powers power)
+@@ -1796,7 +1811,7 @@ void Player::Regenerate(Powers power)
          AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
          for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
              if ((*i)->GetModifier()->m_miscvalue == power)
@@ -8155,7 +8354,7 @@ index bdda338..b14556d 100644
      }
  
      if (power != POWER_RAGE)
-@@ -1837,7 +1850,7 @@ void Player::RegenerateHealth()
+@@ -1837,7 +1852,7 @@ void Player::RegenerateHealth()
          {
              AuraList const& mModHealthRegenPct = GetAurasByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
              for(AuraList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i)
@@ -8164,7 +8363,7 @@ index bdda338..b14556d 100644
          }
          else if(HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
              addvalue *= GetTotalAuraModifier(SPELL_AURA_MOD_REGEN_DURING_COMBAT) / 100.0f;
-@@ -2034,7 +2047,7 @@ void Player::GiveXP(uint32 xp, Unit* victim)
+@@ -2034,7 +2049,7 @@ void Player::GiveXP(uint32 xp, Unit* victim)
      // handle SPELL_AURA_MOD_XP_PCT auras
      Unit::AuraList const& ModXPPctAuras = GetAurasByType(SPELL_AURA_MOD_XP_PCT);
      for(Unit::AuraList::const_iterator i = ModXPPctAuras.begin();i != ModXPPctAuras.end(); ++i)
@@ -8173,7 +8372,7 @@ index bdda338..b14556d 100644
  
      // XP resting bonus for kill
      uint32 rested_bonus_xp = victim ? GetXPRestBonus(xp) : 0;
-@@ -3429,6 +3442,29 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
+@@ -3429,6 +3444,29 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
              guild->DelMember(guid);
      }
  
@@ -8203,7 +8402,7 @@ index bdda338..b14556d 100644
      // the player was uninvited already on logout so just remove from group
      QueryResult *resultGroup = CharacterDatabase.PQuery("SELECT leaderGuid FROM group_member WHERE memberGuid='%u'", guid);
      if(resultGroup)
-@@ -5851,6 +5887,10 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
+@@ -5851,6 +5889,10 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
      // need call before fields update to have chance move yesterday data to appropriate fields before today data change.
      UpdateHonorFields();
  
@@ -8214,7 +8413,7 @@ index bdda338..b14556d 100644
      if(honor <= 0)
      {
          if(!uVictim || uVictim == this || uVictim->HasAuraType(SPELL_AURA_NO_PVP_CREDIT))
-@@ -5922,7 +5962,7 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
+@@ -5922,7 +5964,7 @@ bool Player::RewardHonor(Unit *uVictim, uint32 groupsize, float honor)
              if (!cVictim->isRacialLeader())
                  return false;
  
@@ -8223,7 +8422,7 @@ index bdda338..b14556d 100644
              victim_rank = 19;                               // HK: Leader
          }
      }
-@@ -6583,7 +6623,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attac
+@@ -6583,7 +6625,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item *item, WeaponAttackType attac
  
      if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
      {
@@ -8232,7 +8431,7 @@ index bdda338..b14556d 100644
      }
  }
  
-@@ -6617,7 +6657,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType att
+@@ -6617,7 +6659,7 @@ void Player::_ApplyWeaponDependentAuraDamageMod(Item *item, WeaponAttackType att
  
      if (item->IsFitToSpellRequirements(aura->GetSpellProto()))
      {
@@ -8241,7 +8440,7 @@ index bdda338..b14556d 100644
      }
  }
  
-@@ -7658,19 +7698,34 @@ void Player::SendInitWorldStates()
+@@ -7658,19 +7700,34 @@ void Player::SendInitWorldStates()
              data << uint32(0xa5f) << uint32(0x0);           // 35
              break;
          case 3698:                                          // Nagrand Arena
@@ -8285,7 +8484,7 @@ index bdda338..b14556d 100644
              break;
          case 3703:                                          // Shattrath City
              break;
-@@ -14707,8 +14762,10 @@ void Player::SaveToDB()
+@@ -14729,8 +14786,10 @@ void Player::SaveToDB()
      // first save/honor gain after midnight will also update the player's honor fields
      UpdateHonorFields();
  
@@ -8298,7 +8497,7 @@ index bdda338..b14556d 100644
          return;
  
      int is_save_resting = HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0;
-@@ -15483,7 +15540,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
+@@ -15528,7 +15587,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
      if(!pet)
          pet = GetPet();
  
@@ -8307,7 +8506,7 @@ index bdda338..b14556d 100644
      {
          //returning of reagents only for players, so best done here
          uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
-@@ -17464,7 +17521,8 @@ bool Player::InArena() const
+@@ -17509,7 +17568,8 @@ bool Player::InArena() const
  
  bool Player::GetBGAccessByLevel(uint32 bgTypeId) const
  {
@@ -8318,10 +8517,10 @@ index bdda338..b14556d 100644
          return false;
  
 diff --git a/src/game/Player.h b/src/game/Player.h
-index a5222d3..32a5fee 100644
+index 3308c08..51990b0 100644
 --- a/src/game/Player.h
 +++ b/src/game/Player.h
-@@ -1807,24 +1807,32 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1801,24 +1801,32 @@ class MANGOS_DLL_SPEC Player : public Unit
          static uint32 GetMaxLevelForBattleGroundQueueId(uint32 queue_id);
          uint32 GetBattleGroundQueueIdFromLevel() const;
  
@@ -8362,7 +8561,7 @@ index a5222d3..32a5fee 100644
          }
  
          void SetBattleGroundId(uint32 val)  { m_bgBattleGroundID = val; }
-@@ -1832,34 +1840,47 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1826,34 +1834,47 @@ class MANGOS_DLL_SPEC Player : public Unit
          {
              for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; i++)
              {
@@ -8420,17 +8619,7 @@ index a5222d3..32a5fee 100644
          uint32 GetBattleGroundEntryPointMap() const { return m_bgEntryPointMap; }
          float GetBattleGroundEntryPointX() const { return m_bgEntryPointX; }
          float GetBattleGroundEntryPointY() const { return m_bgEntryPointY; }
-@@ -1916,7 +1937,8 @@ class MANGOS_DLL_SPEC Player : public Unit
-         bool isMoving() const { return HasUnitMovementFlag(movementFlagsMask); }
-         bool isMovingOrTurning() const { return HasUnitMovementFlag(movementOrTurningFlagsMask); }
- 
--        bool CanFly() const { return HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY); }
-+        bool CanFly() const { return m_can_fly; }
-+        void SetCanFly(bool set) {m_can_fly = set;}
-         bool IsFlying() const { return HasUnitMovementFlag(MOVEMENTFLAG_FLYING); }
- 
-         void HandleDrowning();
-@@ -1982,6 +2004,10 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -1976,6 +1997,10 @@ class MANGOS_DLL_SPEC Player : public Unit
          uint32 GetOldPetSpell() const { return m_oldpetspell; }
          void SetOldPetSpell(uint32 petspell) { m_oldpetspell = petspell; }
  
@@ -8441,7 +8630,7 @@ index a5222d3..32a5fee 100644
          /*********************************************************/
          /***                 INSTANCE SYSTEM                   ***/
          /*********************************************************/
-@@ -2040,8 +2066,8 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -2034,8 +2059,8 @@ class MANGOS_DLL_SPEC Player : public Unit
          */
          struct BgBattleGroundQueueID_Rec
          {
@@ -8452,24 +8641,26 @@ index a5222d3..32a5fee 100644
          };
          BgBattleGroundQueueID_Rec m_bgBattleGroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
          uint32 m_bgEntryPointMap;
-@@ -2222,6 +2248,16 @@ class MANGOS_DLL_SPEC Player : public Unit
+@@ -2216,7 +2241,17 @@ class MANGOS_DLL_SPEC Player : public Unit
          float m_rest_bonus;
          RestType rest_type;
          ////////////////////Rest System/////////////////////
+-
 +        //movement anticheat
-+        uint32 m_anti_lastmovetime;     //last movement time 
++        uint32 m_anti_lastmovetime;     //last movement time
 +        uint64 m_anti_transportGUID;    //current transport GUID
 +        float  m_anti_last_hspeed;      //horizontal speed, default RUN speed
 +        uint32 m_anti_lastspeed_changetime;  //last speed change time
 +        float  m_anti_last_vspeed;      //vertical speed, default max jump height
-+ 
-+        uint64 m_anti_lastalarmtime;    //last time when alarm generated
-+        uint64 m_anti_alarmcount;       //alarm counter 
-+        bool m_can_fly;
- 
++        uint32 m_anti_beginfalltime;    //alternative falling begin time
++        uint32 m_anti_justteleported;   //seted when player was teleported
++        uint32 m_anti_teletoplane_count;//Teleport To Plane alarm counter
++
++        uint64 m_anti_alarmcount;       //alarm counter
          // Transports
          Transport * m_transport;
-@@ -2243,9 +2279,12 @@ class MANGOS_DLL_SPEC Player : public Unit
+ 
+@@ -2237,9 +2272,12 @@ class MANGOS_DLL_SPEC Player : public Unit
          uint32 m_temporaryUnsummonedPetNumber;
          uint32 m_oldpetspell;
  
@@ -8484,7 +8675,7 @@ index a5222d3..32a5fee 100644
          time_t m_summon_expire;
          uint32 m_summon_mapid;
 diff --git a/src/game/SharedDefines.h b/src/game/SharedDefines.h
-index 817ae81..241bd48 100644
+index 907cceb..ca2ce17 100644
 --- a/src/game/SharedDefines.h
 +++ b/src/game/SharedDefines.h
 @@ -798,14 +798,16 @@ enum Targets
@@ -8525,7 +8716,7 @@ index 817ae81..241bd48 100644
  };
  
 diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
-index 7faf701..5778ac3 100644
+index b42c59e..96ba4b6 100644
 --- a/src/game/Spell.cpp
 +++ b/src/game/Spell.cpp
 @@ -946,6 +946,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
@@ -8727,7 +8918,7 @@ index 7faf701..5778ac3 100644
                  }
              }
          }
-@@ -3256,23 +3355,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3267,23 +3366,6 @@ uint8 Spell::CanCast(bool strict)
              }
          }
  
@@ -8751,7 +8942,7 @@ index 7faf701..5778ac3 100644
          if(IsPositiveSpell(m_spellInfo->Id))
          {
              if(target->IsImmunedToSpell(m_spellInfo,false))
-@@ -3887,19 +3969,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3898,19 +3980,6 @@ uint8 Spell::CanCast(bool strict)
              case SPELL_EFFECT_LEAP:
              case SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER:
              {
@@ -8771,7 +8962,7 @@ index 7faf701..5778ac3 100644
                  // not allow use this effect at battleground until battleground start
                  if(m_caster->GetTypeId()==TYPEID_PLAYER)
                      if(BattleGround const *bg = ((Player*)m_caster)->GetBattleGround())
-@@ -4046,22 +4115,23 @@ int16 Spell::PetCanCast(Unit* target)
+@@ -4057,22 +4126,23 @@ int16 Spell::PetCanCast(Unit* target)
              if(!_target->isAlive())
                  return SPELL_FAILED_BAD_TARGETS;
  
@@ -8805,7 +8996,7 @@ index 7faf701..5778ac3 100644
                  }
              }
          }
-@@ -4081,9 +4151,16 @@ uint8 Spell::CheckCasterAuras() const
+@@ -4092,9 +4162,16 @@ uint8 Spell::CheckCasterAuras() const
  {
      // Flag drop spells totally immuned to caster auras
      // FIXME: find more nice check for all totally immuned spells
@@ -8826,7 +9017,7 @@ index 7faf701..5778ac3 100644
      uint8 school_immune = 0;
      uint32 mechanic_immune = 0;
 diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
-index 6732fc5..c538d0f 100644
+index 82770df..64bf9e0 100644
 --- a/src/game/SpellAuras.cpp
 +++ b/src/game/SpellAuras.cpp
 @@ -315,7 +315,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
@@ -8838,7 +9029,7 @@ index 6732fc5..c538d0f 100644
  m_timeCla(1000), m_castItemGuid(castItem?castItem->GetGUID():0), m_auraSlot(MAX_AURAS),
  m_positive(false), m_permanent(false), m_isPeriodic(false), m_isTrigger(false), m_isAreaAura(false),
  m_isPersistent(false), m_updated(false), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_isRemovedOnShapeLost(true), m_in_use(false),
-@@ -858,7 +858,6 @@ void Aura::_AddAura()
+@@ -857,7 +857,6 @@ void Aura::_AddAura()
          return;
  
      // we can found aura in NULL_AURA_SLOT and then need store state instead check slot != NULL_AURA_SLOT
@@ -8846,7 +9037,7 @@ index 6732fc5..c538d0f 100644
      bool secondaura = false;
      uint8 slot = NULL_AURA_SLOT;
  
-@@ -870,15 +869,13 @@ void Aura::_AddAura()
+@@ -869,15 +868,13 @@ void Aura::_AddAura()
              // allow use single slot only by auras from same caster
              if(itr->second->GetCasterGUID()==GetCasterGUID())
              {
@@ -8864,7 +9055,7 @@ index 6732fc5..c538d0f 100644
              break;
      }
  
-@@ -907,7 +904,7 @@ void Aura::_AddAura()
+@@ -906,7 +903,7 @@ void Aura::_AddAura()
      if((!m_isPassive || (caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem())) &&
          (m_spellProto->Effect[GetEffIndex()] != SPELL_EFFECT_APPLY_AREA_AURA_ENEMY || m_target != caster))
      {
@@ -8873,7 +9064,7 @@ index 6732fc5..c538d0f 100644
          {
              if (IsPositive())                               // empty positive slot
              {
-@@ -935,30 +932,24 @@ void Aura::_AddAura()
+@@ -934,30 +931,24 @@ void Aura::_AddAura()
              SetAuraSlot( slot );
  
              // Not update fields for not first spell's aura, all data already in fields
@@ -8914,7 +9105,7 @@ index 6732fc5..c538d0f 100644
          // Update Seals information
          if( IsSealSpell(GetSpellProto()) )
              m_target->ModifyAuraState(AURA_STATE_JUDGEMENT, true);
-@@ -1009,7 +1000,6 @@ void Aura::_RemoveAura()
+@@ -1008,7 +999,6 @@ void Aura::_RemoveAura()
          return;
  
      bool samespell = false;
@@ -8922,7 +9113,7 @@ index 6732fc5..c538d0f 100644
  
      // find other aura in same slot (current already removed from list)
      for(uint8 i = 0; i < 3; i++)
-@@ -1020,10 +1010,6 @@ void Aura::_RemoveAura()
+@@ -1019,10 +1009,6 @@ void Aura::_RemoveAura()
              if(itr->second->GetAuraSlot()==slot)
              {
                  samespell = true;
@@ -8933,7 +9124,7 @@ index 6732fc5..c538d0f 100644
                  break;
              }
          }
-@@ -1075,8 +1061,6 @@ void Aura::_RemoveAura()
+@@ -1074,8 +1060,6 @@ void Aura::_RemoveAura()
                  ((Player*)caster)->SendCooldownEvent(GetSpellProto());
          }
      }
@@ -8942,7 +9133,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::SetAuraFlag(uint32 slot, bool add)
-@@ -1115,35 +1099,13 @@ void Aura::SetAuraApplication(uint32 slot, int8 count)
+@@ -1114,35 +1098,13 @@ void Aura::SetAuraApplication(uint32 slot, int8 count)
      m_target->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index, val);
  }
  
@@ -8980,7 +9171,7 @@ index 6732fc5..c538d0f 100644
  
      UpdateAuraDuration();
  }
-@@ -1177,7 +1139,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
+@@ -1176,7 +1138,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
  
          SpellModifier *mod = new SpellModifier;
          mod->op = SpellModOp(m_modifier.m_miscvalue);
@@ -8989,7 +9180,7 @@ index 6732fc5..c538d0f 100644
          mod->type = SpellModType(m_modifier.m_auraname);    // SpellModType value == spell aura types
          mod->spellId = GetId();
          mod->effectId = m_effIndex;
-@@ -1646,8 +1608,21 @@ void Aura::TriggerSpell()
+@@ -1645,8 +1607,21 @@ void Aura::TriggerSpell()
  //                    case 40867: break;
  //                    // Prismatic Shield
  //                    case 40879: break;
@@ -9013,7 +9204,7 @@ index 6732fc5..c538d0f 100644
  //                    // Dementia
  //                    case 41404: break;
  //                    // Chaos Form
-@@ -1867,8 +1842,8 @@ void Aura::TriggerSpell()
+@@ -1866,8 +1841,8 @@ void Aura::TriggerSpell()
                      {
                          switch((*i)->GetModifier()->m_miscvalue)
                          {
@@ -9024,7 +9215,7 @@ index 6732fc5..c538d0f 100644
                              default: break;
                          }
                      }
-@@ -2137,7 +2112,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
+@@ -2136,7 +2111,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                              return;
  
                      // final heal
@@ -9128,23 +9319,7 @@ index 6732fc5..c538d0f 100644
  
      m_target->getHostilRefManager().threatAssist(caster, threatMod);
  }
-@@ -3634,9 +3627,15 @@ void Aura::HandleAuraModIncreaseFlightSpeed(bool apply, bool Real)
-     {
-         WorldPacket data;
-         if(apply)
-+        {
-             data.Initialize(SMSG_MOVE_SET_CAN_FLY, 12);
-+            ((Player*)m_target)->SetCanFly(true);
-+        }
-         else
-+        {
-             data.Initialize(SMSG_MOVE_UNSET_CAN_FLY, 12);
-+            ((Player*)m_target)->SetCanFly(false);
-+        }
-         data.append(m_target->GetPackGUID());
-         data << uint32(0);                                      // unknown
-         m_target->SendMessageToSet(&data, true);
-@@ -4012,6 +4011,40 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
+@@ -4012,6 +4005,40 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
  
      Unit *caster = GetCaster();
  
@@ -9185,7 +9360,7 @@ index 6732fc5..c538d0f 100644
      switch (m_spellProto->SpellFamilyName)
      {
          case SPELLFAMILY_GENERIC:
-@@ -4136,6 +4169,7 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
+@@ -4136,6 +4163,7 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                      m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 3 / 100);
                  return;
              }
@@ -9193,7 +9368,7 @@ index 6732fc5..c538d0f 100644
              break;
          }
          case SPELLFAMILY_HUNTER:
-@@ -4187,6 +4221,10 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
+@@ -4187,6 +4215,10 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
              break;
          }
          default:
@@ -9204,7 +9379,7 @@ index 6732fc5..c538d0f 100644
              break;
      }
  }
-@@ -4229,9 +4267,9 @@ void Aura::HandleAuraModResistanceExclusive(bool apply, bool Real)
+@@ -4229,9 +4261,9 @@ void Aura::HandleAuraModResistanceExclusive(bool apply, bool Real)
      {
          if(m_modifier.m_miscvalue & int32(1<<x))
          {
@@ -9216,7 +9391,7 @@ index 6732fc5..c538d0f 100644
          }
      }
  }
-@@ -4242,9 +4280,9 @@ void Aura::HandleAuraModResistance(bool apply, bool Real)
+@@ -4242,9 +4274,9 @@ void Aura::HandleAuraModResistance(bool apply, bool Real)
      {
          if(m_modifier.m_miscvalue & int32(1<<x))
          {
@@ -9228,7 +9403,7 @@ index 6732fc5..c538d0f 100644
          }
      }
  
-@@ -4264,14 +4302,14 @@ void Aura::HandleAuraModBaseResistancePCT(bool apply, bool Real)
+@@ -4264,14 +4296,14 @@ void Aura::HandleAuraModBaseResistancePCT(bool apply, bool Real)
      {
          //pets only have base armor
          if(((Creature*)m_target)->isPet() && (m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_NORMAL))
@@ -9245,7 +9420,7 @@ index 6732fc5..c538d0f 100644
          }
      }
  }
-@@ -4282,11 +4320,11 @@ void Aura::HandleModResistancePercent(bool apply, bool Real)
+@@ -4282,11 +4314,11 @@ void Aura::HandleModResistancePercent(bool apply, bool Real)
      {
          if(m_modifier.m_miscvalue & int32(1<<i))
          {
@@ -9260,7 +9435,7 @@ index 6732fc5..c538d0f 100644
              }
          }
      }
-@@ -4299,13 +4337,13 @@ void Aura::HandleModBaseResistance(bool apply, bool Real)
+@@ -4299,13 +4331,13 @@ void Aura::HandleModBaseResistance(bool apply, bool Real)
      {
          //only pets have base stats
          if(((Creature*)m_target)->isPet() && (m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_NORMAL))
@@ -9276,7 +9451,7 @@ index 6732fc5..c538d0f 100644
      }
  }
  
-@@ -4327,9 +4365,9 @@ void Aura::HandleAuraModStat(bool apply, bool Real)
+@@ -4327,9 +4359,9 @@ void Aura::HandleAuraModStat(bool apply, bool Real)
          if (m_modifier.m_miscvalue < 0 || m_modifier.m_miscvalue == i)
          {
              //m_target->ApplyStatMod(Stats(i), m_modifier.m_amount,apply);
@@ -9288,7 +9463,7 @@ index 6732fc5..c538d0f 100644
          }
      }
  }
-@@ -4349,7 +4387,7 @@ void Aura::HandleModPercentStat(bool apply, bool Real)
+@@ -4349,7 +4381,7 @@ void Aura::HandleModPercentStat(bool apply, bool Real)
      for (int32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
      {
          if(m_modifier.m_miscvalue == i || m_modifier.m_miscvalue == -1)
@@ -9297,7 +9472,7 @@ index 6732fc5..c538d0f 100644
      }
  }
  
-@@ -4427,9 +4465,9 @@ void Aura::HandleModTotalPercentStat(bool apply, bool Real)
+@@ -4427,9 +4459,9 @@ void Aura::HandleModTotalPercentStat(bool apply, bool Real)
      {
          if(m_modifier.m_miscvalue == i || m_modifier.m_miscvalue == -1)
          {
@@ -9309,7 +9484,7 @@ index 6732fc5..c538d0f 100644
          }
      }
  
-@@ -4527,7 +4565,7 @@ void Aura::HandleModRegen(bool apply, bool Real)            // eating
+@@ -4527,7 +4559,7 @@ void Aura::HandleModRegen(bool apply, bool Real)            // eating
          if(m_periodicTimer <= 0)
          {
              m_periodicTimer += 5000;
@@ -9318,7 +9493,7 @@ index 6732fc5..c538d0f 100644
              Unit *caster = GetCaster();
              if (caster)
              {
-@@ -4543,6 +4581,18 @@ void Aura::HandleModRegen(bool apply, bool Real)            // eating
+@@ -4543,6 +4575,18 @@ void Aura::HandleModRegen(bool apply, bool Real)            // eating
  
  void Aura::HandleModPowerRegen(bool apply, bool Real)       // drinking
  {
@@ -9337,7 +9512,7 @@ index 6732fc5..c538d0f 100644
      if ((GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && apply && !m_target->IsSitState())
          m_target->SetStandState(PLAYER_STATE_SIT);
  
-@@ -4643,7 +4693,7 @@ void Aura::HandleAuraModIncreaseHealth(bool apply, bool Real)
+@@ -4643,7 +4687,7 @@ void Aura::HandleAuraModIncreaseHealth(bool apply, bool Real)
      }
  
      // generic case
@@ -9346,7 +9521,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void  Aura::HandleAuraModIncreaseMaxHealth(bool apply, bool Real)
-@@ -4651,7 +4701,7 @@ void  Aura::HandleAuraModIncreaseMaxHealth(bool apply, bool Real)
+@@ -4651,7 +4695,7 @@ void  Aura::HandleAuraModIncreaseMaxHealth(bool apply, bool Real)
      uint32 oldhealth = m_target->GetHealth();
      double healthPercentage = (double)oldhealth / (double)m_target->GetMaxHealth();
  
@@ -9355,7 +9530,7 @@ index 6732fc5..c538d0f 100644
  
      // refresh percentage
      if(oldhealth > 0)
-@@ -4670,7 +4720,7 @@ void Aura::HandleAuraModIncreaseEnergy(bool apply, bool Real)
+@@ -4670,7 +4714,7 @@ void Aura::HandleAuraModIncreaseEnergy(bool apply, bool Real)
      if(int32(powerType) != m_modifier.m_miscvalue)
          return;
  
@@ -9364,7 +9539,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleAuraModIncreaseEnergyPercent(bool apply, bool Real)
-@@ -4679,13 +4729,13 @@ void Aura::HandleAuraModIncreaseEnergyPercent(bool apply, bool Real)
+@@ -4679,13 +4723,13 @@ void Aura::HandleAuraModIncreaseEnergyPercent(bool apply, bool Real)
      if(int32(powerType) != m_modifier.m_miscvalue)
          return;
  
@@ -9380,7 +9555,7 @@ index 6732fc5..c538d0f 100644
  }
  
  /********************************/
-@@ -4749,9 +4799,9 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
+@@ -4749,9 +4793,9 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
  
      if (GetSpellProto()->EquippedItemClass == -1)
      {
@@ -9393,7 +9568,7 @@ index 6732fc5..c538d0f 100644
      }
      else
      {
-@@ -4761,13 +4811,13 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
+@@ -4761,13 +4805,13 @@ void Aura::HandleAuraModCritPercent(bool apply, bool Real)
  
  void Aura::HandleModHitChance(bool apply, bool Real)
  {
@@ -9410,7 +9585,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleModSpellCritChance(bool apply, bool Real)
-@@ -4782,7 +4832,7 @@ void Aura::HandleModSpellCritChance(bool apply, bool Real)
+@@ -4782,7 +4826,7 @@ void Aura::HandleModSpellCritChance(bool apply, bool Real)
      }
      else
      {
@@ -9419,7 +9594,7 @@ index 6732fc5..c538d0f 100644
      }
  }
  
-@@ -4806,49 +4856,47 @@ void Aura::HandleModSpellCritChanceShool(bool /*apply*/, bool Real)
+@@ -4806,49 +4850,47 @@ void Aura::HandleModSpellCritChanceShool(bool /*apply*/, bool Real)
  
  void Aura::HandleModCastingSpeed(bool apply, bool Real)
  {
@@ -9487,7 +9662,7 @@ index 6732fc5..c538d0f 100644
  }
  
  /********************************/
-@@ -4857,7 +4905,7 @@ void Aura::HandleRangedAmmoHaste(bool apply, bool Real)
+@@ -4857,7 +4899,7 @@ void Aura::HandleRangedAmmoHaste(bool apply, bool Real)
  
  void Aura::HandleAuraModAttackPower(bool apply, bool Real)
  {
@@ -9496,7 +9671,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleAuraModRangedAttackPower(bool apply, bool Real)
-@@ -4865,13 +4913,13 @@ void Aura::HandleAuraModRangedAttackPower(bool apply, bool Real)
+@@ -4865,13 +4907,13 @@ void Aura::HandleAuraModRangedAttackPower(bool apply, bool Real)
      if((m_target->getClassMask() & CLASSMASK_WAND_USERS)!=0)
          return;
  
@@ -9512,7 +9687,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool Real)
-@@ -4880,7 +4928,7 @@ void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool Real)
+@@ -4880,7 +4922,7 @@ void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool Real)
          return;
  
      //UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
@@ -9521,7 +9696,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleAuraModRangedAttackPowerOfStatPercent(bool apply, bool Real)
-@@ -4930,9 +4978,9 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
+@@ -4930,9 +4972,9 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
          // apply generic physical damage bonuses including wand case
          if (GetSpellProto()->EquippedItemClass == -1 || m_target->GetTypeId() != TYPEID_PLAYER)
          {
@@ -9534,7 +9709,7 @@ index 6732fc5..c538d0f 100644
          }
          else
          {
-@@ -4942,9 +4990,9 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
+@@ -4942,9 +4984,9 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
          if(m_target->GetTypeId() == TYPEID_PLAYER)
          {
              if(m_positive)
@@ -9546,7 +9721,7 @@ index 6732fc5..c538d0f 100644
          }
      }
  
-@@ -4970,7 +5018,7 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
+@@ -4970,7 +5012,7 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
              for(int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; i++)
              {
                  if((m_modifier.m_miscvalue & (1<<i)) != 0)
@@ -9555,7 +9730,7 @@ index 6732fc5..c538d0f 100644
              }
          }
          else
-@@ -4978,7 +5026,7 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
+@@ -4978,7 +5020,7 @@ void Aura::HandleModDamageDone(bool apply, bool Real)
              for(int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; i++)
              {
                  if((m_modifier.m_miscvalue & (1<<i)) != 0)
@@ -9564,7 +9739,7 @@ index 6732fc5..c538d0f 100644
              }
          }
          Pet* pet = m_target->GetPet();
-@@ -5013,9 +5061,9 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
+@@ -5013,9 +5055,9 @@ void Aura::HandleModDamagePercentDone(bool apply, bool Real)
          // apply generic physical damage bonuses including wand case
          if (GetSpellProto()->EquippedItemClass == -1 || m_target->GetTypeId() != TYPEID_PLAYER)
          {
@@ -9577,7 +9752,7 @@ index 6732fc5..c538d0f 100644
          }
          else
          {
-@@ -5054,7 +5102,7 @@ void Aura::HandleModOffhandDamagePercent(bool apply, bool Real)
+@@ -5054,7 +5096,7 @@ void Aura::HandleModOffhandDamagePercent(bool apply, bool Real)
  
      sLog.outDebug("AURA MOD OFFHAND DAMAGE");
  
@@ -9586,7 +9761,7 @@ index 6732fc5..c538d0f 100644
  }
  
  /********************************/
-@@ -5067,7 +5115,7 @@ void Aura::HandleModPowerCostPCT(bool apply, bool Real)
+@@ -5067,7 +5109,7 @@ void Aura::HandleModPowerCostPCT(bool apply, bool Real)
      if(!Real)
          return;
  
@@ -9595,7 +9770,7 @@ index 6732fc5..c538d0f 100644
      for(int i = 0; i < MAX_SPELL_SCHOOL; ++i)
          if(m_modifier.m_miscvalue & (1<<i))
              m_target->ApplyModSignedFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER+i,amount,apply);
-@@ -5081,7 +5129,7 @@ void Aura::HandleModPowerCost(bool apply, bool Real)
+@@ -5081,7 +5123,7 @@ void Aura::HandleModPowerCost(bool apply, bool Real)
  
      for(int i = 0; i < MAX_SPELL_SCHOOL; ++i)
          if(m_modifier.m_miscvalue & (1<<i))
@@ -9604,23 +9779,7 @@ index 6732fc5..c538d0f 100644
  }
  
  /*********************************************************/
-@@ -5283,9 +5331,15 @@ void Aura::HandleAuraAllowFlight(bool apply, bool Real)
-     // allow fly
-     WorldPacket data;
-     if(apply)
-+    {
-         data.Initialize(SMSG_MOVE_SET_CAN_FLY, 12);
-+        ((Player*)m_target)->SetCanFly(true);
-+    }
-     else
-+    {
-         data.Initialize(SMSG_MOVE_UNSET_CAN_FLY, 12);
-+        ((Player*)m_target)->SetCanFly(false);
-+    }
-     data.append(m_target->GetPackGUID());
-     data << uint32(0);                                      // unk
-     m_target->SendMessageToSet(&data, true);
-@@ -5302,7 +5356,7 @@ void Aura::HandleModRating(bool apply, bool Real)
+@@ -5302,7 +5344,7 @@ void Aura::HandleModRating(bool apply, bool Real)
  
      for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
          if (m_modifier.m_miscvalue & (1 << rating))
@@ -9629,7 +9788,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleForceMoveForward(bool apply, bool Real)
-@@ -5333,11 +5387,11 @@ void Aura::HandleModTargetResistance(bool apply, bool Real)
+@@ -5333,11 +5375,11 @@ void Aura::HandleModTargetResistance(bool apply, bool Real)
  
      // show armor penetration
      if (m_target->GetTypeId() == TYPEID_PLAYER && (m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_NORMAL))
@@ -9643,7 +9802,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleShieldBlockValue(bool apply, bool Real)
-@@ -5347,7 +5401,7 @@ void Aura::HandleShieldBlockValue(bool apply, bool Real)
+@@ -5347,7 +5389,7 @@ void Aura::HandleShieldBlockValue(bool apply, bool Real)
          modType = PCT_MOD;
  
      if(m_target->GetTypeId() == TYPEID_PLAYER)
@@ -9652,7 +9811,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleAuraRetainComboPoints(bool apply, bool Real)
-@@ -5365,7 +5419,7 @@ void Aura::HandleAuraRetainComboPoints(bool apply, bool Real)
+@@ -5365,7 +5407,7 @@ void Aura::HandleAuraRetainComboPoints(bool apply, bool Real)
      // remove only if aura expire by time (in case combo points amount change aura removed without combo points lost)
      if( !apply && m_duration==0 && target->GetComboTarget())
          if(Unit* unit = ObjectAccessor::GetUnit(*m_target,target->GetComboTarget()))
@@ -9661,7 +9820,7 @@ index 6732fc5..c538d0f 100644
  }
  
  void Aura::HandleModUnattackable( bool Apply, bool Real )
-@@ -5529,6 +5583,21 @@ void Aura::PeriodicTick()
+@@ -5529,6 +5571,21 @@ void Aura::PeriodicTick()
                          }
                          break;
                      }
@@ -9683,7 +9842,7 @@ index 6732fc5..c538d0f 100644
                      default:
                          break;
                  }
-@@ -5574,6 +5643,8 @@ void Aura::PeriodicTick()
+@@ -5574,6 +5631,8 @@ void Aura::PeriodicTick()
              else
                  pdamage = uint32(m_target->GetMaxHealth()*amount/100);
  
@@ -9692,7 +9851,7 @@ index 6732fc5..c538d0f 100644
              //As of 2.2 resilience reduces damage from DoT ticks as much as the chance to not be critically hit
              // Reduce dot damage from resilience for players
              if (m_target->GetTypeId()==TYPEID_PLAYER)
-@@ -5692,6 +5763,8 @@ void Aura::PeriodicTick()
+@@ -5692,6 +5751,8 @@ void Aura::PeriodicTick()
                  }
              }
  
@@ -9701,7 +9860,7 @@ index 6732fc5..c538d0f 100644
              //As of 2.2 resilience reduces damage from DoT ticks as much as the chance to not be critically hit
              // Reduce dot damage from resilience for players
              if (m_target->GetTypeId()==TYPEID_PLAYER)
-@@ -5761,6 +5834,8 @@ void Aura::PeriodicTick()
+@@ -5761,6 +5822,8 @@ void Aura::PeriodicTick()
  
              pdamage = pCaster->SpellHealingBonus(GetSpellProto(), pdamage, DOT, m_target);
  
@@ -9710,7 +9869,7 @@ index 6732fc5..c538d0f 100644
              sLog.outDetail("PeriodicTick: %u (TypeId: %u) heal of %u (TypeId: %u) for %u health inflicted by %u",
                  GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), m_target->GetGUIDLow(), m_target->GetTypeId(), pdamage, GetId());
  
-@@ -5842,6 +5917,8 @@ void Aura::PeriodicTick()
+@@ -5842,6 +5905,8 @@ void Aura::PeriodicTick()
              // ignore non positive values (can be result apply spellmods to aura damage
              uint32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
  
@@ -9719,7 +9878,7 @@ index 6732fc5..c538d0f 100644
              sLog.outDetail("PeriodicTick: %u (TypeId: %u) power leech of %u (TypeId: %u) for %u dmg inflicted by %u",
                  GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), m_target->GetGUIDLow(), m_target->GetTypeId(), pdamage, GetId());
  
-@@ -5854,6 +5931,12 @@ void Aura::PeriodicTick()
+@@ -5854,6 +5919,12 @@ void Aura::PeriodicTick()
              if(m_target->getPowerType() != power)
                  break;
  
@@ -9732,7 +9891,7 @@ index 6732fc5..c538d0f 100644
              int32 drain_amount = m_target->GetPower(power) > pdamage ? pdamage : m_target->GetPower(power);
  
              // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
-@@ -5862,6 +5945,10 @@ void Aura::PeriodicTick()
+@@ -5862,6 +5933,10 @@ void Aura::PeriodicTick()
  
              m_target->ModifyPower(power, -drain_amount);
  
@@ -9743,7 +9902,7 @@ index 6732fc5..c538d0f 100644
              float gain_multiplier = 0;
  
              if(pCaster->GetMaxPower(power) > 0)
-@@ -5897,6 +5984,8 @@ void Aura::PeriodicTick()
+@@ -5897,6 +5972,8 @@ void Aura::PeriodicTick()
              // ignore non positive values (can be result apply spellmods to aura damage
              uint32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
  
@@ -9752,7 +9911,7 @@ index 6732fc5..c538d0f 100644
              sLog.outDetail("PeriodicTick: %u (TypeId: %u) energize %u (TypeId: %u) for %u dmg inflicted by %u",
                  GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), m_target->GetGUIDLow(), m_target->GetTypeId(), pdamage, GetId());
  
-@@ -5931,6 +6020,8 @@ void Aura::PeriodicTick()
+@@ -5931,6 +6008,8 @@ void Aura::PeriodicTick()
  
              uint32 pdamage = uint32(m_target->GetMaxPower(POWER_MANA) * amount/100);
  
@@ -9761,7 +9920,7 @@ index 6732fc5..c538d0f 100644
              sLog.outDetail("PeriodicTick: %u (TypeId: %u) energize %u (TypeId: %u) for %u mana inflicted by %u",
                  GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), m_target->GetGUIDLow(), m_target->GetTypeId(), pdamage, GetId());
  
-@@ -5965,6 +6056,8 @@ void Aura::PeriodicTick()
+@@ -5965,6 +6044,8 @@ void Aura::PeriodicTick()
  
              int32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
  
@@ -9800,7 +9959,7 @@ index ea4f25f..c58ebf2 100644
          void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
          void SetAuraFlag(uint32 slot, bool add);
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index ef129fa..71a448c 100644
+index a681589..6fbaf93 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -335,6 +335,13 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
@@ -10011,10 +10170,10 @@ index f215701..689c372 100644
      float maxdamage = ((base_value + weapon_maxdamage) * base_pct + total_value) * total_pct;
  
 diff --git a/src/game/TaxiHandler.cpp b/src/game/TaxiHandler.cpp
-index 7673622..3dbdb52 100644
+index 7673622..53257f7 100644
 --- a/src/game/TaxiHandler.cpp
 +++ b/src/game/TaxiHandler.cpp
-@@ -192,10 +192,29 @@ void WorldSession::HandleActivateTaxiFarOpcode ( WorldPacket & recv_data )
+@@ -192,7 +192,7 @@ void WorldSession::HandleActivateTaxiFarOpcode ( WorldPacket & recv_data )
      GetPlayer()->ActivateTaxiPathTo(nodes, 0, npc);
  }
  
@@ -10023,6 +10182,12 @@ index 7673622..3dbdb52 100644
  {
      sLog.outDebug( "WORLD: Received CMSG_MOVE_SPLINE_DONE" );
  
+@@ -200,12 +200,46 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& /*recv_data*/)
+     // 1) end taxi path in far (multi-node) flight
+     // 2) switch from one map to other in case multim-map taxi path
+     // we need proccess only (1)
++
++    //movement anticheat code
 +    MovementInfo movementInfo;
 +    uint32 MovementFlags;
 +
@@ -10033,31 +10198,42 @@ index 7673622..3dbdb52 100644
 +    recv_data >> movementInfo.y;
 +    recv_data >> movementInfo.z;
 +    recv_data >> movementInfo.o;
++    //<<< end movement anticheat
 +
-+ 
-+    while(GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType()==FLIGHT_MOTION_TYPE)
-+        GetPlayer()->GetMotionMaster()->MovementExpired(false);
-+
-+    GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
-+    GetPlayer()->m_movementInfo = movementInfo;
-+    GetPlayer()->m_anti_lastmovetime = movementInfo.time;   
-+
-     // in taxi flight packet received in 2 case:
-     // 1) end taxi path in far (multi-node) flight
-     // 2) switch from one map to other in case multim-map taxi path
-@@ -204,6 +223,7 @@ void WorldSession::HandleTaxiNextDestinationOpcode(WorldPacket& /*recv_data*/)
+     uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
      if(!curDest)
++    {
++        //movement anticheat code
++        GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
++        GetPlayer()->m_movementInfo = movementInfo;
++        GetPlayer()->m_anti_lastmovetime = movementInfo.time;
++        GetPlayer()->m_anti_justteleported = 1;
++        //<<< end movement anticheat
          return;
++    }
  
-+
      TaxiNodesEntry const* curDestNode = sTaxiNodesStore.LookupEntry(curDest);
  
++    if(curDestNode && curDestNode->map_id == GetPlayer()->GetMapId())
++    {
++        while(GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType()==FLIGHT_MOTION_TYPE)
++            GetPlayer()->GetMotionMaster()->MovementExpired(false);
++    }
++
++    //movement anticheat code
++    GetPlayer()->SetPosition(movementInfo.x, movementInfo.y, movementInfo.z, movementInfo.o);
++    GetPlayer()->m_movementInfo = movementInfo;
++    GetPlayer()->m_anti_lastmovetime = movementInfo.time;
++    //<<< end movement anticheat
++
      // far teleport case
+     if(curDestNode && curDestNode->map_id != GetPlayer()->GetMapId())
+     {
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index b64f538..1303464 100644
+index dc9d837..f3f14f8 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
-@@ -437,19 +437,6 @@ bool Unit::HasAuraType(AuraType auraType) const
+@@ -442,19 +442,6 @@ bool Unit::HasAuraType(AuraType auraType) const
      return (!m_modAuras[auraType].empty());
  }
  
@@ -10077,7 +10253,7 @@ index b64f538..1303464 100644
  uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss)
  {
      if (!pVictim->isAlive() || pVictim->isInFlight() || pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
-@@ -497,11 +484,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -502,11 +489,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
          return 0;
      }
  
@@ -10089,7 +10265,7 @@ index b64f538..1303464 100644
      if(pVictim->GetTypeId() != TYPEID_PLAYER)
      {
          // no xp,health if type 8 /critters/
-@@ -600,25 +582,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -605,25 +587,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
          ((Creature*)pVictim)->SetLootRecipient(this);
      if (health <= damage)
      {
@@ -10115,7 +10291,7 @@ index b64f538..1303464 100644
          DEBUG_LOG("DealDamage: victim just died");
  
          // find player: owner of controlled `this` or `this` itself maybe
-@@ -757,6 +720,25 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -762,6 +725,25 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
  
              he->DuelComplete(DUEL_INTERUPTED);
          }
@@ -10141,7 +10317,7 @@ index b64f538..1303464 100644
      }
      else                                                    // if (health <= damage)
      {
-@@ -853,6 +835,16 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -858,6 +840,16 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                      // FIXME: this may cause the auras with proc chance to be rerolled several times
                      next = vAuras.begin();
                  }
@@ -10158,7 +10334,7 @@ index b64f538..1303464 100644
              }
          }
  
-@@ -1129,7 +1121,7 @@ void Unit::DealFlatDamage(Unit *pVictim, SpellEntry const *spellInfo, uint32 *da
+@@ -1134,7 +1126,7 @@ void Unit::DealFlatDamage(Unit *pVictim, SpellEntry const *spellInfo, uint32 *da
                      AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS);
                      for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
                          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -10167,7 +10343,7 @@ index b64f538..1303464 100644
  
                      *damage += bonusDmg;
  
-@@ -1811,7 +1803,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
+@@ -1816,7 +1808,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
                  AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS);
                  for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
                      if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -10176,7 +10352,7 @@ index b64f538..1303464 100644
              }
  
              *damage += crit_bonus;
-@@ -2146,7 +2138,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
+@@ -2151,7 +2143,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
          if (alreadyDone.find(*i) == alreadyDone.end())
          {
              alreadyDone.insert(*i);
@@ -10185,7 +10361,7 @@ index b64f538..1303464 100644
              if (pVictim->m_removedAuras > removedAuras)
              {
                  removedAuras = pVictim->m_removedAuras;
-@@ -2819,7 +2811,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
+@@ -2824,7 +2816,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
          {
              if((*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spell))
              {
@@ -10194,7 +10370,7 @@ index b64f538..1303464 100644
                  if (reflectchance > 0 && roll_chance_i(reflectchance))
                  {
                      if((*i)->m_procCharges > 0)
-@@ -2837,7 +2829,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
+@@ -2842,7 +2834,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
          Unit::AuraList const& mReflectSpells = pVictim->GetAurasByType(SPELL_AURA_REFLECT_SPELLS);
          for(Unit::AuraList::const_iterator i = mReflectSpells.begin(); i != mReflectSpells.end(); ++i)
          {
@@ -10203,7 +10379,7 @@ index b64f538..1303464 100644
              if (reflectchance > 0 && roll_chance_i(reflectchance))
              {
                  if((*i)->m_procCharges > 0)
-@@ -3452,7 +3444,7 @@ int32 Unit::GetTotalAuraModifier(AuraType auratype) const
+@@ -3457,7 +3449,7 @@ int32 Unit::GetTotalAuraModifier(AuraType auratype) const
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -10212,7 +10388,7 @@ index b64f538..1303464 100644
  
      return modifier;
  }
-@@ -3463,7 +3455,7 @@ float Unit::GetTotalAuraMultiplier(AuraType auratype) const
+@@ -3468,7 +3460,7 @@ float Unit::GetTotalAuraMultiplier(AuraType auratype) const
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -10221,7 +10397,7 @@ index b64f538..1303464 100644
  
      return multiplier;
  }
-@@ -3474,8 +3466,11 @@ int32 Unit::GetMaxPositiveAuraModifier(AuraType auratype) const
+@@ -3479,8 +3471,11 @@ int32 Unit::GetMaxPositiveAuraModifier(AuraType auratype) const
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -10235,7 +10411,7 @@ index b64f538..1303464 100644
  
      return modifier;
  }
-@@ -3486,8 +3481,11 @@ int32 Unit::GetMaxNegativeAuraModifier(AuraType auratype) const
+@@ -3491,8 +3486,11 @@ int32 Unit::GetMaxNegativeAuraModifier(AuraType auratype) const
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -10249,7 +10425,7 @@ index b64f538..1303464 100644
  
      return modifier;
  }
-@@ -3501,7 +3499,7 @@ int32 Unit::GetTotalAuraModifierByMiscMask(AuraType auratype, uint32 misc_mask)
+@@ -3506,7 +3504,7 @@ int32 Unit::GetTotalAuraModifierByMiscMask(AuraType auratype, uint32 misc_mask)
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue & misc_mask)
@@ -10258,7 +10434,7 @@ index b64f538..1303464 100644
      }
      return modifier;
  }
-@@ -3515,7 +3513,7 @@ float Unit::GetTotalAuraMultiplierByMiscMask(AuraType auratype, uint32 misc_mask
+@@ -3520,7 +3518,7 @@ float Unit::GetTotalAuraMultiplierByMiscMask(AuraType auratype, uint32 misc_mask
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue & misc_mask)
@@ -10267,7 +10443,7 @@ index b64f538..1303464 100644
      }
      return multiplier;
  }
-@@ -3528,8 +3526,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscMask(AuraType auratype, uint32 misc_
+@@ -3533,8 +3531,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscMask(AuraType auratype, uint32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
      {
          Modifier* mod = (*i)->GetModifier();
@@ -10279,7 +10455,7 @@ index b64f538..1303464 100644
      }
  
      return modifier;
-@@ -3543,8 +3542,9 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscMask(AuraType auratype, uint32 misc_
+@@ -3548,8 +3547,9 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscMask(AuraType auratype, uint32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
      {
          Modifier* mod = (*i)->GetModifier();
@@ -10291,7 +10467,7 @@ index b64f538..1303464 100644
      }
  
      return modifier;
-@@ -3559,7 +3559,7 @@ int32 Unit::GetTotalAuraModifierByMiscValue(AuraType auratype, int32 misc_value)
+@@ -3564,7 +3564,7 @@ int32 Unit::GetTotalAuraModifierByMiscValue(AuraType auratype, int32 misc_value)
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue == misc_value)
@@ -10300,7 +10476,7 @@ index b64f538..1303464 100644
      }
      return modifier;
  }
-@@ -3573,7 +3573,7 @@ float Unit::GetTotalAuraMultiplierByMiscValue(AuraType auratype, int32 misc_valu
+@@ -3578,7 +3578,7 @@ float Unit::GetTotalAuraMultiplierByMiscValue(AuraType auratype, int32 misc_valu
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue == misc_value)
@@ -10309,7 +10485,7 @@ index b64f538..1303464 100644
      }
      return multiplier;
  }
-@@ -3586,8 +3586,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_
+@@ -3591,8 +3591,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
      {
          Modifier* mod = (*i)->GetModifier();
@@ -10321,7 +10497,7 @@ index b64f538..1303464 100644
      }
  
      return modifier;
-@@ -3601,8 +3602,9 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_
+@@ -3606,8 +3607,9 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
      {
          Modifier* mod = (*i)->GetModifier();
@@ -10333,7 +10509,7 @@ index b64f538..1303464 100644
      }
  
      return modifier;
-@@ -3641,8 +3643,10 @@ bool Unit::AddAura(Aura *Aur)
+@@ -3646,8 +3648,10 @@ bool Unit::AddAura(Aura *Aur)
              // replace aura if next will > spell StackAmount
              if(aurSpellInfo->StackAmount)
              {
@@ -10346,7 +10522,7 @@ index b64f538..1303464 100644
              }
              // if StackAmount==0 not allow auras from same caster
              else
-@@ -4025,7 +4029,19 @@ void Unit::RemoveSingleAuraFromStack(uint32 spellId, uint32 effindex)
+@@ -4030,7 +4034,19 @@ void Unit::RemoveSingleAuraFromStack(uint32 spellId, uint32 effindex)
  {
      AuraMap::iterator iter = m_Auras.find(spellEffectPair(spellId, effindex));
      if(iter != m_Auras.end())
@@ -10366,7 +10542,7 @@ index b64f538..1303464 100644
  }
  
  void Unit::RemoveAurasDueToSpell(uint32 spellId, Aura* except)
-@@ -4130,6 +4146,9 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
+@@ -4135,6 +4151,9 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
  
      sLog.outDebug("Aura %u now is remove mode %d",Aur->GetModifier()->m_auraname, mode);
      Aur->ApplyModifier(false,true);
@@ -10376,7 +10552,7 @@ index b64f538..1303464 100644
      Aur->_RemoveAura();
      delete Aur;
  
-@@ -4152,6 +4171,22 @@ void Unit::RemoveAllAuras()
+@@ -4157,6 +4176,22 @@ void Unit::RemoveAllAuras()
      }
  }
  
@@ -10399,7 +10575,7 @@ index b64f538..1303464 100644
  void Unit::RemoveAllAurasOnDeath()
  {
      // used just after dieing to remove all visible auras
-@@ -6088,14 +6123,12 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
+@@ -6098,14 +6133,12 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                          ((Player*)this)->AddSpellCooldown(37657,0,time(NULL)+(roll_chance_i(50) ? 2 : 3));
  
                          // counting
@@ -10418,7 +10594,7 @@ index b64f538..1303464 100644
                              return true;                    // main triggered spell casted anyway
  
                          RemoveAurasDueToSpell(37658);
-@@ -7217,7 +7250,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
+@@ -7229,7 +7262,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
              (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0 )
                                                              // 0 == any inventory type (not wand then)
          {
@@ -10427,7 +10603,7 @@ index b64f538..1303464 100644
          }
      }
  
-@@ -7225,13 +7258,13 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
+@@ -7237,13 +7270,13 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
      AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
      for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -10443,7 +10619,7 @@ index b64f538..1303464 100644
  
      // .. taken pct: scripted (increases damage of * against targets *)
      AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-@@ -7503,14 +7536,14 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
+@@ -7515,14 +7548,14 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
      float LvlPenalty = CalculateLevelPenalty(spellProto);
  
      // Spellmod SpellDamage
@@ -10462,7 +10638,7 @@ index b64f538..1303464 100644
      float TakenActualBenefit = TakenAdvertisedBenefit * (CastingTime / 3500.0f) * DotFactor * LvlPenalty;
  
      float tmpDamage = (float(pdamage)+DoneActualBenefit)*DoneTotalMod;
-@@ -7542,7 +7575,7 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
+@@ -7554,7 +7587,7 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
                                                              // -1 == any item class (not wand then)
          (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0 )
                                                              // 0 == any inventory type (not wand then)
@@ -10471,7 +10647,7 @@ index b64f538..1303464 100644
  
      if (GetTypeId() == TYPEID_PLAYER)
      {
-@@ -7560,14 +7593,14 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
+@@ -7572,14 +7605,14 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
                  if(eff < 2 && iSpellProto->EffectApplyAuraName[eff+1]==SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT)
                      usedStat = Stats(iSpellProto->EffectMiscValue[eff+1]);
  
@@ -10488,7 +10664,7 @@ index b64f538..1303464 100644
  
      }
      return DoneAdvertisedBenefit;
-@@ -7582,13 +7615,13 @@ int32 Unit::SpellBaseDamageBonusForVictim(SpellSchoolMask schoolMask, Unit *pVic
+@@ -7594,13 +7627,13 @@ int32 Unit::SpellBaseDamageBonusForVictim(SpellSchoolMask schoolMask, Unit *pVic
      AuraList const& mDamageDoneCreature = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
      for(AuraList::const_iterator i = mDamageDoneCreature.begin();i != mDamageDoneCreature.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -10504,7 +10680,7 @@ index b64f538..1303464 100644
  
      return TakenAdvertisedBenefit;
  }
-@@ -7791,6 +7824,11 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
+@@ -7803,6 +7836,11 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
          // Exception
          switch (spellProto->SpellFamilyName)
          {
@@ -10516,7 +10692,7 @@ index b64f538..1303464 100644
              case  SPELLFAMILY_SHAMAN:
                  // Healing stream from totem (add 6% per tick from hill bonus owner)
                  if (spellProto->SpellFamilyFlags & 0x000000002000LL)
-@@ -7839,14 +7877,14 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
+@@ -7851,14 +7889,14 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
          float LvlPenalty = CalculateLevelPenalty(spellProto);
  
          // Spellmod SpellDamage
@@ -10535,7 +10711,7 @@ index b64f538..1303464 100644
      }
  
      // use float as more appropriate for negative values and percent applying
-@@ -7856,7 +7894,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
+@@ -7868,7 +7906,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
      // Healing done percent
      AuraList const& mHealingDonePct = GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
      for(AuraList::const_iterator i = mHealingDonePct.begin();i != mHealingDonePct.end(); ++i)
@@ -10544,7 +10720,7 @@ index b64f538..1303464 100644
  
      // apply spellmod to Done amount
      if(Player* modOwner = GetSpellModOwner())
-@@ -7897,7 +7935,7 @@ int32 Unit::SpellBaseHealingBonus(SpellSchoolMask schoolMask)
+@@ -7909,7 +7947,7 @@ int32 Unit::SpellBaseHealingBonus(SpellSchoolMask schoolMask)
      AuraList const& mHealingDone = GetAurasByType(SPELL_AURA_MOD_HEALING_DONE);
      for(AuraList::const_iterator i = mHealingDone.begin();i != mHealingDone.end(); ++i)
          if(((*i)->GetModifier()->m_miscvalue & schoolMask) != 0)
@@ -10553,7 +10729,7 @@ index b64f538..1303464 100644
  
      // Healing bonus of spirit, intellect and strength
      if (GetTypeId() == TYPEID_PLAYER)
-@@ -7908,14 +7946,14 @@ int32 Unit::SpellBaseHealingBonus(SpellSchoolMask schoolMask)
+@@ -7920,14 +7958,14 @@ int32 Unit::SpellBaseHealingBonus(SpellSchoolMask schoolMask)
          {
              // stat used dependent from misc value (stat index)
              Stats usedStat = Stats((*i)->GetSpellProto()->EffectMiscValue[(*i)->GetEffIndex()]);
@@ -10570,7 +10746,7 @@ index b64f538..1303464 100644
      }
      return AdvertisedBenefit;
  }
-@@ -7926,7 +7964,7 @@ int32 Unit::SpellBaseHealingBonusForVictim(SpellSchoolMask schoolMask, Unit *pVi
+@@ -7938,7 +7976,7 @@ int32 Unit::SpellBaseHealingBonusForVictim(SpellSchoolMask schoolMask, Unit *pVi
      AuraList const& mDamageTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_HEALING);
      for(AuraList::const_iterator i = mDamageTaken.begin();i != mDamageTaken.end(); ++i)
          if(((*i)->GetModifier()->m_miscvalue & schoolMask) != 0)
@@ -10579,7 +10755,7 @@ index b64f538..1303464 100644
      return AdvertisedBenefit;
  }
  
-@@ -8079,7 +8117,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8091,7 +8129,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageDoneCreature = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
      for(AuraList::const_iterator i = mDamageDoneCreature.begin();i != mDamageDoneCreature.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -10588,7 +10764,7 @@ index b64f538..1303464 100644
  
      // ..done
      // SPELL_AURA_MOD_DAMAGE_DONE included in weapon damage
-@@ -8094,7 +8132,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8106,7 +8144,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
          AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_RANGED_ATTACK_POWER_VERSUS);
          for(AuraList::const_iterator i = mCreatureAttackPower.begin();i != mCreatureAttackPower.end(); ++i)
              if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -10597,7 +10773,7 @@ index b64f538..1303464 100644
      }
      else
      {
-@@ -8104,7 +8142,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8116,7 +8154,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
          AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS);
          for(AuraList::const_iterator i = mCreatureAttackPower.begin();i != mCreatureAttackPower.end(); ++i)
              if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -10606,7 +10782,7 @@ index b64f538..1303464 100644
      }
  
      if (APbonus!=0)                                         // Can be negative
-@@ -8129,7 +8167,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8141,7 +8179,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
      for(AuraList::const_iterator i = mDamageTaken.begin();i != mDamageTaken.end(); ++i)
          if((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask())
@@ -10615,7 +10791,7 @@ index b64f538..1303464 100644
  
      if(attType!=RANGED_ATTACK)
          TakenFlatBenefit += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN);
-@@ -8147,13 +8185,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8159,13 +8197,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
      for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -10631,7 +10807,7 @@ index b64f538..1303464 100644
  
      // .. taken pct: dummy auras
      AuraList const& mDummyAuras = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
-@@ -8211,13 +8249,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8223,13 +8261,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      {
          AuraList const& mModMeleeDamageTakenPercent = pVictim->GetAurasByType(SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT);
          for(AuraList::const_iterator i = mModMeleeDamageTakenPercent.begin(); i != mModMeleeDamageTakenPercent.end(); ++i)
@@ -10648,7 +10824,7 @@ index b64f538..1303464 100644
  
      float tmpDamage = float(int32(*pdamage) + DoneFlatBenefit) * DoneTotalMod;
 diff --git a/src/game/Unit.h b/src/game/Unit.h
-index 5d598fb..e338848 100644
+index 9447c5d..f75da58 100644
 --- a/src/game/Unit.h
 +++ b/src/game/Unit.h
 @@ -910,8 +910,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
@@ -10669,7 +10845,7 @@ index 5d598fb..e338848 100644
          void DelayAura(uint32 spellId, uint32 effindex, int32 delaytime);
  
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 11b95cf..d1c0a13 100644
+index db9bee3..166de4d 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -41,6 +41,7 @@
@@ -10688,20 +10864,37 @@ index 11b95cf..d1c0a13 100644
  
  INSTANTIATE_SINGLETON_1( World );
  
-@@ -484,7 +486,11 @@ void World::LoadConfigSettings(bool reload)
-             rate_values[RATE_TARGET_POS_RECALCULATION_RANGE],ATTACK_DISTANCE,ATTACK_DISTANCE);
-         rate_values[RATE_TARGET_POS_RECALCULATION_RANGE] = ATTACK_DISTANCE;
+@@ -70,7 +72,9 @@ float World::m_MaxVisibleDistanceForObject    = DEFAULT_VISIBILITY_DISTANCE;
+ float World::m_MaxVisibleDistanceInFlight     = DEFAULT_VISIBILITY_DISTANCE;
+ float World::m_VisibleUnitGreyDistance        = 0;
+ float World::m_VisibleObjectGreyDistance      = 0;
+-
++//movement anticheat
++bool World::m_EnableMvAnticheat = true;
++uint32  World::m_TeleportToPlaneAlarms = 50;
+ // ServerMessages.dbc
+ enum ServerMessageType
+ {
+@@ -510,7 +514,17 @@ void World::LoadConfigSettings(bool reload)
+         sLog.outError("DurabilityLossChance.Block (%f) must be >=0. Using 0.0 instead.",rate_values[RATE_DURABILITY_LOSS_BLOCK]);
+         rate_values[RATE_DURABILITY_LOSS_BLOCK] = 0.0f;
      }
 -
 +    // movement anticheat
-+    m_EnableMvAnticheat = sConfig.GetBoolDefault("Anticheat.Movement.Enable",true);     
-+    m_AlarmKickMvAnticheat = sConfig.GetBoolDefault("Anticheat.Movement.Kick",false);
-+    m_AlarmCountMvAnticheat = sConfig.GetIntDefault("Anticheat.Movement.AlarmCount", 5);
-+    m_AlarmTimeMvAnticheat = sConfig.GetIntDefault("Anticheat.Movement.AlarmTime", 5000); 
-     rate_values[RATE_DURABILITY_LOSS_DAMAGE] = sConfig.GetFloatDefault("DurabilityLossChance.Damage",0.5f);
-     if(rate_values[RATE_DURABILITY_LOSS_DAMAGE] < 0.0f)
-     {
-@@ -795,6 +801,13 @@ void World::LoadConfigSettings(bool reload)
++    m_EnableMvAnticheat = sConfig.GetBoolDefault("Anticheat.Movement.Enable",true);
++    m_TeleportToPlaneAlarms = sConfig.GetIntDefault("Anticheat.Movement.TeleportToPlaneAlarms", 50);
++    if (m_TeleportToPlaneAlarms<20){
++        sLog.outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be >=20. Using 20 instead.",m_TeleportToPlaneAlarms);
++        m_TeleportToPlaneAlarms = 20;
++    }
++    if (m_TeleportToPlaneAlarms>100){
++        sLog.outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be <=100. Using 100 instead.",m_TeleportToPlaneAlarms);
++        m_TeleportToPlaneAlarms = 100;
++    }
+     ///- Read other configuration items from the config file
+ 
+     m_configs[CONFIG_COMPRESSION] = sConfig.GetIntDefault("Compression", 1);
+@@ -796,6 +810,13 @@ void World::LoadConfigSettings(bool reload)
      m_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfig.GetIntDefault("ListenRange.TextEmote", 25);
      m_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfig.GetIntDefault("ListenRange.Yell", 300);
  
@@ -10715,7 +10908,7 @@ index 11b95cf..d1c0a13 100644
      m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
      if(m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
      {
-@@ -1160,6 +1173,9 @@ void World::SetInitialWorldSettings()
+@@ -1164,6 +1185,9 @@ void World::SetInitialWorldSettings()
      WorldDatabase.PExecute("INSERT INTO uptime (startstring, starttime, uptime) VALUES('%s', " I64FMTD ", 0)",
          isoDate, uint64(m_startTime));
  
@@ -10725,7 +10918,7 @@ index 11b95cf..d1c0a13 100644
      m_timers[WUPDATE_OBJECTS].SetInterval(0);
      m_timers[WUPDATE_SESSIONS].SetInterval(0);
      m_timers[WUPDATE_WEATHERS].SetInterval(1000);
-@@ -1167,6 +1183,7 @@ void World::SetInitialWorldSettings()
+@@ -1171,6 +1195,7 @@ void World::SetInitialWorldSettings()
      m_timers[WUPDATE_UPTIME].SetInterval(m_configs[CONFIG_UPTIME_UPDATE]*MINUTE*1000);
                                                              //Update "uptime" table based on configuration entry in minutes.
      m_timers[WUPDATE_CORPSES].SetInterval(20*MINUTE*1000);  //erase corpses every 20 minutes
@@ -10733,7 +10926,7 @@ index 11b95cf..d1c0a13 100644
  
      //to set mailtimer to return mails every day between 4 and 5 am
      //mailtimer is increased when updating auctions
-@@ -1188,6 +1205,7 @@ void World::SetInitialWorldSettings()
+@@ -1192,6 +1217,7 @@ void World::SetInitialWorldSettings()
      ///- Initialize Battlegrounds
      sLog.outString( "Starting BattleGround System" );
      sBattleGroundMgr.CreateInitialBattleGrounds();
@@ -10741,7 +10934,7 @@ index 11b95cf..d1c0a13 100644
  
      //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
      sLog.outString( "Loading Transports..." );
-@@ -1203,6 +1221,8 @@ void World::SetInitialWorldSettings()
+@@ -1207,6 +1233,8 @@ void World::SetInitialWorldSettings()
      uint32 nextGameEvent = gameeventmgr.Initialize();
      m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
  
@@ -10750,7 +10943,7 @@ index 11b95cf..d1c0a13 100644
      sLog.outString( "WORLD: World initialized" );
  }
  
-@@ -1271,6 +1291,7 @@ void World::Update(time_t diff)
+@@ -1275,6 +1303,7 @@ void World::Update(time_t diff)
      /// <ul><li> Handle auctions when the timer has passed
      if (m_timers[WUPDATE_AUCTIONS].Passed())
      {
@@ -10758,7 +10951,7 @@ index 11b95cf..d1c0a13 100644
          m_timers[WUPDATE_AUCTIONS].Reset();
  
          ///- Update mails (return old mails with item, or delete them)
-@@ -1404,6 +1425,17 @@ void World::Update(time_t diff)
+@@ -1408,6 +1437,17 @@ void World::Update(time_t diff)
          m_timers[WUPDATE_EVENTS].Reset();
      }
  
@@ -10776,7 +10969,7 @@ index 11b95cf..d1c0a13 100644
      /// </ul>
      ///- Move all creatures with "delayed move" and remove and delete all objects with "delayed remove"
      MapManager::Instance().DoDelayedMovesAndRemoves();
-@@ -2133,6 +2165,24 @@ void World::SendWorldText(int32 string_id, ...)
+@@ -2132,6 +2172,24 @@ void World::SendWorldText(int32 string_id, ...)
              delete data_cache[i][j];
  }
  
@@ -10801,7 +10994,7 @@ index 11b95cf..d1c0a13 100644
  /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
  void World::SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self, uint32 team)
  {
-@@ -2467,6 +2517,45 @@ void World::ProcessCliCommands()
+@@ -2466,6 +2524,45 @@ void World::ProcessCliCommands()
      zprint("mangos>");
  }
  
@@ -10848,7 +11041,7 @@ index 11b95cf..d1c0a13 100644
  {
      m_resultQueue = new SqlResultQueue;
 diff --git a/src/game/World.h b/src/game/World.h
-index 108b1bb..0d0c8d3 100644
+index baa36fd..e21fbb6 100644
 --- a/src/game/World.h
 +++ b/src/game/World.h
 @@ -59,7 +59,8 @@ enum WorldTimers
@@ -10889,28 +11082,26 @@ index 108b1bb..0d0c8d3 100644
          void SendGlobalMessage(WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
          void SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self = 0, uint32 team = 0);
          void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
-@@ -439,6 +447,11 @@ class World
+@@ -439,7 +447,10 @@ class World
          static float GetMaxVisibleDistanceInFlight()    { return m_MaxVisibleDistanceInFlight;    }
          static float GetVisibleUnitGreyDistance()       { return m_VisibleUnitGreyDistance;       }
          static float GetVisibleObjectGreyDistance()     { return m_VisibleObjectGreyDistance;     }
-+        //movement anticheat enable flag
-+        bool GetEnableMvAnticheat()     {return m_EnableMvAnticheat;}       
-+        bool GetAlarmKickMvAnticheat()  {return m_AlarmKickMvAnticheat;}    
-+        uint32 GetAlarmCountMvAnticheat() {return m_AlarmCountMvAnticheat;}    
-+        uint32 GetAlarmTimeMvAnticheat()  {return m_AlarmTimeMvAnticheat;} 
- 
+-
++        //movement anticheat
++        static bool GetEnableMvAnticheat()     {return m_EnableMvAnticheat;}
++        static uint32 GetTeleportToPlaneAlarms()  {return m_TeleportToPlaneAlarms;}
++        //<<< end movement anticheat
          void ProcessCliCommands();
          void QueueCliCommand( CliCommandHolder::Print* zprintf, char const* input ) { cliCmdQueue.add(new CliCommandHolder(input, zprintf)); }
-@@ -503,7 +516,11 @@ class World
+ 
+@@ -503,7 +514,9 @@ class World
          static float m_MaxVisibleDistanceInFlight;
          static float m_VisibleUnitGreyDistance;
          static float m_VisibleObjectGreyDistance;
 -
 +        //movement anticheat enable flag
-+        bool m_EnableMvAnticheat;
-+        bool m_AlarmKickMvAnticheat;
-+        uint32 m_AlarmCountMvAnticheat;
-+        uint32 m_AlarmTimeMvAnticheat;    
++        static bool m_EnableMvAnticheat;
++        static uint32 m_TeleportToPlaneAlarms;
          // CLI command holder to be thread safe
          ZThread::LockedQueue<CliCommandHolder*, ZThread::FastMutex> cliCmdQueue;
          SqlResultQueue *m_resultQueue;
@@ -10937,7 +11128,7 @@ index 4fd1efd..78836a9 100644
 +    return true;
 +}
 diff --git a/src/mangosd/mangosd.conf.dist.in b/src/mangosd/mangosd.conf.dist.in
-index 4c69f2d..08321a1 100644
+index 4c69f2d..4eec7ed 100644
 --- a/src/mangosd/mangosd.conf.dist.in
 +++ b/src/mangosd/mangosd.conf.dist.in
 @@ -294,6 +294,78 @@ GmLogTimestamp = 0
@@ -11019,7 +11210,30 @@ index 4c69f2d..08321a1 100644
  ###################################################################################################################
  # SERVER SETTINGS
  #
-@@ -1079,3 +1151,252 @@ Ra.IP = 0.0.0.0
+@@ -1047,6 +1119,22 @@ Network.OutUBuff = 65536
+ Network.TcpNodelay = 1
+ 
+ ###################################################################################################################
++# MOVEMENT ANTICHEAT
++#
++#    Anticheat.Movement.Enable
++#        Enable Movement Anticheat
++#        Default: 1 - on
++#                 0 - off
++#
++#    Anticheat.Movement.TeleportToPlaneAlarms
++#        maximum alarms before player will be kicked (default 50, allowed 20 - 100)
++#
++###################################################################################################################
++
++Anticheat.Movement.Enable = 1
++Anticheat.Movement.TeleportToPlaneAlarms = 50
++
++###################################################################################################################
+ # CONSOLE AND REMOTE ACCESS
+ #
+ #    Console.Enable
+@@ -1079,3 +1167,226 @@ Ra.IP = 0.0.0.0
  Ra.Port = 3443
  Ra.MinLevel = 3
  Ra.Secure = 1
@@ -11046,234 +11260,208 @@ index 4c69f2d..08321a1 100644
 +AutoBroadcast.On = 0
 +AutoBroadcast.Center = 0
 +AutoBroadcast.Timer = 60000
-+ 
-+ ###################################################################################################################
-+ # AUCTION HOUSE BOT SETTINGS
-+ # 
-+ #    Auction House Bot character data
-+ #        AuctionHouseBot.Account is the account number (in realmd->account table) of the player you want to run as the auction bot.
-+ # 	    AuctionHouseBot.GUID is the GUID (in characters->characters table) of the player you want to run as the auction bot. 
-+ #    Default: 0 (Auction House Bot disabled)
-+ #
-+ #    AuctionHouseBot.NoMail
-+ #        This is a flag to disable mail for successfull auctions. 
-+ #        A value of 0 will allow mail for successful auctions to be sent, which is the default.
-+ #        Non-zero (e.g. AuctionHouseBot.NoMail = 1) will stop successful auction mail.
-+ #    Default: 0 (Send auction successful mail)
-+ # 
-+ #    AuctionHouseBot.AllianceItems
-+ #        This is the number of items you want to keep in the Alliance auction house.
-+ #    AuctionHouseBot.HordeItems
-+ #        This is the number of items you want to keep in the Horde auction house.
-+ #    AuctionHouseBot.NeutralItems
-+ #        This is the number of items you want to keep in the Neutral auction house.
-+ #    Default: 0 (No items generated)
-+ #        Note: If you enable AllowTwoSide.Interaction.Trade, ALL auction houses are linked to the neutral auction house.
-+ #
-+ #    AuctionHouseBot.MinAllianceItems
-+ #        This is the minimum number of items you want to keep in the Alliance auction house.
-+ #    AuctionHouseBot.MinHordeItems
-+ #        This is the minimum number of items you want to keep in the Horde auction house.
-+ #    AuctionHouseBot.MinNeutralItems
-+ #        This is the minimum number of items you want to keep in the Neutral auction house.
-+ #    Default: -1 (minimum will be the same as maximum)
-+ # 
-+ #    AuctionHouseBot.MinTime
-+ #        Sets the minimum number of hours for an auction.
-+ #    Default: 8
-+ #
-+ #    AuctionHouseBot.MaxTime
-+ #        Sets the maximum number of hours for an auction.
-+ #    Default: 24
-+ #
-+ #    Item distribution
-+ #        Sets the percentage of the auction items that should be trade goods of white quality.
-+ #        A value of 0 will disable.
-+ #    AuctionHouseBot.PercentWhiteTradeGoods
-+ #        Sets the percentage of the White Trade Goods auction items
-+ #    Default: 30
-+ #    AuctionHouseBot.PercentGreenTradeGoods
-+ #        Sets the percentage of the Green Trade Goods auction items
-+ #    Default: 13
-+ #    AuctionHouseBot.PercentBlueTradeGoods
-+ #        Sets the percentage of the Blue Trade Goods auction items
-+ #    Default: 9
-+ #    AuctionHouseBot.PercentPurpleTradeGoods
-+ #        Sets the percentage of the Purple Trade Goods auction items
-+ #    Default: 1
-+ #        Note: All of the above values (AuctionHouseBot Percent TradeGoods) must add together to make 100 percent.
-+ #
-+ #    AuctionHouseBot.PercentWhiteItems
-+ #        Sets the percentage of the non trade White auction items
-+ #    Default: 6
-+ #    AuctionHouseBot.PercentGreenItems
-+ #        Sets the percentage of the non trade Green auction items
-+ #    Default: 30
-+ #    AuctionHouseBot.PercentBlueItems
-+ #        Sets the percentage of the non trade Blue auction items
-+ #    Default: 9
-+ #    AuctionHouseBot.PercentPurpleItems
-+ #        Sets the percentage of the non trade Purple auction items
-+ #    Default: 2
-+ #        Note: All of the above values (AuctionHouseBot Percent Items) must add together to make 100 percent.
-+ #
-+ #    Minimum and maximim price mark-up for items.  Percentage of vendor sale price.
-+ #        Example: If a vendor would sell an item for 1g and MinPrice = 150 and MaxPrice = 250,
-+ #        then that item would be randomly priced between 1g 50s and 2g 50s.
-+ #    AuctionHouseBot.MinPriceWhite
-+ #        Minimum price of White items.
-+ #    Default: 150
-+ #    AuctionHouseBot.MaxPriceWhite
-+ #        Maximum price of White items.
-+ #    Default: 250
-+ #    AuctionHouseBot.MinPriceGreen
-+ #        Minimum price of Green items.
-+ #    Default: 200
-+ #    AuctionHouseBot.MaxPriceGreen
-+ #        Maximum price of Green items.
-+ #    Default: 300
-+ #    AuctionHouseBot.MinPriceBlue
-+ #        Minimum price of Blue items.
-+ #    Default: 250
-+ #    AuctionHouseBot.MaxPriceBlue
-+ #        Maximum price of Blue items.
-+ #    Default: 350
-+ #    AuctionHouseBot.MinPricePurple
-+ #        Minimum price of Purple items.
-+ #    Default: 300
-+ #    AuctionHouseBot.MaxPricePurple
-+ #        Maximum price of Purple items.
-+ #    Default: 450
-+ #
-+ #    AuctionHouseBot.BidPrice
-+ #    Starting bid price as a percentage of the randomly chosen buyout price
-+ #    AuctionHouseBot.BidPriceWhite
-+ #    Default: 100 (Bid and buyout price the same)
-+ #    AuctionHouseBot.BidPriceGreen
-+ #    Default: 100 (Bid and buyout price the same)
-+ #    AuctionHouseBot.BidPriceBlue
-+ #    Default: 100 (Bid and buyout price the same)
-+ #    +AuctionHouseBot.BidPricePurple
-+ #    Default: 100 (Bid and buyout price the same)
-+ #
-+ #    AuctionHouseBot.MaxStack
-+ #        Stack size limits for item qualities - a value of 0 will disable a maximum stack size for that quality,
-+ #        which will allow the bot to create items in stack as large as the item allows.
-+ #    AuctionHouseBot.MaxStackWhite
-+ #    Default: 0
-+ #    AuctionHouseBot.MaxStackGreen
-+ #    Default: 3
-+ #    AuctionHouseBot.MaxStackBlue
-+ #    Default: 2
-+ #    AuctionHouseBot.MaxStackPurple
-+ #    Default: 1
-+ #
-+ ###################################################################################################################
-+ 
-+ AuctionHouseBot.Account = 0
-+ AuctionHouseBot.GUID = 0
-+ AuctionHouseBot.NoMail = 0
-+ AuctionHouseBot.AllianceItems = 0
-+ AuctionHouseBot.HordeItems = 0
-+ AuctionHouseBot.NeutralItems = 0
-+ AuctionHouseBot.MinAllianceItems = -1
-+ AuctionHouseBot.MinHordeItems = -1
-+ AuctionHouseBot.MinNeutralItems = -1
-+ AuctionHouseBot.MinTime = 8
-+ AuctionHouseBot.MaxTime = 24
-+ AuctionHouseBot.PercentWhiteTradeGoods = 30
-+ AuctionHouseBot.PercentGreenTradeGoods = 13
-+ AuctionHouseBot.PercentBlueTradeGoods = 9
-+ AuctionHouseBot.PercentPurpleTradeGoods = 1
-+ AuctionHouseBot.PercentWhiteItems = 6
-+ AuctionHouseBot.PercentGreenItems = 30
-+ AuctionHouseBot.PercentBlueItems = 9
-+ AuctionHouseBot.PercentPurpleItems = 2
-+ AuctionHouseBot.MinPriceWhite = 150
-+ AuctionHouseBot.MaxPriceWhite = 250
-+ AuctionHouseBot.MinPriceGreen = 200
-+ AuctionHouseBot.MaxPriceGreen = 300
-+ AuctionHouseBot.MinPriceBlue = 250
-+ AuctionHouseBot.MaxPriceBlue = 350
-+ AuctionHouseBot.MinPricePurple = 300
-+ AuctionHouseBot.MaxPricePurple = 450
-+ AuctionHouseBot.BidPriceWhite = 100
-+ AuctionHouseBot.BidPriceGreen = 100
-+ AuctionHouseBot.BidPriceBlue = 100
-+ AuctionHouseBot.BidPricePurple = 100
-+ AuctionHouseBot.MaxStackWhite = 0
-+ AuctionHouseBot.MaxStackGreen = 3
-+ AuctionHouseBot.MaxStackBlue = 2
-+ AuctionHouseBot.MaxStackPurple = 1
-+ 
-+ ###################################################################################################################
-+ #
-+ # Rated arena matches config
-+ #
-+ # MaxRatingDifference: the maximum rating difference between two groups in rated matches
-+ #             Default: 0 (disable, rating difference is discarded)  
-+ #
-+ # RatingDiscardTimer: after the specified milliseconds has passed, 
-+ #                     rating information will be discarded when selecting teams for matches
-+ #                     also initiates an update by this timer
-+ #             Default: 60000
-+ #
-+ # AutoDistributePoints: set if arena points should be distributed automatically, or by GM command
-+ #             Default: 0 (disable) (recommended): use gm command or sql query to distribute the points
-+ #                      1 (enable): arena points are distributed automatically
-+ #
-+ # AutoDistributeInterval: how often should the distribution take place 
-+ #                         if automatic distribution is enabled
-+ #                         in days
-+ #             Default: 7 (weekly)
-+ #
-+ ###################################################################################################################
-+ 
-+ Arena.MaxRatingDifference = 0
-+ Arena.RatingDiscardTimer = 60000
-+ Arena.AutoDistributePoints = 0
-+ Arena.AutoDistributeInterval = 7
-+ 
-+ ###################################################################################################################
-+ #
-+ # Battleground config
-+ #
-+ # PrematureFinishTimer: the time to end the bg if there are less than minplayersperteam on one side
-+ #                       in milliseconds
-+ #              Default: 300000
-+ #                       0 - disable
-+ #
-+ ###################################################################################################################
-+ 
-+ BattleGround.PrematureFinishTimer = 300000
 +
-+ ###################################################################################################################
-+ # MOVEMENT ANTICHEAT
-+ #
-+ #    Anticheat.Movement.Enable
-+ #        Enable Movement Anticheat
-+ #        Default: 1 - on
-+ #                 0 - off
-+ #
-+ #    Anticheat.Movement.Kick
-+ #        Enable Kick cheater
-+ #        Default: 1 - on
-+ #                 0 - off
-+ #
-+ #    Anticheat.Movement.AlarmCount
-+ #        Count alarms after that player kicked (default 5)
-+ #
-+ #    Anticheat.Movement.AlarmTime
-+ #        maximum time between alarms for count it (default 5000)
-+ #
-+ ###################################################################################################################
++###################################################################################################################
++# AUCTION HOUSE BOT SETTINGS
++# 
++#    Auction House Bot character data
++#        AuctionHouseBot.Account is the account number (in realmd->account table) of the player you want to run as the auction bot.
++# 	    AuctionHouseBot.GUID is the GUID (in characters->characters table) of the player you want to run as the auction bot. 
++#    Default: 0 (Auction House Bot disabled)
++#
++#    AuctionHouseBot.NoMail
++#        This is a flag to disable mail for successfull auctions. 
++#        A value of 0 will allow mail for successful auctions to be sent, which is the default.
++#        Non-zero (e.g. AuctionHouseBot.NoMail = 1) will stop successful auction mail.
++#    Default: 0 (Send auction successful mail)
++# 
++#    AuctionHouseBot.AllianceItems
++#        This is the number of items you want to keep in the Alliance auction house.
++#    AuctionHouseBot.HordeItems
++#        This is the number of items you want to keep in the Horde auction house.
++#    AuctionHouseBot.NeutralItems
++#        This is the number of items you want to keep in the Neutral auction house.
++#    Default: 0 (No items generated)
++#        Note: If you enable AllowTwoSide.Interaction.Trade, ALL auction houses are linked to the neutral auction house.
++#
++#    AuctionHouseBot.MinAllianceItems
++#        This is the minimum number of items you want to keep in the Alliance auction house.
++#    AuctionHouseBot.MinHordeItems
++#        This is the minimum number of items you want to keep in the Horde auction house.
++#    AuctionHouseBot.MinNeutralItems
++#        This is the minimum number of items you want to keep in the Neutral auction house.
++#    Default: -1 (minimum will be the same as maximum)
++# 
++#    AuctionHouseBot.MinTime
++#        Sets the minimum number of hours for an auction.
++#    Default: 8
++#
++#    AuctionHouseBot.MaxTime
++#        Sets the maximum number of hours for an auction.
++#    Default: 24
++#
++#    Item distribution
++#        Sets the percentage of the auction items that should be trade goods of white quality.
++#        A value of 0 will disable.
++#    AuctionHouseBot.PercentWhiteTradeGoods
++#        Sets the percentage of the White Trade Goods auction items
++#    Default: 30
++#    AuctionHouseBot.PercentGreenTradeGoods
++#        Sets the percentage of the Green Trade Goods auction items
++#    Default: 13
++#    AuctionHouseBot.PercentBlueTradeGoods
++#        Sets the percentage of the Blue Trade Goods auction items
++#    Default: 9
++#    AuctionHouseBot.PercentPurpleTradeGoods
++#        Sets the percentage of the Purple Trade Goods auction items
++#    Default: 1
++#        Note: All of the above values (AuctionHouseBot Percent TradeGoods) must add together to make 100 percent.
++#
++#    AuctionHouseBot.PercentWhiteItems
++#        Sets the percentage of the non trade White auction items
++#    Default: 6
++#    AuctionHouseBot.PercentGreenItems
++#        Sets the percentage of the non trade Green auction items
++#    Default: 30
++#    AuctionHouseBot.PercentBlueItems
++#        Sets the percentage of the non trade Blue auction items
++#    Default: 9
++#    AuctionHouseBot.PercentPurpleItems
++#        Sets the percentage of the non trade Purple auction items
++#    Default: 2
++#        Note: All of the above values (AuctionHouseBot Percent Items) must add together to make 100 percent.
++#
++#    Minimum and maximim price mark-up for items.  Percentage of vendor sale price.
++#        Example: If a vendor would sell an item for 1g and MinPrice = 150 and MaxPrice = 250,
++#        then that item would be randomly priced between 1g 50s and 2g 50s.
++#    AuctionHouseBot.MinPriceWhite
++#        Minimum price of White items.
++#    Default: 150
++#    AuctionHouseBot.MaxPriceWhite
++#        Maximum price of White items.
++#    Default: 250
++#    AuctionHouseBot.MinPriceGreen
++#        Minimum price of Green items.
++#    Default: 200
++#    AuctionHouseBot.MaxPriceGreen
++#        Maximum price of Green items.
++#    Default: 300
++#    AuctionHouseBot.MinPriceBlue
++#        Minimum price of Blue items.
++#    Default: 250
++#    AuctionHouseBot.MaxPriceBlue
++#        Maximum price of Blue items.
++#    Default: 350
++#    AuctionHouseBot.MinPricePurple
++#        Minimum price of Purple items.
++#    Default: 300
++#    AuctionHouseBot.MaxPricePurple
++#        Maximum price of Purple items.
++#    Default: 450
++#
++#    AuctionHouseBot.BidPrice
++#    Starting bid price as a percentage of the randomly chosen buyout price
++#    AuctionHouseBot.BidPriceWhite
++#    Default: 100 (Bid and buyout price the same)
++#    AuctionHouseBot.BidPriceGreen
++#    Default: 100 (Bid and buyout price the same)
++#    AuctionHouseBot.BidPriceBlue
++#    Default: 100 (Bid and buyout price the same)
++#    +AuctionHouseBot.BidPricePurple
++#    Default: 100 (Bid and buyout price the same)
++#
++#    AuctionHouseBot.MaxStack
++#        Stack size limits for item qualities - a value of 0 will disable a maximum stack size for that quality,
++#        which will allow the bot to create items in stack as large as the item allows.
++#    AuctionHouseBot.MaxStackWhite
++#    Default: 0
++#    AuctionHouseBot.MaxStackGreen
++#    Default: 3
++#    AuctionHouseBot.MaxStackBlue
++#    Default: 2
++#    AuctionHouseBot.MaxStackPurple
++#    Default: 1
++#
++###################################################################################################################
 +
-+ Anticheat.Movement.Enable = 1
-+ Anticheat.Movement.Kick = 1
-+ Anticheat.Movement.AlarmCount = 5
-+ Anticheat.Movement.AlarmTime = 5000
++AuctionHouseBot.Account = 0
++AuctionHouseBot.GUID = 0
++AuctionHouseBot.NoMail = 0
++AuctionHouseBot.AllianceItems = 0
++AuctionHouseBot.HordeItems = 0
++AuctionHouseBot.NeutralItems = 0
++AuctionHouseBot.MinAllianceItems = -1
++AuctionHouseBot.MinHordeItems = -1
++AuctionHouseBot.MinNeutralItems = -1
++AuctionHouseBot.MinTime = 8
++AuctionHouseBot.MaxTime = 24
++AuctionHouseBot.PercentWhiteTradeGoods = 30
++AuctionHouseBot.PercentGreenTradeGoods = 13
++AuctionHouseBot.PercentBlueTradeGoods = 9
++AuctionHouseBot.PercentPurpleTradeGoods = 1
++AuctionHouseBot.PercentWhiteItems = 6
++AuctionHouseBot.PercentGreenItems = 30
++AuctionHouseBot.PercentBlueItems = 9
++AuctionHouseBot.PercentPurpleItems = 2
++AuctionHouseBot.MinPriceWhite = 150
++AuctionHouseBot.MaxPriceWhite = 250
++AuctionHouseBot.MinPriceGreen = 200
++AuctionHouseBot.MaxPriceGreen = 300
++AuctionHouseBot.MinPriceBlue = 250
++AuctionHouseBot.MaxPriceBlue = 350
++AuctionHouseBot.MinPricePurple = 300
++AuctionHouseBot.MaxPricePurple = 450
++AuctionHouseBot.BidPriceWhite = 100
++AuctionHouseBot.BidPriceGreen = 100
++AuctionHouseBot.BidPriceBlue = 100
++AuctionHouseBot.BidPricePurple = 100
++AuctionHouseBot.MaxStackWhite = 0
++AuctionHouseBot.MaxStackGreen = 3
++AuctionHouseBot.MaxStackBlue = 2
++AuctionHouseBot.MaxStackPurple = 1
++
++###################################################################################################################
++#
++# Rated arena matches config
++#
++# MaxRatingDifference: the maximum rating difference between two groups in rated matches
++#             Default: 0 (disable, rating difference is discarded)  
++#
++# RatingDiscardTimer: after the specified milliseconds has passed, 
++#                     rating information will be discarded when selecting teams for matches
++#                     also initiates an update by this timer
++#             Default: 60000
++#
++# AutoDistributePoints: set if arena points should be distributed automatically, or by GM command
++#             Default: 0 (disable) (recommended): use gm command or sql query to distribute the points
++#                      1 (enable): arena points are distributed automatically
++#
++# AutoDistributeInterval: how often should the distribution take place 
++#                         if automatic distribution is enabled
++#                         in days
++#             Default: 7 (weekly)
++#
++###################################################################################################################
++
++Arena.MaxRatingDifference = 0
++Arena.RatingDiscardTimer = 60000
++Arena.AutoDistributePoints = 0
++Arena.AutoDistributeInterval = 7
++
++###################################################################################################################
++#
++# Battleground config
++#
++# PrematureFinishTimer: the time to end the bg if there are less than minplayersperteam on one side
++#                       in milliseconds
++#              Default: 300000
++#                       0 - disable
++#
++###################################################################################################################
++
++BattleGround.PrematureFinishTimer = 300000
 diff --git a/src/shared/Database/DBCStructure.h b/src/shared/Database/DBCStructure.h
-index 61d4f9e..42e92ec 100644
+index b45f9c9..a6b7e23 100644
 --- a/src/shared/Database/DBCStructure.h
 +++ b/src/shared/Database/DBCStructure.h
 @@ -418,9 +418,10 @@ struct MapEntry

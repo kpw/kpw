@@ -731,10 +731,10 @@ index 0000000..04815b7
 +
 +#endif
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 1f2bcdd..8e97290 100644
+index 068476c..95a06d7 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
-@@ -484,6 +484,8 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -485,6 +485,8 @@ ChatCommand * ChatHandler::getCommandTable()
          { "gps",            SEC_MODERATOR,      false, &ChatHandler::HandleGPSCommand,                 "", NULL },
          { "guid",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGUIDCommand,                "", NULL },
          { "help",           SEC_PLAYER,         true,  &ChatHandler::HandleHelpCommand,                "", NULL },
@@ -744,10 +744,10 @@ index 1f2bcdd..8e97290 100644
          { "cooldown",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleCooldownCommand,            "", NULL },
          { "unlearn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleUnLearnCommand,             "", NULL },
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 28d1b3c..d10dde3 100644
+index 77a9d51..571c017 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
-@@ -149,6 +149,8 @@ class ChatHandler
+@@ -151,6 +151,8 @@ class ChatHandler
          bool HandleLookupSkillCommand(const char* args);
          bool HandleLookupSpellCommand(const char* args);
          bool HandleLookupTeleCommand(const char * args);
@@ -2223,7 +2223,7 @@ index 5672f14..b07146d 100644
      }
  }
 diff --git a/src/game/Language.h b/src/game/Language.h
-index 7dcee62..4aa3437 100644
+index ad5a2b4..59c7a91 100644
 --- a/src/game/Language.h
 +++ b/src/game/Language.h
 @@ -21,6 +21,8 @@
@@ -2236,7 +2236,7 @@ index 7dcee62..4aa3437 100644
      LANG_SELECT_CHAR_OR_CREATURE        = 1,
      LANG_SELECT_CREATURE                = 2,
 diff --git a/src/game/Level1.cpp b/src/game/Level1.cpp
-index 37b8b14..24cd067 100644
+index 3bb2475..15cc9dd 100644
 --- a/src/game/Level1.cpp
 +++ b/src/game/Level1.cpp
 @@ -1188,7 +1188,7 @@ bool ChatHandler::HandleModifyScaleCommand(const char* args)
@@ -2249,10 +2249,10 @@ index 37b8b14..24cd067 100644
          SendSysMessage(LANG_BAD_VALUE);
          SetSentErrorMessage(true);
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 2a12a53..bd29a1e 100644
+index 8d7e412..a98e9e0 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
-@@ -4846,6 +4846,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
+@@ -4855,6 +4855,92 @@ bool ChatHandler::HandleCompleteQuest(const char* args)
      return true;
  }
  
@@ -2370,7 +2370,7 @@ index 03dbeef..51cfdd1 100644
      ConfusedMovementGenerator.cpp \
      ConfusedMovementGenerator.h \
 diff --git a/src/game/ObjectMgr.cpp b/src/game/ObjectMgr.cpp
-index 7740f83..5bd7e8a 100644
+index f49f0a1..6462dec 100644
 --- a/src/game/ObjectMgr.cpp
 +++ b/src/game/ObjectMgr.cpp
 @@ -20,6 +20,7 @@
@@ -2392,7 +2392,7 @@ index 7740f83..5bd7e8a 100644
      Player *owner = GetPlayer(owner_guid);
  
 diff --git a/src/game/Pet.cpp b/src/game/Pet.cpp
-index b0ac1f6..f2d10cc 100644
+index e72e29e..f701e35 100644
 --- a/src/game/Pet.cpp
 +++ b/src/game/Pet.cpp
 @@ -619,7 +619,7 @@ void Pet::RegenerateFocus()
@@ -2418,7 +2418,7 @@ index 144b2d7..b16877a 100644
          }
      }
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index bdda338..4b5658d 100644
+index 8d80991..16e96c6 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -766,7 +766,7 @@ void Player::HandleDrowning()
@@ -2485,7 +2485,7 @@ index bdda338..4b5658d 100644
  }
  
 diff --git a/src/game/SharedDefines.h b/src/game/SharedDefines.h
-index 817ae81..241bd48 100644
+index 907cceb..ca2ce17 100644
 --- a/src/game/SharedDefines.h
 +++ b/src/game/SharedDefines.h
 @@ -798,14 +798,16 @@ enum Targets
@@ -2526,7 +2526,7 @@ index 817ae81..241bd48 100644
  };
  
 diff --git a/src/game/Spell.cpp b/src/game/Spell.cpp
-index 7faf701..5778ac3 100644
+index b42c59e..96ba4b6 100644
 --- a/src/game/Spell.cpp
 +++ b/src/game/Spell.cpp
 @@ -946,6 +946,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
@@ -2728,7 +2728,7 @@ index 7faf701..5778ac3 100644
                  }
              }
          }
-@@ -3256,23 +3355,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3267,23 +3366,6 @@ uint8 Spell::CanCast(bool strict)
              }
          }
  
@@ -2752,7 +2752,7 @@ index 7faf701..5778ac3 100644
          if(IsPositiveSpell(m_spellInfo->Id))
          {
              if(target->IsImmunedToSpell(m_spellInfo,false))
-@@ -3887,19 +3969,6 @@ uint8 Spell::CanCast(bool strict)
+@@ -3898,19 +3980,6 @@ uint8 Spell::CanCast(bool strict)
              case SPELL_EFFECT_LEAP:
              case SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER:
              {
@@ -2772,7 +2772,7 @@ index 7faf701..5778ac3 100644
                  // not allow use this effect at battleground until battleground start
                  if(m_caster->GetTypeId()==TYPEID_PLAYER)
                      if(BattleGround const *bg = ((Player*)m_caster)->GetBattleGround())
-@@ -4046,22 +4115,23 @@ int16 Spell::PetCanCast(Unit* target)
+@@ -4057,22 +4126,23 @@ int16 Spell::PetCanCast(Unit* target)
              if(!_target->isAlive())
                  return SPELL_FAILED_BAD_TARGETS;
  
@@ -2806,7 +2806,7 @@ index 7faf701..5778ac3 100644
                  }
              }
          }
-@@ -4081,9 +4151,16 @@ uint8 Spell::CheckCasterAuras() const
+@@ -4092,9 +4162,16 @@ uint8 Spell::CheckCasterAuras() const
  {
      // Flag drop spells totally immuned to caster auras
      // FIXME: find more nice check for all totally immuned spells
@@ -2827,7 +2827,7 @@ index 7faf701..5778ac3 100644
      uint8 school_immune = 0;
      uint32 mechanic_immune = 0;
 diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
-index 6732fc5..88e367d 100644
+index 82770df..e0795e3 100644
 --- a/src/game/SpellAuras.cpp
 +++ b/src/game/SpellAuras.cpp
 @@ -315,7 +315,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
@@ -2839,7 +2839,7 @@ index 6732fc5..88e367d 100644
  m_timeCla(1000), m_castItemGuid(castItem?castItem->GetGUID():0), m_auraSlot(MAX_AURAS),
  m_positive(false), m_permanent(false), m_isPeriodic(false), m_isTrigger(false), m_isAreaAura(false),
  m_isPersistent(false), m_updated(false), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_isRemovedOnShapeLost(true), m_in_use(false),
-@@ -858,7 +858,6 @@ void Aura::_AddAura()
+@@ -857,7 +857,6 @@ void Aura::_AddAura()
          return;
  
      // we can found aura in NULL_AURA_SLOT and then need store state instead check slot != NULL_AURA_SLOT
@@ -2847,7 +2847,7 @@ index 6732fc5..88e367d 100644
      bool secondaura = false;
      uint8 slot = NULL_AURA_SLOT;
  
-@@ -870,15 +869,13 @@ void Aura::_AddAura()
+@@ -869,15 +868,13 @@ void Aura::_AddAura()
              // allow use single slot only by auras from same caster
              if(itr->second->GetCasterGUID()==GetCasterGUID())
              {
@@ -2865,7 +2865,7 @@ index 6732fc5..88e367d 100644
              break;
      }
  
-@@ -907,7 +904,7 @@ void Aura::_AddAura()
+@@ -906,7 +903,7 @@ void Aura::_AddAura()
      if((!m_isPassive || (caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem())) &&
          (m_spellProto->Effect[GetEffIndex()] != SPELL_EFFECT_APPLY_AREA_AURA_ENEMY || m_target != caster))
      {
@@ -2874,7 +2874,7 @@ index 6732fc5..88e367d 100644
          {
              if (IsPositive())                               // empty positive slot
              {
-@@ -935,30 +932,24 @@ void Aura::_AddAura()
+@@ -934,30 +931,24 @@ void Aura::_AddAura()
              SetAuraSlot( slot );
  
              // Not update fields for not first spell's aura, all data already in fields
@@ -2915,7 +2915,7 @@ index 6732fc5..88e367d 100644
          // Update Seals information
          if( IsSealSpell(GetSpellProto()) )
              m_target->ModifyAuraState(AURA_STATE_JUDGEMENT, true);
-@@ -1009,7 +1000,6 @@ void Aura::_RemoveAura()
+@@ -1008,7 +999,6 @@ void Aura::_RemoveAura()
          return;
  
      bool samespell = false;
@@ -2923,7 +2923,7 @@ index 6732fc5..88e367d 100644
  
      // find other aura in same slot (current already removed from list)
      for(uint8 i = 0; i < 3; i++)
-@@ -1020,10 +1010,6 @@ void Aura::_RemoveAura()
+@@ -1019,10 +1009,6 @@ void Aura::_RemoveAura()
              if(itr->second->GetAuraSlot()==slot)
              {
                  samespell = true;
@@ -2934,7 +2934,7 @@ index 6732fc5..88e367d 100644
                  break;
              }
          }
-@@ -1075,8 +1061,6 @@ void Aura::_RemoveAura()
+@@ -1074,8 +1060,6 @@ void Aura::_RemoveAura()
                  ((Player*)caster)->SendCooldownEvent(GetSpellProto());
          }
      }
@@ -2943,7 +2943,7 @@ index 6732fc5..88e367d 100644
  }
  
  void Aura::SetAuraFlag(uint32 slot, bool add)
-@@ -1115,35 +1099,13 @@ void Aura::SetAuraApplication(uint32 slot, int8 count)
+@@ -1114,35 +1098,13 @@ void Aura::SetAuraApplication(uint32 slot, int8 count)
      m_target->SetUInt32Value(UNIT_FIELD_AURAAPPLICATIONS + index, val);
  }
  
@@ -2981,7 +2981,7 @@ index 6732fc5..88e367d 100644
  
      UpdateAuraDuration();
  }
-@@ -1177,7 +1139,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
+@@ -1176,7 +1138,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
  
          SpellModifier *mod = new SpellModifier;
          mod->op = SpellModOp(m_modifier.m_miscvalue);
@@ -2990,7 +2990,7 @@ index 6732fc5..88e367d 100644
          mod->type = SpellModType(m_modifier.m_auraname);    // SpellModType value == spell aura types
          mod->spellId = GetId();
          mod->effectId = m_effIndex;
-@@ -1867,8 +1829,8 @@ void Aura::TriggerSpell()
+@@ -1866,8 +1828,8 @@ void Aura::TriggerSpell()
                      {
                          switch((*i)->GetModifier()->m_miscvalue)
                          {
@@ -3669,7 +3669,7 @@ index ea4f25f..c58ebf2 100644
          void SetAura(uint32 slot, bool remove) { m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId()); }
          void SetAuraFlag(uint32 slot, bool add);
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index ef129fa..9fcd192 100644
+index a681589..f0beb41 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -335,6 +335,13 @@ void Spell::EffectSchoolDMG(uint32 effect_idx)
@@ -3871,10 +3871,10 @@ index f215701..689c372 100644
      float maxdamage = ((base_value + weapon_maxdamage) * base_pct + total_value) * total_pct;
  
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index b64f538..0250798 100644
+index dc9d837..2d7efb6 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
-@@ -437,19 +437,6 @@ bool Unit::HasAuraType(AuraType auraType) const
+@@ -442,19 +442,6 @@ bool Unit::HasAuraType(AuraType auraType) const
      return (!m_modAuras[auraType].empty());
  }
  
@@ -3894,7 +3894,7 @@ index b64f538..0250798 100644
  uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss)
  {
      if (!pVictim->isAlive() || pVictim->isInFlight() || pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
-@@ -497,11 +484,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -502,11 +489,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
          return 0;
      }
  
@@ -3906,7 +3906,7 @@ index b64f538..0250798 100644
      if(pVictim->GetTypeId() != TYPEID_PLAYER)
      {
          // no xp,health if type 8 /critters/
-@@ -853,6 +835,16 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -858,6 +840,16 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                      // FIXME: this may cause the auras with proc chance to be rerolled several times
                      next = vAuras.begin();
                  }
@@ -3923,7 +3923,7 @@ index b64f538..0250798 100644
              }
          }
  
-@@ -1129,7 +1121,7 @@ void Unit::DealFlatDamage(Unit *pVictim, SpellEntry const *spellInfo, uint32 *da
+@@ -1134,7 +1126,7 @@ void Unit::DealFlatDamage(Unit *pVictim, SpellEntry const *spellInfo, uint32 *da
                      AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS);
                      for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
                          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -3932,7 +3932,7 @@ index b64f538..0250798 100644
  
                      *damage += bonusDmg;
  
-@@ -1811,7 +1803,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
+@@ -1816,7 +1808,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
                  AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS);
                  for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
                      if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -3941,7 +3941,7 @@ index b64f538..0250798 100644
              }
  
              *damage += crit_bonus;
-@@ -2146,7 +2138,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
+@@ -2151,7 +2143,7 @@ void Unit::DoAttackDamage (Unit *pVictim, uint32 *damage, CleanDamage *cleanDama
          if (alreadyDone.find(*i) == alreadyDone.end())
          {
              alreadyDone.insert(*i);
@@ -3950,7 +3950,7 @@ index b64f538..0250798 100644
              if (pVictim->m_removedAuras > removedAuras)
              {
                  removedAuras = pVictim->m_removedAuras;
-@@ -2819,7 +2811,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
+@@ -2824,7 +2816,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
          {
              if((*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spell))
              {
@@ -3959,7 +3959,7 @@ index b64f538..0250798 100644
                  if (reflectchance > 0 && roll_chance_i(reflectchance))
                  {
                      if((*i)->m_procCharges > 0)
-@@ -2837,7 +2829,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
+@@ -2842,7 +2834,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool
          Unit::AuraList const& mReflectSpells = pVictim->GetAurasByType(SPELL_AURA_REFLECT_SPELLS);
          for(Unit::AuraList::const_iterator i = mReflectSpells.begin(); i != mReflectSpells.end(); ++i)
          {
@@ -3968,7 +3968,7 @@ index b64f538..0250798 100644
              if (reflectchance > 0 && roll_chance_i(reflectchance))
              {
                  if((*i)->m_procCharges > 0)
-@@ -3452,7 +3444,7 @@ int32 Unit::GetTotalAuraModifier(AuraType auratype) const
+@@ -3457,7 +3449,7 @@ int32 Unit::GetTotalAuraModifier(AuraType auratype) const
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -3977,7 +3977,7 @@ index b64f538..0250798 100644
  
      return modifier;
  }
-@@ -3463,7 +3455,7 @@ float Unit::GetTotalAuraMultiplier(AuraType auratype) const
+@@ -3468,7 +3460,7 @@ float Unit::GetTotalAuraMultiplier(AuraType auratype) const
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -3986,7 +3986,7 @@ index b64f538..0250798 100644
  
      return multiplier;
  }
-@@ -3474,8 +3466,11 @@ int32 Unit::GetMaxPositiveAuraModifier(AuraType auratype) const
+@@ -3479,8 +3471,11 @@ int32 Unit::GetMaxPositiveAuraModifier(AuraType auratype) const
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -4000,7 +4000,7 @@ index b64f538..0250798 100644
  
      return modifier;
  }
-@@ -3486,8 +3481,11 @@ int32 Unit::GetMaxNegativeAuraModifier(AuraType auratype) const
+@@ -3491,8 +3486,11 @@ int32 Unit::GetMaxNegativeAuraModifier(AuraType auratype) const
  
      AuraList const& mTotalAuraList = GetAurasByType(auratype);
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
@@ -4014,7 +4014,7 @@ index b64f538..0250798 100644
  
      return modifier;
  }
-@@ -3501,7 +3499,7 @@ int32 Unit::GetTotalAuraModifierByMiscMask(AuraType auratype, uint32 misc_mask)
+@@ -3506,7 +3504,7 @@ int32 Unit::GetTotalAuraModifierByMiscMask(AuraType auratype, uint32 misc_mask)
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue & misc_mask)
@@ -4023,7 +4023,7 @@ index b64f538..0250798 100644
      }
      return modifier;
  }
-@@ -3515,7 +3513,7 @@ float Unit::GetTotalAuraMultiplierByMiscMask(AuraType auratype, uint32 misc_mask
+@@ -3520,7 +3518,7 @@ float Unit::GetTotalAuraMultiplierByMiscMask(AuraType auratype, uint32 misc_mask
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue & misc_mask)
@@ -4032,7 +4032,7 @@ index b64f538..0250798 100644
      }
      return multiplier;
  }
-@@ -3528,8 +3526,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscMask(AuraType auratype, uint32 misc_
+@@ -3533,8 +3531,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscMask(AuraType auratype, uint32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
      {
          Modifier* mod = (*i)->GetModifier();
@@ -4044,7 +4044,7 @@ index b64f538..0250798 100644
      }
  
      return modifier;
-@@ -3543,8 +3542,9 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscMask(AuraType auratype, uint32 misc_
+@@ -3548,8 +3547,9 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscMask(AuraType auratype, uint32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
      {
          Modifier* mod = (*i)->GetModifier();
@@ -4056,7 +4056,7 @@ index b64f538..0250798 100644
      }
  
      return modifier;
-@@ -3559,7 +3559,7 @@ int32 Unit::GetTotalAuraModifierByMiscValue(AuraType auratype, int32 misc_value)
+@@ -3564,7 +3564,7 @@ int32 Unit::GetTotalAuraModifierByMiscValue(AuraType auratype, int32 misc_value)
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue == misc_value)
@@ -4065,7 +4065,7 @@ index b64f538..0250798 100644
      }
      return modifier;
  }
-@@ -3573,7 +3573,7 @@ float Unit::GetTotalAuraMultiplierByMiscValue(AuraType auratype, int32 misc_valu
+@@ -3578,7 +3578,7 @@ float Unit::GetTotalAuraMultiplierByMiscValue(AuraType auratype, int32 misc_valu
      {
          Modifier* mod = (*i)->GetModifier();
          if (mod->m_miscvalue == misc_value)
@@ -4074,7 +4074,7 @@ index b64f538..0250798 100644
      }
      return multiplier;
  }
-@@ -3586,8 +3586,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_
+@@ -3591,8 +3591,9 @@ int32 Unit::GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
      {
          Modifier* mod = (*i)->GetModifier();
@@ -4086,7 +4086,7 @@ index b64f538..0250798 100644
      }
  
      return modifier;
-@@ -3601,8 +3602,9 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_
+@@ -3606,8 +3607,9 @@ int32 Unit::GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_
      for(AuraList::const_iterator i = mTotalAuraList.begin();i != mTotalAuraList.end(); ++i)
      {
          Modifier* mod = (*i)->GetModifier();
@@ -4098,7 +4098,7 @@ index b64f538..0250798 100644
      }
  
      return modifier;
-@@ -3641,8 +3643,10 @@ bool Unit::AddAura(Aura *Aur)
+@@ -3646,8 +3648,10 @@ bool Unit::AddAura(Aura *Aur)
              // replace aura if next will > spell StackAmount
              if(aurSpellInfo->StackAmount)
              {
@@ -4111,7 +4111,7 @@ index b64f538..0250798 100644
              }
              // if StackAmount==0 not allow auras from same caster
              else
-@@ -4025,7 +4029,19 @@ void Unit::RemoveSingleAuraFromStack(uint32 spellId, uint32 effindex)
+@@ -4030,7 +4034,19 @@ void Unit::RemoveSingleAuraFromStack(uint32 spellId, uint32 effindex)
  {
      AuraMap::iterator iter = m_Auras.find(spellEffectPair(spellId, effindex));
      if(iter != m_Auras.end())
@@ -4131,7 +4131,7 @@ index b64f538..0250798 100644
  }
  
  void Unit::RemoveAurasDueToSpell(uint32 spellId, Aura* except)
-@@ -4130,6 +4146,9 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
+@@ -4135,6 +4151,9 @@ void Unit::RemoveAura(AuraMap::iterator &i, AuraRemoveMode mode)
  
      sLog.outDebug("Aura %u now is remove mode %d",Aur->GetModifier()->m_auraname, mode);
      Aur->ApplyModifier(false,true);
@@ -4141,7 +4141,7 @@ index b64f538..0250798 100644
      Aur->_RemoveAura();
      delete Aur;
  
-@@ -6088,14 +6107,12 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
+@@ -6098,14 +6117,12 @@ bool Unit::HandleProcTriggerSpell(Unit *pVictim, uint32 damage, Aura* triggeredB
                          ((Player*)this)->AddSpellCooldown(37657,0,time(NULL)+(roll_chance_i(50) ? 2 : 3));
  
                          // counting
@@ -4160,7 +4160,7 @@ index b64f538..0250798 100644
                              return true;                    // main triggered spell casted anyway
  
                          RemoveAurasDueToSpell(37658);
-@@ -7217,7 +7234,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
+@@ -7229,7 +7246,7 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
              (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0 )
                                                              // 0 == any inventory type (not wand then)
          {
@@ -4169,7 +4169,7 @@ index b64f538..0250798 100644
          }
      }
  
-@@ -7225,13 +7242,13 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
+@@ -7237,13 +7254,13 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
      AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
      for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -4185,7 +4185,7 @@ index b64f538..0250798 100644
  
      // .. taken pct: scripted (increases damage of * against targets *)
      AuraList const& mOverrideClassScript = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-@@ -7503,14 +7520,14 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
+@@ -7515,14 +7532,14 @@ uint32 Unit::SpellDamageBonus(Unit *pVictim, SpellEntry const *spellProto, uint3
      float LvlPenalty = CalculateLevelPenalty(spellProto);
  
      // Spellmod SpellDamage
@@ -4204,7 +4204,7 @@ index b64f538..0250798 100644
      float TakenActualBenefit = TakenAdvertisedBenefit * (CastingTime / 3500.0f) * DotFactor * LvlPenalty;
  
      float tmpDamage = (float(pdamage)+DoneActualBenefit)*DoneTotalMod;
-@@ -7542,7 +7559,7 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
+@@ -7554,7 +7571,7 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
                                                              // -1 == any item class (not wand then)
          (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0 )
                                                              // 0 == any inventory type (not wand then)
@@ -4213,7 +4213,7 @@ index b64f538..0250798 100644
  
      if (GetTypeId() == TYPEID_PLAYER)
      {
-@@ -7560,14 +7577,14 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
+@@ -7572,14 +7589,14 @@ int32 Unit::SpellBaseDamageBonus(SpellSchoolMask schoolMask)
                  if(eff < 2 && iSpellProto->EffectApplyAuraName[eff+1]==SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT)
                      usedStat = Stats(iSpellProto->EffectMiscValue[eff+1]);
  
@@ -4230,7 +4230,7 @@ index b64f538..0250798 100644
  
      }
      return DoneAdvertisedBenefit;
-@@ -7582,13 +7599,13 @@ int32 Unit::SpellBaseDamageBonusForVictim(SpellSchoolMask schoolMask, Unit *pVic
+@@ -7594,13 +7611,13 @@ int32 Unit::SpellBaseDamageBonusForVictim(SpellSchoolMask schoolMask, Unit *pVic
      AuraList const& mDamageDoneCreature = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
      for(AuraList::const_iterator i = mDamageDoneCreature.begin();i != mDamageDoneCreature.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -4246,7 +4246,7 @@ index b64f538..0250798 100644
  
      return TakenAdvertisedBenefit;
  }
-@@ -7791,6 +7808,11 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
+@@ -7803,6 +7820,11 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
          // Exception
          switch (spellProto->SpellFamilyName)
          {
@@ -4258,7 +4258,7 @@ index b64f538..0250798 100644
              case  SPELLFAMILY_SHAMAN:
                  // Healing stream from totem (add 6% per tick from hill bonus owner)
                  if (spellProto->SpellFamilyFlags & 0x000000002000LL)
-@@ -7839,14 +7861,14 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
+@@ -7851,14 +7873,14 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
          float LvlPenalty = CalculateLevelPenalty(spellProto);
  
          // Spellmod SpellDamage
@@ -4277,7 +4277,7 @@ index b64f538..0250798 100644
      }
  
      // use float as more appropriate for negative values and percent applying
-@@ -7856,7 +7878,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
+@@ -7868,7 +7890,7 @@ uint32 Unit::SpellHealingBonus(SpellEntry const *spellProto, uint32 healamount,
      // Healing done percent
      AuraList const& mHealingDonePct = GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
      for(AuraList::const_iterator i = mHealingDonePct.begin();i != mHealingDonePct.end(); ++i)
@@ -4286,7 +4286,7 @@ index b64f538..0250798 100644
  
      // apply spellmod to Done amount
      if(Player* modOwner = GetSpellModOwner())
-@@ -7897,7 +7919,7 @@ int32 Unit::SpellBaseHealingBonus(SpellSchoolMask schoolMask)
+@@ -7909,7 +7931,7 @@ int32 Unit::SpellBaseHealingBonus(SpellSchoolMask schoolMask)
      AuraList const& mHealingDone = GetAurasByType(SPELL_AURA_MOD_HEALING_DONE);
      for(AuraList::const_iterator i = mHealingDone.begin();i != mHealingDone.end(); ++i)
          if(((*i)->GetModifier()->m_miscvalue & schoolMask) != 0)
@@ -4295,7 +4295,7 @@ index b64f538..0250798 100644
  
      // Healing bonus of spirit, intellect and strength
      if (GetTypeId() == TYPEID_PLAYER)
-@@ -7908,14 +7930,14 @@ int32 Unit::SpellBaseHealingBonus(SpellSchoolMask schoolMask)
+@@ -7920,14 +7942,14 @@ int32 Unit::SpellBaseHealingBonus(SpellSchoolMask schoolMask)
          {
              // stat used dependent from misc value (stat index)
              Stats usedStat = Stats((*i)->GetSpellProto()->EffectMiscValue[(*i)->GetEffIndex()]);
@@ -4312,7 +4312,7 @@ index b64f538..0250798 100644
      }
      return AdvertisedBenefit;
  }
-@@ -7926,7 +7948,7 @@ int32 Unit::SpellBaseHealingBonusForVictim(SpellSchoolMask schoolMask, Unit *pVi
+@@ -7938,7 +7960,7 @@ int32 Unit::SpellBaseHealingBonusForVictim(SpellSchoolMask schoolMask, Unit *pVi
      AuraList const& mDamageTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_HEALING);
      for(AuraList::const_iterator i = mDamageTaken.begin();i != mDamageTaken.end(); ++i)
          if(((*i)->GetModifier()->m_miscvalue & schoolMask) != 0)
@@ -4321,7 +4321,7 @@ index b64f538..0250798 100644
      return AdvertisedBenefit;
  }
  
-@@ -8079,7 +8101,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8091,7 +8113,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageDoneCreature = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE);
      for(AuraList::const_iterator i = mDamageDoneCreature.begin();i != mDamageDoneCreature.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -4330,7 +4330,7 @@ index b64f538..0250798 100644
  
      // ..done
      // SPELL_AURA_MOD_DAMAGE_DONE included in weapon damage
-@@ -8094,7 +8116,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8106,7 +8128,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
          AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_RANGED_ATTACK_POWER_VERSUS);
          for(AuraList::const_iterator i = mCreatureAttackPower.begin();i != mCreatureAttackPower.end(); ++i)
              if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -4339,7 +4339,7 @@ index b64f538..0250798 100644
      }
      else
      {
-@@ -8104,7 +8126,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8116,7 +8138,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
          AuraList const& mCreatureAttackPower = GetAurasByType(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS);
          for(AuraList::const_iterator i = mCreatureAttackPower.begin();i != mCreatureAttackPower.end(); ++i)
              if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -4348,7 +4348,7 @@ index b64f538..0250798 100644
      }
  
      if (APbonus!=0)                                         // Can be negative
-@@ -8129,7 +8151,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8141,7 +8163,7 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageTaken = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_TAKEN);
      for(AuraList::const_iterator i = mDamageTaken.begin();i != mDamageTaken.end(); ++i)
          if((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask())
@@ -4357,7 +4357,7 @@ index b64f538..0250798 100644
  
      if(attType!=RANGED_ATTACK)
          TakenFlatBenefit += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN);
-@@ -8147,13 +8169,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8159,13 +8181,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      AuraList const& mDamageDoneVersus = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
      for(AuraList::const_iterator i = mDamageDoneVersus.begin();i != mDamageDoneVersus.end(); ++i)
          if(creatureTypeMask & uint32((*i)->GetModifier()->m_miscvalue))
@@ -4373,7 +4373,7 @@ index b64f538..0250798 100644
  
      // .. taken pct: dummy auras
      AuraList const& mDummyAuras = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
-@@ -8211,13 +8233,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
+@@ -8223,13 +8245,13 @@ void Unit::MeleeDamageBonus(Unit *pVictim, uint32 *pdamage,WeaponAttackType attT
      {
          AuraList const& mModMeleeDamageTakenPercent = pVictim->GetAurasByType(SPELL_AURA_MOD_MELEE_DAMAGE_TAKEN_PCT);
          for(AuraList::const_iterator i = mModMeleeDamageTakenPercent.begin(); i != mModMeleeDamageTakenPercent.end(); ++i)
@@ -4390,7 +4390,7 @@ index b64f538..0250798 100644
  
      float tmpDamage = float(int32(*pdamage) + DoneFlatBenefit) * DoneTotalMod;
 diff --git a/src/game/Unit.h b/src/game/Unit.h
-index 5d598fb..42374c5 100644
+index 9447c5d..419a8d4 100644
 --- a/src/game/Unit.h
 +++ b/src/game/Unit.h
 @@ -910,8 +910,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
@@ -4403,7 +4403,7 @@ index 5d598fb..42374c5 100644
          virtual bool IsInWater() const;
          virtual bool IsUnderWater() const;
 diff --git a/src/game/World.cpp b/src/game/World.cpp
-index 11b95cf..52a8ed8 100644
+index db9bee3..76db6b1 100644
 --- a/src/game/World.cpp
 +++ b/src/game/World.cpp
 @@ -41,6 +41,7 @@
@@ -4422,7 +4422,7 @@ index 11b95cf..52a8ed8 100644
  
  INSTANTIATE_SINGLETON_1( World );
  
-@@ -1160,6 +1162,9 @@ void World::SetInitialWorldSettings()
+@@ -1164,6 +1166,9 @@ void World::SetInitialWorldSettings()
      WorldDatabase.PExecute("INSERT INTO uptime (startstring, starttime, uptime) VALUES('%s', " I64FMTD ", 0)",
          isoDate, uint64(m_startTime));
  
@@ -4432,7 +4432,7 @@ index 11b95cf..52a8ed8 100644
      m_timers[WUPDATE_OBJECTS].SetInterval(0);
      m_timers[WUPDATE_SESSIONS].SetInterval(0);
      m_timers[WUPDATE_WEATHERS].SetInterval(1000);
-@@ -1167,6 +1172,7 @@ void World::SetInitialWorldSettings()
+@@ -1171,6 +1176,7 @@ void World::SetInitialWorldSettings()
      m_timers[WUPDATE_UPTIME].SetInterval(m_configs[CONFIG_UPTIME_UPDATE]*MINUTE*1000);
                                                              //Update "uptime" table based on configuration entry in minutes.
      m_timers[WUPDATE_CORPSES].SetInterval(20*MINUTE*1000);  //erase corpses every 20 minutes
@@ -4440,7 +4440,7 @@ index 11b95cf..52a8ed8 100644
  
      //to set mailtimer to return mails every day between 4 and 5 am
      //mailtimer is increased when updating auctions
-@@ -1203,6 +1209,8 @@ void World::SetInitialWorldSettings()
+@@ -1207,6 +1213,8 @@ void World::SetInitialWorldSettings()
      uint32 nextGameEvent = gameeventmgr.Initialize();
      m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
  
@@ -4449,7 +4449,7 @@ index 11b95cf..52a8ed8 100644
      sLog.outString( "WORLD: World initialized" );
  }
  
-@@ -1271,6 +1279,7 @@ void World::Update(time_t diff)
+@@ -1275,6 +1283,7 @@ void World::Update(time_t diff)
      /// <ul><li> Handle auctions when the timer has passed
      if (m_timers[WUPDATE_AUCTIONS].Passed())
      {
@@ -4457,7 +4457,7 @@ index 11b95cf..52a8ed8 100644
          m_timers[WUPDATE_AUCTIONS].Reset();
  
          ///- Update mails (return old mails with item, or delete them)
-@@ -1404,6 +1413,17 @@ void World::Update(time_t diff)
+@@ -1408,6 +1417,17 @@ void World::Update(time_t diff)
          m_timers[WUPDATE_EVENTS].Reset();
      }
  
@@ -4475,7 +4475,7 @@ index 11b95cf..52a8ed8 100644
      /// </ul>
      ///- Move all creatures with "delayed move" and remove and delete all objects with "delayed remove"
      MapManager::Instance().DoDelayedMovesAndRemoves();
-@@ -2467,6 +2487,45 @@ void World::ProcessCliCommands()
+@@ -2466,6 +2486,45 @@ void World::ProcessCliCommands()
      zprint("mangos>");
  }
  
@@ -4522,7 +4522,7 @@ index 11b95cf..52a8ed8 100644
  {
      m_resultQueue = new SqlResultQueue;
 diff --git a/src/game/World.h b/src/game/World.h
-index 108b1bb..d101500 100644
+index baa36fd..455ee83 100644
 --- a/src/game/World.h
 +++ b/src/game/World.h
 @@ -59,7 +59,8 @@ enum WorldTimers
