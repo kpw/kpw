@@ -4866,7 +4866,7 @@ index 700f4f8..6e7bbaa 100644
  
  class LoginQueryHolder : public SqlQueryHolder
 diff --git a/src/game/Chat.cpp b/src/game/Chat.cpp
-index 1f2bcdd..ba7db55 100644
+index d77838c..7bfd1fc 100644
 --- a/src/game/Chat.cpp
 +++ b/src/game/Chat.cpp
 @@ -169,6 +169,7 @@ ChatCommand * ChatHandler::getCommandTable()
@@ -4877,19 +4877,19 @@ index 1f2bcdd..ba7db55 100644
          { NULL,             0,                  false, NULL,                                           "", NULL }
      };
  
-@@ -530,6 +531,7 @@ ChatCommand * ChatHandler::getCommandTable()
+@@ -532,6 +533,7 @@ ChatCommand * ChatHandler::getCommandTable()
          { "damage",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDamageCommand,              "", NULL },
          { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
-         { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCombatStopCommand,          "", NULL },
+         { "chardelete",     SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterDeleteCommand,     "", NULL },
 +        { "flusharenapoints",    SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,         "",   NULL },
          { "sendmessage",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
          { "repairitems",    SEC_GAMEMASTER,     false, &ChatHandler::HandleRepairitemsCommand,         "", NULL },
          { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
 diff --git a/src/game/Chat.h b/src/game/Chat.h
-index 28d1b3c..233acfc 100644
+index 86f310e..e414f7a 100644
 --- a/src/game/Chat.h
 +++ b/src/game/Chat.h
-@@ -411,6 +411,7 @@ class ChatHandler
+@@ -413,6 +413,7 @@ class ChatHandler
          bool HandleComeToMeCommand(const char *args);
          bool HandleCombatStopCommand(const char *args);
          bool HandleSendMessageCommand(const char * args);
@@ -4897,7 +4897,7 @@ index 28d1b3c..233acfc 100644
          bool HandleRepairitemsCommand(const char* args);
          bool HandleWaterwalkCommand(const char* args);
  
-@@ -425,6 +426,7 @@ class ChatHandler
+@@ -427,6 +428,7 @@ class ChatHandler
          bool HandleSaveAllCommand(const char* args);
          bool HandleGetItemState(const char * args);
          bool HandleGetLootRecipient(const char * args);
@@ -4965,7 +4965,7 @@ index cb03eda..ebf4916 100644
  //============== Roll ===============================
  //===================================================
 diff --git a/src/game/Group.h b/src/game/Group.h
-index 3368cbf..1a03b8a 100644
+index 6160fd0..52a1188 100644
 --- a/src/game/Group.h
 +++ b/src/game/Group.h
 @@ -234,6 +234,7 @@ class MANGOS_DLL_SPEC Group
@@ -5013,7 +5013,7 @@ index 7dcee62..1f9b8db 100644
      // in game strings
      //                                  = 800, not used
 diff --git a/src/game/Level1.cpp b/src/game/Level1.cpp
-index 37b8b14..b590fa6 100644
+index 3bb2475..9e59254 100644
 --- a/src/game/Level1.cpp
 +++ b/src/game/Level1.cpp
 @@ -351,7 +351,14 @@ bool ChatHandler::HandleNamegoCommand(const char* args)
@@ -5062,7 +5062,7 @@ index 37b8b14..b590fa6 100644
              // we have to go to instance, and can go to player only if:
              //   1) we are in his group (either as leader or as member)
 diff --git a/src/game/Level3.cpp b/src/game/Level3.cpp
-index 2a12a53..962a90c 100644
+index 14de327..557c8d8 100644
 --- a/src/game/Level3.cpp
 +++ b/src/game/Level3.cpp
 @@ -47,6 +47,7 @@
@@ -5072,8 +5072,8 @@ index 2a12a53..962a90c 100644
 +#include "BattleGroundMgr.h"
  #include "InstanceSaveMgr.h"
  #include "InstanceData.h"
- #include "AccountMgr.h"
-@@ -6159,6 +6160,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
+ 
+@@ -6404,6 +6405,12 @@ bool ChatHandler::HandleSendMessageCommand(const char* args)
      return true;
  }
  
@@ -5123,7 +5123,7 @@ index 691448b..878b845 100644
              m = new MapInstanced(id, i_gridCleanUpDelay);
          }
 diff --git a/src/game/MiscHandler.cpp b/src/game/MiscHandler.cpp
-index 2d77c73..70293e6 100644
+index 24a9bfb..7743500 100644
 --- a/src/game/MiscHandler.cpp
 +++ b/src/game/MiscHandler.cpp
 @@ -661,6 +661,10 @@ void WorldSession::HandleCorpseReclaimOpcode(WorldPacket &recv_data)
@@ -5138,7 +5138,7 @@ index 2d77c73..70293e6 100644
      if(!GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
          return;
 diff --git a/src/game/MovementHandler.cpp b/src/game/MovementHandler.cpp
-index 8ebae23..b4d8402 100644
+index a171e7b..227962b 100644
 --- a/src/game/MovementHandler.cpp
 +++ b/src/game/MovementHandler.cpp
 @@ -130,22 +130,28 @@ void WorldSession::HandleMoveWorldportAckOpcode()
@@ -5216,7 +5216,7 @@ index 8ebae23..b4d8402 100644
  }
  
 diff --git a/src/game/ObjectMgr.h b/src/game/ObjectMgr.h
-index a849df1..184dd42 100644
+index 788934e..fa41d54 100644
 --- a/src/game/ObjectMgr.h
 +++ b/src/game/ObjectMgr.h
 @@ -313,6 +313,8 @@ class ObjectMgr
@@ -5229,7 +5229,7 @@ index a849df1..184dd42 100644
          static CreatureInfo const *GetCreatureTemplate( uint32 id );
          CreatureModelInfo const *GetCreatureModelInfo( uint32 modelid );
 diff --git a/src/game/Player.cpp b/src/game/Player.cpp
-index bdda338..9b0e912 100644
+index ed5bf47..e18970c 100644
 --- a/src/game/Player.cpp
 +++ b/src/game/Player.cpp
 @@ -346,8 +346,8 @@ Player::Player (WorldSession *session): Unit()
@@ -5371,7 +5371,7 @@ index bdda338..9b0e912 100644
          return false;
  
 diff --git a/src/game/Player.h b/src/game/Player.h
-index a5222d3..45e23f8 100644
+index 3d19dc5..7c66b28 100644
 --- a/src/game/Player.h
 +++ b/src/game/Player.h
 @@ -1807,24 +1807,32 @@ class MANGOS_DLL_SPEC Player : public Unit
@@ -5485,10 +5485,10 @@ index a5222d3..45e23f8 100644
          BgBattleGroundQueueID_Rec m_bgBattleGroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
          uint32 m_bgEntryPointMap;
 diff --git a/src/game/SpellAuras.cpp b/src/game/SpellAuras.cpp
-index 6732fc5..050283b 100644
+index 44d50ac..c01aca6 100644
 --- a/src/game/SpellAuras.cpp
 +++ b/src/game/SpellAuras.cpp
-@@ -2137,7 +2137,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
+@@ -2136,7 +2136,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                              return;
  
                      // final heal
@@ -5499,7 +5499,7 @@ index 6732fc5..050283b 100644
                  return;
              }
 diff --git a/src/game/SpellEffects.cpp b/src/game/SpellEffects.cpp
-index ef129fa..c446c87 100644
+index a681589..a8fbb9c 100644
 --- a/src/game/SpellEffects.cpp
 +++ b/src/game/SpellEffects.cpp
 @@ -2598,7 +2598,7 @@ void Spell::DoCreateItem(uint32 i, uint32 itemtype)
@@ -5512,10 +5512,10 @@ index ef129fa..c446c87 100644
      }
  }
 diff --git a/src/game/Unit.cpp b/src/game/Unit.cpp
-index b64f538..60146a9 100644
+index 0f5ef86..e60bc88 100644
 --- a/src/game/Unit.cpp
 +++ b/src/game/Unit.cpp
-@@ -600,25 +600,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -605,25 +605,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
          ((Creature*)pVictim)->SetLootRecipient(this);
      if (health <= damage)
      {
@@ -5541,7 +5541,7 @@ index b64f538..60146a9 100644
          DEBUG_LOG("DealDamage: victim just died");
  
          // find player: owner of controlled `this` or `this` itself maybe
-@@ -757,6 +738,25 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
+@@ -762,6 +743,25 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
  
              he->DuelComplete(DUEL_INTERUPTED);
          }
@@ -5567,7 +5567,7 @@ index b64f538..60146a9 100644
      }
      else                                                    // if (health <= damage)
      {
-@@ -4152,6 +4152,22 @@ void Unit::RemoveAllAuras()
+@@ -4157,6 +4157,22 @@ void Unit::RemoveAllAuras()
      }
  }
  
@@ -5591,7 +5591,7 @@ index b64f538..60146a9 100644
  {
      // used just after dieing to remove all visible auras
 diff --git a/src/game/Unit.h b/src/game/Unit.h
-index 5d598fb..ef82a09 100644
+index 3ebab69..8a05a76 100644
 --- a/src/game/Unit.h
 +++ b/src/game/Unit.h
 @@ -1006,6 +1006,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
@@ -5654,7 +5654,7 @@ index 11b95cf..57074de 100644
  void World::SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self, uint32 team)
  {
 diff --git a/src/game/World.h b/src/game/World.h
-index 108b1bb..6d66af7 100644
+index baa36fd..842a5f5 100644
 --- a/src/game/World.h
 +++ b/src/game/World.h
 @@ -160,6 +160,11 @@ enum WorldConfigs

@@ -14,7 +14,7 @@ index 03dbeef..7b802b0 100644
  ## Link against shared library
  libmangosgame_a_LIBADD = ../shared/libmangosshared.a ../shared/Auth/libmangosauth.a ../shared/Config/libmangosconfig.a ../shared/Database/libmangosdatabase.a ../shared/vmap/libmangosvmaps.a
 diff --git a/src/game/Map.cpp b/src/game/Map.cpp
-index 7518cf1..865561c 100644
+index 7892138..cf6fdc4 100644
 --- a/src/game/Map.cpp
 +++ b/src/game/Map.cpp
 @@ -1326,6 +1326,33 @@ void Map::AddObjectToRemoveList(WorldObject *obj)
@@ -52,7 +52,7 @@ index 7518cf1..865561c 100644
  {
      if(i_objectsToRemove.empty())
 diff --git a/src/game/Map.h b/src/game/Map.h
-index 6da1e56..8f0b6a2 100644
+index e4f9f58..f1a7de5 100644
 --- a/src/game/Map.h
 +++ b/src/game/Map.h
 @@ -137,6 +137,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
@@ -174,7 +174,7 @@ index 691448b..fd6f550 100644
  {
      uint32 ret = 0;
 diff --git a/src/game/MapManager.h b/src/game/MapManager.h
-index 71a627b..4f206b6 100644
+index 43ba884..ee4744a 100644
 --- a/src/game/MapManager.h
 +++ b/src/game/MapManager.h
 @@ -27,6 +27,7 @@
@@ -431,7 +431,7 @@ index 0000000..4e97dbf
 +
 +#endif //_MAP_UPDATER_H_INCLUDED
 diff --git a/src/game/ObjectAccessor.cpp b/src/game/ObjectAccessor.cpp
-index f1cf1e5..314bbc3 100644
+index 586f84a..6751b24 100644
 --- a/src/game/ObjectAccessor.cpp
 +++ b/src/game/ObjectAccessor.cpp
 @@ -558,18 +558,29 @@ ObjectAccessor::Update(uint32 diff)
@@ -675,22 +675,20 @@ index 0000000..0a7b77e
 +
 +#endif // _M_DELAY_EXECUTOR_H
 diff --git a/src/shared/Makefile.am b/src/shared/Makefile.am
-index 915076a..3a9fe89 100644
+index c393e68..83f8cf8 100644
 --- a/src/shared/Makefile.am
 +++ b/src/shared/Makefile.am
-@@ -46,8 +46,10 @@ libmangosshared_a_SOURCES = \
-     Util.cpp \
+@@ -47,7 +47,9 @@ libmangosshared_a_SOURCES = \
      Util.h \
      WorldPacket.h \
+     revision_nr.h \
 -    revision.h
--
 +    revision.h \
 +    DelayExecutor.h \
 +    DelayExecutor.cpp
-+    
+ 
  # Get revision (git or svn)
  REVISION_FILE = revision.h
- 
 diff --git a/win/VC71/game.vcproj b/win/VC71/game.vcproj
 index d131d0f..e05cbf5 100644
 --- a/win/VC71/game.vcproj
@@ -709,7 +707,7 @@ index d131d0f..e05cbf5 100644
  			</File>
  			<File
 diff --git a/win/VC71/shared.vcproj b/win/VC71/shared.vcproj
-index 924ccdb..ac8ff84 100644
+index 5321788..060bcfb 100644
 --- a/win/VC71/shared.vcproj
 +++ b/win/VC71/shared.vcproj
 @@ -415,6 +415,12 @@
@@ -745,7 +743,7 @@ index 80aa58b..5ca59f5 100644
  				>
  			</File>
 diff --git a/win/VC80/shared.vcproj b/win/VC80/shared.vcproj
-index 9ca9a66..5408363 100644
+index 291b4e9..0a24870 100644
 --- a/win/VC80/shared.vcproj
 +++ b/win/VC80/shared.vcproj
 @@ -762,6 +762,14 @@
@@ -783,11 +781,11 @@ index 19b0ae4..51e881c 100644
  				>
  			</File>
 diff --git a/win/VC90/shared.vcproj b/win/VC90/shared.vcproj
-index de3fa88..36ca5b4 100644
+index f6ad561..bc7a3ab 100644
 --- a/win/VC90/shared.vcproj
 +++ b/win/VC90/shared.vcproj
-@@ -806,6 +806,14 @@
- 			</FileConfiguration>
+@@ -810,6 +810,14 @@
+ 			>
  		</File>
  		<File
 +			RelativePath="..\..\src\shared\DelayExecutor.cpp"
